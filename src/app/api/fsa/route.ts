@@ -1,11 +1,11 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@/generated/prisma";
 import { NextRequest } from "next/server";
 
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const result = await prisma.FSA.create({ data: body });
+  const result = await prisma.fSA.create({ data: body });
   return new Response(JSON.stringify(result), { status: 201 });
 }
 
@@ -21,6 +21,6 @@ export async function GET(req: NextRequest) {
     if (to) where.createdAt.lte = new Date(to);
   }
 
-  const data = await prisma.FSA.findMany({ where });
+  const data = await prisma.fSA.findMany({ where });
   return new Response(JSON.stringify(data), { status: 200 });
 }

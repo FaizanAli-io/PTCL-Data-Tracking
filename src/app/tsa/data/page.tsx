@@ -24,9 +24,9 @@ export default function TsaData() {
     const params = new URLSearchParams();
     if (from) params.append("from", from);
     if (to) params.append("to", to);
-    // const res = await fetch(`/api/tsa?${params.toString()}`);
-    // const json = await res.json();
-    // setData(json);
+    const res = await fetch(`/api/tsa?${params.toString()}`);
+    const json = await res.json();
+    setData(json);
   };
 
   useEffect(() => {
