@@ -29,9 +29,9 @@ export default function FsaData() {
     const params = new URLSearchParams();
     if (from) params.append("from", from);
     if (to) params.append("to", to);
-    const res = await fetch(`/api/fsa?${params.toString()}`);
-    const json = await res.json();
-    setData(json);
+    // const res = await fetch(`/api/fsa?${params.toString()}`);
+    // const json = await res.json();
+    // setData(json);
   };
 
   useEffect(() => {
