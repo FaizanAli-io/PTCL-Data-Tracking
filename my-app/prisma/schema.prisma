@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Exchange {
+  KAP
+  MMC
+  Hijri
+  Hadeed
+  Jauhar
+  Maymar
+  Gulshan
+  Azizabad
+  Nazimabad
+  Orangi_SITE
+  Pak_Capital
+  North_Karachi_Surjani
+}
+
+enum DialingRemarks {
+  Contacted_Interested
+  Contacted_Already_User
+  Contacted_Not_Interested
+  Switched_Off
+  Unresponsive
+}
+
+model FSA {
+  id                      Int      @id @default(autoincrement())
+  epi                     Int
+  fsaName                 String
+  exchange                Exchange
+  customerName            String
+  customerMobile          String
+  locationAddress         String
+  locationLatitude        Float
+  locationLongitude       Float
+  locationAltitude        Float
+  locationAccuracy        Float
+  currentInternetPrice    Int?
+  currentInternetProvider String?
+  remarks                 String?
+  createdAt               DateTime @default(now())
+}
+
+model TSA {
+  id               Int            @id @default(autoincrement())
+  epi              Int
+  tsaName          String
+  callerExchange   Exchange
+  customerName     String
+  customerMobile   String
+  customerAddress  String
+  customerExchange Exchange
+  dialingRemarks   DialingRemarks
+  createdAt        DateTime       @default(now())
+}
