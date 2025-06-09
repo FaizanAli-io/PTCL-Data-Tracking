@@ -24,3 +24,9 @@ export async function GET(req: NextRequest) {
   const data = await prisma.fSA.findMany({ where });
   return new Response(JSON.stringify(data), { status: 200 });
 }
+
+export async function DELETE(req: Request) {
+  const { id } = await req.json();
+  await prisma.fSA.delete({ where: { id } });
+  return new Response(null, { status: 204 });
+}

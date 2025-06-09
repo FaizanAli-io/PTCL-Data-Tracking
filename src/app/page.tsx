@@ -4,10 +4,9 @@ import Link from "next/link";
 
 export default function Home() {
   const links = [
-    { href: "/fsa/form", label: "Fill FSA Form" },
-    { href: "/tsa/form", label: "Fill TSA Form" },
-    { href: "/fsa/data", label: "View FSA Data" },
-    { href: "/tsa/data", label: "View TSA Data" }
+    { href: "/form", label: "Fill Form" },
+    { href: "/report", label: "View Report" },
+    { href: "/network", label: "View Network" }
   ];
 
   return (
