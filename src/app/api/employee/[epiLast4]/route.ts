@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(_req: NextRequest, { params }: { params: { epiLast4: string } }) {
-  const epiLast4 = params.epiLast4;
+export async function GET(_req: NextRequest, context: { params: { epiLast4: string } }) {
+  const { epiLast4 } = context.params;
+  const epi = Number(epiLast4);
 
-  if (!epiLast4 || isNaN(Number(epiLast4))) {
+  if (isNaN(epi)) {
     return NextResponse.json({ error: "Invalid EPI" }, { status: 400 });
   }
 
-  const epi = Number(epiLast4);
   const fsa = {
     epi: 12345678,
     name: "Faizan Ali",
