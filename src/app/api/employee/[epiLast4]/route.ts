@@ -1,4 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+// app/api/employee/[epiLast4]/route.ts
+
+import { NextResponse } from "next/server";
 
 type Agent = {
   epi: number;
@@ -12,13 +14,27 @@ type ErrorResponse = {
   error: string;
 };
 
+interface RouteParams {
+  params: {
+    epiLast4: string;
+  };
+}
+
 export async function GET(
-  _req: NextRequest,
-  { params }: { params: { epiLast4: number } }
+  request: Request,
+  { params }: RouteParams
 ): Promise<NextResponse<Agent | ErrorResponse>> {
   const { epiLast4 } = params;
 
-  const agents: Record<string, Agent> = {
+  // Validate the input is exactly 4 digits
+  if (!/^\d{4}$/.test(epiLast4)) {
+    return NextResponse.json({ error: "EPI last 4 must be exactly 4 digits" }, { status: 400 });
+  }
+
+  const epi = Number(epiLast4);
+
+  // Mock data
+  const agents = {
     even: {
       epi: 12345678,
       name: "Faizan Ali",
@@ -35,7 +51,7 @@ export async function GET(
     }
   };
 
-  const agentType = epiLast4 % 2 === 0 ? "even" : "odd";
+  const agentType = epi % 2 === 0 ? "even" : "odd";
   const data = agents[agentType];
 
   return NextResponse.json(data, { status: 200 });
