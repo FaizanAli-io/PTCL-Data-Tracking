@@ -1,30 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(_req: NextRequest, context: { params: { epiLast4: string } }) {
-  const { epiLast4 } = context.params;
-  const epi = Number(epiLast4);
+type Agent = {
+  epi: number;
+  name: string;
+  role: string;
+  exchange: string;
+  type: string;
+};
 
-  if (isNaN(epi)) {
-    return NextResponse.json({ error: "Invalid EPI" }, { status: 400 });
-  }
+type ErrorResponse = {
+  error: string;
+};
 
-  const fsa = {
-    epi: 12345678,
-    name: "Faizan Ali",
-    role: "Field Agent",
-    exchange: "Jauhar",
-    type: "Regular"
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: { epiLast4: number } }
+): Promise<NextResponse<Agent | ErrorResponse>> {
+  const { epiLast4 } = params;
+
+  const agents: Record<string, Agent> = {
+    even: {
+      epi: 12345678,
+      name: "Faizan Ali",
+      role: "Field Agent",
+      exchange: "Jauhar",
+      type: "Regular"
+    },
+    odd: {
+      epi: 87654321,
+      name: "Hira Yaqoob",
+      role: "Telecom Agent",
+      exchange: "Hadeed",
+      type: "Regular"
+    }
   };
 
-  const tsa = {
-    epi: 87654321,
-    name: "Hira Yaqoob",
-    role: "Telecom Agent",
-    exchange: "Hadeed",
-    type: "Regular"
-  };
-
-  const data = epi % 2 === 0 ? fsa : tsa;
+  const agentType = epiLast4 % 2 === 0 ? "even" : "odd";
+  const data = agents[agentType];
 
   return NextResponse.json(data, { status: 200 });
 }
