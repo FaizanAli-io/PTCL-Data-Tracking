@@ -74,7 +74,7 @@ export const BaseForm = ({
           onChange={(e) => onChange("customerAddress", e.target.value)}
         />
       )}
-      <h2 className="text-lg font-semibold mt-4 text-gray-900">Service Details</h2>
+      <h2 className="text-lg font-semibold mt-4 text-gray-900">Customer Service Details</h2>
       <ServiceDetails form={form} onChange={onChange} />
       <button type="submit" className="w-full p-2 bg-blue-600 text-white rounded">
         Submit
