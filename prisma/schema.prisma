@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -14,30 +8,39 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Exchange {
-  KAP
-  MMC
-  Hijri
-  Hadeed
-  Jauhar
-  Maymar
-  Gulshan
-  Azizabad
-  Nazimabad
-  Orangi_SITE
-  Pak_Capital
-  North_Karachi_Surjani
+enum JobType {
+  OSP
+  Regular
 }
 
 enum JobRole {
+  FFO
   FSA
   TSA
-  Executive
 }
 
-enum JobType {
-  regular
-  thirdParty
+enum Region {
+  KTR_I
+  KTR_II
+  KTR_III
+}
+
+enum Exchange {
+  KAP
+  SITE
+  Hijri
+  Johar
+  Malir
+  Baldia
+  Hadeed
+  Maymar
+  Orangi
+  Gulshan
+  Surjani
+  Azizabad
+  Nazimabad
+  Pak_Capital
+  North_Karachi
 }
 
 model Employee {
@@ -45,7 +48,9 @@ model Employee {
   name     String
   type     JobType
   role     JobRole
+  region   Region
   exchange Exchange
+  joinDate DateTime
 }
 
 model FSA {

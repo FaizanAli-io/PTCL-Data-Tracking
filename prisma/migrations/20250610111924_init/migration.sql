@@ -1,11 +1,14 @@
 -- CreateEnum
-CREATE TYPE "Exchange" AS ENUM ('KAP', 'MMC', 'Hijri', 'Hadeed', 'Jauhar', 'Maymar', 'Gulshan', 'Azizabad', 'Nazimabad', 'Orangi_SITE', 'Pak_Capital', 'North_Karachi_Surjani');
+CREATE TYPE "JobType" AS ENUM ('OSP', 'Regular');
 
 -- CreateEnum
-CREATE TYPE "JobRole" AS ENUM ('FSA', 'TSA', 'Executive');
+CREATE TYPE "JobRole" AS ENUM ('FSA', 'TSA');
 
 -- CreateEnum
-CREATE TYPE "JobType" AS ENUM ('regular', 'thirdParty');
+CREATE TYPE "Region" AS ENUM ('KTR_I', 'KTR_II', 'KTR_III');
+
+-- CreateEnum
+CREATE TYPE "Exchange" AS ENUM ('KAP', 'SITE', 'Hijri', 'Johar', 'Malir', 'Baldia', 'Hadeed', 'Maymar', 'Orangi', 'Gulshan', 'Surjani', 'Azizabad', 'Nazimabad', 'Pak_Capital', 'North_Karachi');
 
 -- CreateTable
 CREATE TABLE "Employee" (
@@ -13,7 +16,9 @@ CREATE TABLE "Employee" (
     "name" TEXT NOT NULL,
     "type" "JobType" NOT NULL,
     "role" "JobRole" NOT NULL,
+    "region" "Region" NOT NULL,
     "exchange" "Exchange" NOT NULL,
+    "joinDate" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Employee_pkey" PRIMARY KEY ("epi")
 );

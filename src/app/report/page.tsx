@@ -7,7 +7,9 @@ type ReportItem = {
   name: string;
   role: string;
   type: string;
+  region: string;
   exchange: string;
+  joinDate: string;
   entryCount: number;
 };
 
@@ -16,6 +18,7 @@ export default function ReportPage() {
   const [roleFilter, setRoleFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [exchangeFilter, setExchangeFilter] = useState("");
+  const [regionFilter, setRegionFilter] = useState("");
   const [filteredData, setFilteredData] = useState<ReportItem[]>([]);
 
   useEffect(() => {
@@ -33,20 +36,26 @@ export default function ReportPage() {
         (item) =>
           (roleFilter ? item.role === roleFilter : true) &&
           (typeFilter ? item.type === typeFilter : true) &&
-          (exchangeFilter ? item.exchange === exchangeFilter : true)
+          (exchangeFilter ? item.exchange === exchangeFilter : true) &&
+          (regionFilter ? item.region === regionFilter : true)
       )
     );
-  }, [roleFilter, typeFilter, exchangeFilter, data]);
+  }, [roleFilter, typeFilter, exchangeFilter, regionFilter, data]);
 
   const roles = Array.from(new Set(data.map((d) => d.role)));
   const types = Array.from(new Set(data.map((d) => d.type)));
   const exchanges = Array.from(new Set(data.map((d) => d.exchange)));
+  const regions = Array.from(new Set(data.map((d) => d.region)));
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
 
   return (
-    <div className="max-w-5xl mx-auto mt-10 text-gray-900">
+    <div className="max-w-6xl mx-auto mt-10 text-gray-900">
       <h1 className="text-2xl font-bold mb-4 text-white">Employee Report</h1>
 
-      <div className="flex gap-4 mb-4 text-white">
+      <div className="flex gap-4 mb-4 flex-wrap text-white">
         <select
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}
@@ -85,6 +94,19 @@ export default function ReportPage() {
             </option>
           ))}
         </select>
+
+        <select
+          value={regionFilter}
+          onChange={(e) => setRegionFilter(e.target.value)}
+          className="border rounded px-3 py-1 bg-gray-800 text-white"
+        >
+          <option value="">All Regions</option>
+          {regions.map((reg) => (
+            <option key={reg} value={reg}>
+              {reg}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="overflow-x-auto">
@@ -95,7 +117,9 @@ export default function ReportPage() {
               <th className="py-2 px-4">Name</th>
               <th className="py-2 px-4">Role</th>
               <th className="py-2 px-4">Type</th>
+              <th className="py-2 px-4">Region</th>
               <th className="py-2 px-4">Exchange</th>
+              <th className="py-2 px-4">Join Date</th>
               <th className="py-2 px-4">Entry Count</th>
             </tr>
           </thead>
@@ -106,7 +130,9 @@ export default function ReportPage() {
                 <td className="py-2 px-4">{emp.name}</td>
                 <td className="py-2 px-4">{emp.role}</td>
                 <td className="py-2 px-4">{emp.type}</td>
+                <td className="py-2 px-4">{emp.region}</td>
                 <td className="py-2 px-4">{emp.exchange}</td>
+                <td className="py-2 px-4">{formatDate(emp.joinDate)}</td>
                 <td className="py-2 px-4">{emp.entryCount}</td>
               </tr>
             ))}

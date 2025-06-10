@@ -6,8 +6,9 @@ import { useFormState } from "./hooks/useFormState";
 
 export default function MainForm() {
   const [epiLast4, setEpiLast4] = useState("");
-  const [employee, setEmployee] = useState<any>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
+  const [employee, setEmployee] = useState<any>(null);
 
   const fsaInitial = {
     customerName: "",
@@ -16,7 +17,6 @@ export default function MainForm() {
     customerAddress: "",
     customerLatitude: "",
     customerLongitude: "",
-    locationAccuracy: "",
     currentInternetProvider: "",
     currentInternetPrice: "",
     reason: "",
@@ -38,14 +38,26 @@ export default function MainForm() {
   const tsaState = useFormState(tsaInitial);
 
   const isValid = () => {
-    if (!form.customerName.trim()) return false;
-    if (!/^03\d{9}$/.test(form.customerMobile)) return false;
-    if (form.customerPSTN && !/^021\d{7}$/.test(form.customerPSTN)) return false;
-    if (!form.customerAddress.trim()) return false;
-    if (!form.currentInternetProvider.trim()) return false;
-    if (!form.currentInternetPrice.trim()) return false;
-    if (!form.reason.trim()) return false;
-    return true;
+    const errs: string[] = [];
+
+    if (form.customerPSTN && !/^021\d{7}$/.test(form.customerPSTN))
+      errs.push("Invalid PSTN (must start with 021 and have 10 digits).");
+
+    if (!/^03\d{9}$/.test(form.customerMobile))
+      errs.push("Invalid mobile number (must start with 03 and have 11 digits).");
+
+    if (!form.currentInternetProvider.trim()) errs.push("Current internet provider is required.");
+
+    if (!form.currentInternetPrice.trim()) errs.push("Current internet price is required.");
+
+    if (!form.customerAddress.trim()) errs.push("Customer address is required.");
+
+    if (!form.customerName.trim()) errs.push("Customer name is required.");
+
+    if (!form.reason.trim()) errs.push("Reason is required.");
+
+    setErrors(errs);
+    return errs.length === 0;
   };
 
   const submit = async () => {
@@ -53,7 +65,6 @@ export default function MainForm() {
 
     const isFSA = employee.role === "FSA";
     const form = isFSA ? fsaState.form : tsaState.form;
-    delete form.locationAccuracy;
 
     const body = {
       ...form,
@@ -106,10 +117,11 @@ export default function MainForm() {
 
   return (
     <BaseForm
-      employee={employee}
       form={form}
-      onChange={onChange}
+      errors={errors}
       onSubmit={submit}
+      onChange={onChange}
+      employee={employee}
       isFieldAgent={isFieldAgent}
     />
   );
