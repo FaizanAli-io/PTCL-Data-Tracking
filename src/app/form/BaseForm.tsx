@@ -42,8 +42,10 @@ export const BaseForm = ({
       className="max-w-xl mx-auto p-6 bg-white shadow rounded-md space-y-4"
     >
       <EmployeeData employee={employee} />
+
       <h2 className="text-lg font-semibold mt-4 text-gray-900">Customer Information</h2>
       <CustomerInformation form={form} onChange={onChange} />
+
       {isFieldAgent && (
         <>
           <button
@@ -53,29 +55,36 @@ export const BaseForm = ({
           >
             Get Location
           </button>
+
           <InputBox
+            id="customerAddress"
             type="text"
-            placeholder="Address"
+            label="Address"
             value={form.customerAddress}
             onChange={(e) => onChange("customerAddress", e.target.value)}
           />
+
           <div className="grid grid-cols-3 gap-2">
-            <DisabledInput value={form.customerLatitude} placeholder="Latitude" />
-            <DisabledInput value={form.customerLongitude} placeholder="Longitude" />
-            <DisabledInput value={form.locationAccuracy} placeholder="Accuracy" />
+            <DisabledInput label="Latitude" value={form.customerLatitude} />
+            <DisabledInput label="Longitude" value={form.customerLongitude} />
+            <DisabledInput label="Accuracy" value={form.locationAccuracy} />
           </div>
         </>
       )}
+
       {!isFieldAgent && (
         <InputBox
+          id="customerAddress"
           type="text"
-          placeholder="Address"
+          label="Address"
           value={form.customerAddress}
           onChange={(e) => onChange("customerAddress", e.target.value)}
         />
       )}
+
       <h2 className="text-lg font-semibold mt-4 text-gray-900">Customer Service Details</h2>
       <ServiceDetails form={form} onChange={onChange} />
+
       <button type="submit" className="w-full p-2 bg-blue-600 text-white rounded">
         Submit
       </button>

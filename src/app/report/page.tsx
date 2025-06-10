@@ -13,9 +13,10 @@ type ReportItem = {
 
 export default function ReportPage() {
   const [data, setData] = useState<ReportItem[]>([]);
-  const [filteredData, setFilteredData] = useState<ReportItem[]>([]);
   const [roleFilter, setRoleFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
   const [exchangeFilter, setExchangeFilter] = useState("");
+  const [filteredData, setFilteredData] = useState<ReportItem[]>([]);
 
   useEffect(() => {
     fetch("/api/report")
@@ -31,12 +32,14 @@ export default function ReportPage() {
       data.filter(
         (item) =>
           (roleFilter ? item.role === roleFilter : true) &&
+          (typeFilter ? item.type === typeFilter : true) &&
           (exchangeFilter ? item.exchange === exchangeFilter : true)
       )
     );
-  }, [roleFilter, exchangeFilter, data]);
+  }, [roleFilter, typeFilter, exchangeFilter, data]);
 
   const roles = Array.from(new Set(data.map((d) => d.role)));
+  const types = Array.from(new Set(data.map((d) => d.type)));
   const exchanges = Array.from(new Set(data.map((d) => d.exchange)));
 
   return (
@@ -47,7 +50,7 @@ export default function ReportPage() {
         <select
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}
-          className="border rounded px-3 py-1"
+          className="border rounded px-3 py-1 bg-gray-800 text-white"
         >
           <option value="">All Roles</option>
           {roles.map((r) => (
@@ -58,9 +61,22 @@ export default function ReportPage() {
         </select>
 
         <select
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value)}
+          className="border rounded px-3 py-1 bg-gray-800 text-white"
+        >
+          <option value="">All Types</option>
+          {types.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
+
+        <select
           value={exchangeFilter}
           onChange={(e) => setExchangeFilter(e.target.value)}
-          className="border rounded px-3 py-1"
+          className="border rounded px-3 py-1 bg-gray-800 text-white"
         >
           <option value="">All Exchanges</option>
           {exchanges.map((ex) => (

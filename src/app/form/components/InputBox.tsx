@@ -1,16 +1,32 @@
-export const InputBox = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
-  <input
-    {...props}
-    className={`w-full p-2 border border-gray-600 rounded text-black placeholder-gray-400 ${
-      props.className || ""
-    }`}
-  />
+interface InputBoxProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+}
+
+export const InputBox = ({ label, ...props }: InputBoxProps) => (
+  <div className="space-y-1">
+    {label && (
+      <label htmlFor={props.id} className="block text-sm font-medium text-gray-700">
+        {label}
+      </label>
+    )}
+    <input
+      {...props}
+      className={`w-full p-2 border border-gray-600 rounded text-black ${props.className || ""}`}
+    />
+  </div>
 );
 
-export const DisabledInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
-  <input
-    disabled
-    {...props}
-    className="p-2 border border-gray-600 rounded text-black placeholder-gray-400 cursor-not-allowed"
-  />
+export const DisabledInput = ({ label, ...props }: InputBoxProps) => (
+  <div className="space-y-1">
+    {label && (
+      <label htmlFor={props.id} className="block text-sm font-medium text-gray-700">
+        {label}
+      </label>
+    )}
+    <input
+      disabled
+      {...props}
+      className="w-full p-2 border border-gray-600 rounded text-black cursor-not-allowed"
+    />
+  </div>
 );

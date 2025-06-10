@@ -4,25 +4,25 @@ import { isValidPhone, isValidPSTN } from "../utils/validation";
 export const CustomerInformation = ({ form, onChange }: any) => (
   <>
     {[
-      { name: "customerName", placeholder: "Customer Name", type: "text" },
+      { name: "customerName", label: "Customer Name", type: "text" },
       {
         name: "customerMobile",
-        placeholder: "Customer Mobile (03xxxxxxxxx)",
+        label: "Customer Mobile (03xxxxxxxxx)",
         type: "tel",
         maxLength: 11,
         validator: isValidPhone
       },
       {
         name: "customerPSTN",
-        placeholder: "Customer PSTN (Optional, 021xxxxxxx)",
+        label: "Customer PSTN (Optional, 021xxxxxxx)",
         type: "tel",
         validator: isValidPSTN
       }
-    ].map(({ name, placeholder, type, maxLength, validator }) => (
+    ].map(({ name, label, type, maxLength, validator }) => (
       <div className="mb-4" key={name}>
         <InputBox
           type={type}
-          placeholder={placeholder}
+          label={label}
           value={form[name]}
           onChange={(e) => onChange(name, e.target.value)}
           maxLength={maxLength}

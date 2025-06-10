@@ -67,7 +67,7 @@ export default function MainForm() {
       })
     };
 
-    await fetch(`/api/${isFSA ? "fsa" : "tsa"}`, {
+    await fetch(`/api/form/${isFSA ? "fsa" : "tsa"}`, {
       method: "POST",
       body: JSON.stringify(body)
     });
