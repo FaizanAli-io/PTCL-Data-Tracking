@@ -51,7 +51,7 @@ export default function MainForm() {
   const submit = async () => {
     if (!isValid()) return;
 
-    const isFSA = employee.role === "Field Agent";
+    const isFSA = employee.role === "FSA";
     const form = isFSA ? fsaState.form : tsaState.form;
     delete form.locationAccuracy;
 
@@ -101,7 +101,7 @@ export default function MainForm() {
       </div>
     );
 
-  const isFieldAgent = employee.role === "Field Agent";
+  const isFieldAgent = employee.role === "FSA";
   const { form, onChange } = isFieldAgent ? fsaState : tsaState;
 
   return (

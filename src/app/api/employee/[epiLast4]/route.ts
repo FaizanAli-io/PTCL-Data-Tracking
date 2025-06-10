@@ -1,33 +1,22 @@
+import { PrismaClient } from "@/generated/prisma";
 import { NextRequest, NextResponse } from "next/server";
+
+const prisma = new PrismaClient();
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ epiLast4: string }> }
 ) {
   const { epiLast4 } = await params;
-
-  const epi = Number(epiLast4);
-  if (isNaN(epi)) {
+  const suffix = Number(epiLast4);
+  if (isNaN(suffix)) {
     return NextResponse.json({ error: "Invalid EPI" }, { status: 400 });
   }
 
-  const fsa = {
-    epi: 12345678,
-    name: "Faizan Ali",
-    role: "Field Agent",
-    exchange: "Jauhar",
-    type: "Regular"
-  };
+  const employees = await prisma.employee.findMany();
+  const matchEmployee = employees.find((e) => String(e.epi).endsWith(epiLast4));
 
-  const tsa = {
-    epi: 87654321,
-    name: "Hira Yaqoob",
-    role: "Telecom Agent",
-    exchange: "Hadeed",
-    type: "Regular"
-  };
-
-  const data = epi % 2 === 0 ? fsa : tsa;
-
-  return NextResponse.json(data);
+  return matchEmployee
+    ? NextResponse.json(matchEmployee)
+    : NextResponse.json({ error: "No matching employee found" }, { status: 404 });
 }
