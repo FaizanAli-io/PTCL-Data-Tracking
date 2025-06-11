@@ -1,5 +1,13 @@
-// types/index.ts
-export type ReportItem = {
+export type DateMode = "date" | "range";
+
+export type FilterState = {
+  role: string;
+  type: string;
+  region: string;
+  exchange: string;
+};
+
+export type EmployeeAnalytics = {
   epi: number;
   name: string;
   role: string;
@@ -12,15 +20,6 @@ export type ReportItem = {
   min?: number;
   max?: number;
   absent?: number;
-};
-
-export type DateMode = "date" | "range";
-
-export type FilterState = {
-  role: string;
-  type: string;
-  region: string;
-  exchange: string;
 };
 
 export type ExchangeAnalytics = {

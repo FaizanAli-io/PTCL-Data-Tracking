@@ -11,7 +11,11 @@ type FilterControlsProps = {
   };
 };
 
-export default function FilterControls({ filters, setFilters, options }: FilterControlsProps) {
+export default function EmployeeFilterControls({
+  filters,
+  setFilters,
+  options
+}: FilterControlsProps) {
   const updateFilter = (key: keyof FilterState, value: string) => {
     setFilters({ ...filters, [key]: value });
   };

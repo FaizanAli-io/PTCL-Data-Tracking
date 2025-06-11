@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { ReportItem, DateMode, FilterState } from "../types";
-import { mockData } from "../data/mockData";
+import { EmployeeAnalytics, DateMode, FilterState } from "../types";
 
 export const useEmployeeData = () => {
-  const [data, setData] = useState<ReportItem[]>([]);
-  const [filteredData, setFilteredData] = useState<ReportItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<EmployeeAnalytics[]>([]);
+  const [filteredData, setFilteredData] = useState<EmployeeAnalytics[]>([]);
   const [filters, setFilters] = useState<FilterState>({
     role: "",
     type: "",
@@ -21,20 +20,22 @@ export const useEmployeeData = () => {
   ) => {
     setLoading(true);
     try {
-      let url = "/api/report?";
-      if (mode === "date") {
-        url += `date=${startDate}`;
-      } else {
-        url += `from=${startDate}&to=${endDate}&workingDays=${workingDays}`;
-      }
-
-      // Simulate API call - replace with actual fetch
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setData(mockData);
+      const res = await fetch("/api/report/employee", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode,
+          date: startDate,
+          from: startDate,
+          to: endDate,
+          workingDays
+        })
+      });
+      const result = await res.json();
+      setData(result);
     } catch (error) {
       console.error("Failed to fetch data:", error);
-      // Fallback to mock data
-      setData(mockData);
+      setData([]);
     } finally {
       setLoading(false);
     }

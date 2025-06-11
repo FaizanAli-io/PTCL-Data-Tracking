@@ -1,7 +1,7 @@
-import { ReportItem, DateMode } from "../../types";
+import { EmployeeAnalytics, DateMode } from "../../types";
 
 type EmployeeTableProps = {
-  data: ReportItem[];
+  data: EmployeeAnalytics[];
   totalCount: number;
   mode: DateMode;
 };

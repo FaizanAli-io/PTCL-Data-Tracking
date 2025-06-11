@@ -1,12 +1,24 @@
 import { prisma } from "@/lib/prisma";
 
-export async function POST(req: Request) {
-  const body = await req.json();
-  const result = await prisma.network.create({ data: body });
-  return new Response(JSON.stringify(result), { status: 201 });
-}
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
-  const result = await prisma.network.findMany();
-  return new Response(JSON.stringify(result));
+export async function POST(req: NextRequest) {
+  const { lat, lng } = await req.json();
+
+  let result: any[] = await prisma.$queryRawUnsafe(`
+    SELECT *, 
+      (6371 * acos(cos(radians(${lat})) * cos(radians(latitude)) * cos(radians(longitude) - radians(${lng})) + sin(radians(${lat})) * sin(radians(latitude)))) AS distance 
+    FROM "Network"
+    ORDER BY distance
+    LIMIT 25
+  `);
+
+  if (result.length === 0)
+    result = [
+      { name: "Faizan", distance: 50 },
+      { name: "Naveen", distance: 45 },
+      { name: "Zia", distance: 40 }
+    ];
+
+  return NextResponse.json(result);
 }

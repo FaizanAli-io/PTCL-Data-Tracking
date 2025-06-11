@@ -1,59 +1,58 @@
 "use client";
+import { useState } from "react";
 
-import { useEffect, useState } from "react";
+export default function NearestNetworkPage() {
+  const [lat, setLat] = useState("");
+  const [lng, setLng] = useState("");
+  const [results, setResults] = useState([]);
 
-interface Network {
-  id: number;
-  latitude: number;
-  longitude: number;
-  FDH: string;
-  FAT: string;
-}
-
-export default function NetworkData() {
-  const [data, setData] = useState<Network[]>([]);
-
-  useEffect(() => {
-    fetch("/api/network")
-      .then((res) => res.json())
-      .then(setData);
-  }, []);
+  const fetchNearest = async () => {
+    const res = await fetch("/api/network", {
+      method: "POST",
+      body: JSON.stringify({ lat, lng }),
+      headers: { "Content-Type": "application/json" }
+    });
+    const data = await res.json();
+    console.log(data);
+    setResults(data);
+  };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow rounded">
-      <h1 className="text-2xl font-bold mb-4 text-gray-900">Network Data</h1>
-      <div className="overflow-auto border rounded">
-        <table className="min-w-full text-sm text-left text-gray-700">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-3 py-2">ID</th>
-              <th className="px-3 py-2">Latitude</th>
-              <th className="px-3 py-2">Longitude</th>
-              <th className="px-3 py-2">FDH</th>
-              <th className="px-3 py-2">FAT</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="text-center p-4 text-gray-500">
-                  No records found
-                </td>
-              </tr>
-            ) : (
-              data.map((row) => (
-                <tr key={row.id} className="border-b even:bg-gray-50">
-                  <td className="px-3 py-2">{row.id}</td>
-                  <td className="px-3 py-2">{row.latitude}</td>
-                  <td className="px-3 py-2">{row.longitude}</td>
-                  <td className="px-3 py-2">{row.FDH}</td>
-                  <td className="px-3 py-2">{row.FAT}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+    <div className="p-6 space-y-4 text-white">
+      <h2 className="text-2xl font-bold">Find Nearest Network Entries</h2>
+      <div className="flex gap-4">
+        <input
+          type="number"
+          placeholder="Latitude"
+          value={lat}
+          onChange={(e) => setLat(e.target.value)}
+          className="bg-gray-800 px-3 py-2 rounded"
+        />
+        <input
+          type="number"
+          placeholder="Longitude"
+          value={lng}
+          onChange={(e) => setLng(e.target.value)}
+          className="bg-gray-800 px-3 py-2 rounded"
+        />
+        <button
+          onClick={fetchNearest}
+          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+        >
+          Submit
+        </button>
       </div>
+
+      {results.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          {results.map((entry: any, i) => (
+            <div key={i} className="bg-gray-900 p-4 rounded shadow">
+              <p className="text-lg font-semibold">{entry.name}</p>
+              <p className="text-sm text-gray-400">Distance: {entry.distance.toFixed(2)} km</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

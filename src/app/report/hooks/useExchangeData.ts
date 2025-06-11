@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { ReportItem, DateMode, FilterState, ExchangeAnalytics } from "../types";
+import { EmployeeAnalytics, DateMode, FilterState, ExchangeAnalytics } from "../types";
 import { mockData } from "../data/mockData";
 
 export const useExchangeData = () => {
-  const [data, setData] = useState<ReportItem[]>([]);
+  const [data, setData] = useState<EmployeeAnalytics[]>([]);
   const [exchangeData, setExchangeData] = useState<ExchangeAnalytics[]>([]);
   const [filteredData, setFilteredData] = useState<ExchangeAnalytics[]>([]);
   const [loading, setLoading] = useState(false);
@@ -14,8 +14,8 @@ export const useExchangeData = () => {
     exchange: ""
   });
 
-  const processExchangeData = (employeeData: ReportItem[]): ExchangeAnalytics[] => {
-    const exchangeMap = new Map<string, ReportItem[]>();
+  const processExchangeData = (employeeData: EmployeeAnalytics[]): ExchangeAnalytics[] => {
+    const exchangeMap = new Map<string, EmployeeAnalytics[]>();
 
     // Group employees by exchange
     employeeData.forEach((emp) => {

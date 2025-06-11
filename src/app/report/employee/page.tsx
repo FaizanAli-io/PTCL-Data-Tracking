@@ -7,8 +7,8 @@ import { formatDate, addDays } from "../utils/dateUtils";
 import { useEmployeeData } from "../hooks/useEmployeeData";
 import PageHeader from "../components/ui/PageHeader";
 import SummaryCards from "../components/ui/SummaryCards";
-import ReportControlsPanel from "../components/controls/ReportControlsPanel";
 import EmployeeTable from "../components/tables/EmployeeTable";
+import EmployeeReportControlsPanel from "../components/controls/EmployeeReportControlsPanel";
 
 export default function EmployeeAnalyticsPage() {
   const { data, filteredData, loading, filters, setFilters, filterOptions, fetchData } =
@@ -49,7 +49,7 @@ export default function EmployeeAnalyticsPage() {
           totalAbsent={totalAbsent}
         />
 
-        <ReportControlsPanel
+        <EmployeeReportControlsPanel
           mode={mode}
           setMode={setMode}
           startDate={startDate}

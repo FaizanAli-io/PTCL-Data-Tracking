@@ -87,6 +87,6 @@ model Network {
   id        Int    @id @default(autoincrement())
   latitude  Float
   longitude Float
-  FDH       String
-  FAT       String
+  fdh_id    String
+  fat_id    String
 }

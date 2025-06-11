@@ -1,7 +1,7 @@
 import { Filter } from "lucide-react";
 import { DateMode, FilterState } from "../../types";
 import DateControls from "./DateControls";
-import FilterControls from "./FilterControls";
+import EmployeeFilterControls from "./EmployeeFilterControls";
 
 type ReportControlsPanelProps = {
   mode: DateMode;
@@ -24,7 +24,7 @@ type ReportControlsPanelProps = {
   };
 };
 
-export default function ReportControlsPanel({
+export default function EmployeeReportControlsPanel({
   mode,
   setMode,
   startDate,
@@ -59,7 +59,7 @@ export default function ReportControlsPanel({
         onFetchData={onFetchData}
       />
 
-      <FilterControls filters={filters} setFilters={setFilters} options={filterOptions} />
+      <EmployeeFilterControls filters={filters} setFilters={setFilters} options={filterOptions} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
-import { ReportItem } from "../types";
+import { EmployeeAnalytics } from "../types";
 
-export const mockData: ReportItem[] = [
+export const mockData: EmployeeAnalytics[] = [
   {
     epi: 1001,
     name: "John Smith",
