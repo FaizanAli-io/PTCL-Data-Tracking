@@ -44,7 +44,7 @@ enum Exchange {
 }
 
 model Employee {
-  epi      Int      @id
+  epi      BigInt   @id
   name     String
   type     JobType
   role     JobRole
@@ -55,7 +55,7 @@ model Employee {
 
 model FSA {
   id                      Int      @id @default(autoincrement())
-  epi                     Int
+  epi                     BigInt
   customerName            String
   customerPSTN            String?
   customerMobile          String
@@ -71,7 +71,7 @@ model FSA {
 
 model TSA {
   id                      Int      @id @default(autoincrement())
-  epi                     Int
+  epi                     BigInt
   customerName            String
   customerPSTN            String?
   customerMobile          String

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 interface EmployeeReport {
-  epi: number;
+  epi: string;
   name: string;
   role: string;
   type: string;
@@ -37,19 +37,19 @@ export async function GET(_req: NextRequest) {
         : []
     ]);
 
-    const fsaCountMap = new Map(fsaCounts.map((item) => [item.epi, item._count.epi]));
-    const tsaCountMap = new Map(tsaCounts.map((item) => [item.epi, item._count.epi]));
+    const fsaCountMap = new Map(fsaCounts.map((item) => [item.epi, Number(item._count.epi)]));
+    const tsaCountMap = new Map(tsaCounts.map((item) => [item.epi, Number(item._count.epi)]));
 
     const report: EmployeeReport[] = employees.map((emp) => {
-      let count = 0;
-      if (emp.role === "FSA") {
-        count = fsaCountMap.get(emp.epi) || 0;
-      } else if (emp.role === "TSA") {
-        count = tsaCountMap.get(emp.epi) || 0;
-      }
+      let count =
+        emp.role === "FSA"
+          ? fsaCountMap.get(emp.epi) || 0
+          : emp.role === "TSA"
+          ? tsaCountMap.get(emp.epi) || 0
+          : 0;
 
       return {
-        epi: emp.epi,
+        epi: emp.epi.toString(),
         name: emp.name,
         role: emp.role,
         type: emp.type,
@@ -60,6 +60,7 @@ export async function GET(_req: NextRequest) {
       };
     });
 
+    report.sort((a, b) => b.entryCount - a.entryCount);
     return NextResponse.json(report, { status: 200 });
   } catch (error) {
     console.error("Error generating employee report:", error);
