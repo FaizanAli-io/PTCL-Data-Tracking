@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { EmployeeAnalytics, DateMode, FilterState, ExchangeAnalytics } from "../types";
-import { mockData } from "../data/mockData";
 
 export const useExchangeData = () => {
   const [data, setData] = useState<EmployeeAnalytics[]>([]);
@@ -14,49 +13,6 @@ export const useExchangeData = () => {
     exchange: ""
   });
 
-  const processExchangeData = (employeeData: EmployeeAnalytics[]): ExchangeAnalytics[] => {
-    const exchangeMap = new Map<string, EmployeeAnalytics[]>();
-
-    // Group employees by exchange
-    employeeData.forEach((emp) => {
-      if (!exchangeMap.has(emp.exchange)) {
-        exchangeMap.set(emp.exchange, []);
-      }
-      exchangeMap.get(emp.exchange)!.push(emp);
-    });
-
-    // Calculate analytics for each exchange
-    return Array.from(exchangeMap.entries())
-      .map(([exchange, employees]) => {
-        const totalEmployees = employees.length;
-        const totalEntries = employees.reduce((sum, emp) => sum + emp.entryCount, 0);
-        const avgEntryCount = totalEntries / totalEmployees;
-        const totalAbsent = employees.reduce((sum, emp) => sum + (emp.absent || 0), 0);
-        const avgPerformance =
-          employees.reduce((sum, emp) => sum + (emp.avg || 0), 0) / totalEmployees;
-
-        // Find top performer
-        const topPerformer = employees.reduce((top, emp) =>
-          (emp.avg || 0) > (top.avg || 0) ? emp : top
-        ).name;
-
-        // Get unique regions
-        const regions = Array.from(new Set(employees.map((emp) => emp.region)));
-
-        return {
-          exchange,
-          totalEmployees,
-          avgEntryCount,
-          totalEntries,
-          totalAbsent,
-          avgPerformance,
-          topPerformer,
-          regions
-        };
-      })
-      .sort((a, b) => b.avgPerformance - a.avgPerformance); // Sort by performance
-  };
-
   const fetchData = async (
     mode: DateMode,
     startDate: string,
@@ -65,24 +21,24 @@ export const useExchangeData = () => {
   ) => {
     setLoading(true);
     try {
-      let url = "/api/report?";
-      if (mode === "date") {
-        url += `date=${startDate}`;
-      } else {
-        url += `from=${startDate}&to=${endDate}&workingDays=${workingDays}`;
-      }
-
-      // Simulate API call - replace with actual fetch
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setData(mockData);
-      const processedData = processExchangeData(mockData);
-      setExchangeData(processedData);
+      const res = await fetch("/api/report/exchange", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode,
+          date: startDate,
+          from: startDate,
+          to: endDate,
+          workingDays
+        })
+      });
+      const result = await res.json();
+      setExchangeData(result);
+      setData([]);
     } catch (error) {
-      console.error("Failed to fetch data:", error);
-      // Fallback to mock data
-      setData(mockData);
-      const processedData = processExchangeData(mockData);
-      setExchangeData(processedData);
+      console.error("Failed to fetch exchange data:", error);
+      setExchangeData([]);
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -93,14 +49,12 @@ export const useExchangeData = () => {
       exchangeData.filter(
         (item) =>
           (filters.exchange ? item.exchange === filters.exchange : true) &&
-          (filters.region ? item.regions.includes(filters.region) : true)
+          (filters.region ? item.region.includes(filters.region) : true)
       )
     );
   }, [filters, exchangeData]);
 
   const filterOptions = {
-    roles: [], // Not applicable for exchange view
-    types: [], // Not applicable for exchange view
     regions: Array.from(new Set(data.map((d) => d.region))),
     exchanges: Array.from(new Set(data.map((d) => d.exchange)))
   };

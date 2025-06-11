@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { BarChart3 } from "lucide-react";
 import { DateMode } from "../types";
+import { BarChart3 } from "lucide-react";
 import { formatDate, addDays } from "../utils/dateUtils";
 import { useEmployeeData } from "../hooks/useEmployeeData";
+
 import PageHeader from "../components/ui/PageHeader";
-import SummaryCards from "../components/ui/SummaryCards";
 import EmployeeTable from "../components/tables/EmployeeTable";
+import EmployeeSummaryCards from "../components/ui/EmployeeSummaryCards";
 import EmployeeReportControlsPanel from "../components/controls/EmployeeReportControlsPanel";
 
 export default function EmployeeAnalyticsPage() {
@@ -43,7 +44,7 @@ export default function EmployeeAnalyticsPage() {
           subtitle="Track and analyze employee performance metrics"
         />
 
-        <SummaryCards
+        <EmployeeSummaryCards
           totalEmployees={totalEmployees}
           avgEntryCount={avgEntryCount}
           totalAbsent={totalAbsent}

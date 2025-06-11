@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Building2 } from "lucide-react";
 import { DateMode } from "../types";
+import { Building2 } from "lucide-react";
 import { formatDate, addDays } from "../utils/dateUtils";
 import { useExchangeData } from "../hooks/useExchangeData";
+
 import PageHeader from "../components/ui/PageHeader";
+import ExchangeTable from "../components/tables/ExchangeTable";
 import ExchangeSummaryCards from "../components/ui/ExchangeSummaryCards";
 import ExchangeReportControlsPanel from "../components/controls/ExchangeReportControlsPanel";
-import ExchangeTable from "../components/tables/ExchangeTable";
 
 export default function ExchangeAnalyticsPage() {
   const { exchangeData, filteredData, loading, filters, setFilters, filterOptions, fetchData } =
@@ -24,19 +25,24 @@ export default function ExchangeAnalyticsPage() {
   };
 
   // Calculate summary stats
-  const totalExchanges = filteredData.length;
-  const avgPerformance =
+  const topRegion =
     filteredData.length > 0
-      ? (
-          filteredData.reduce((sum, ex) => sum + ex.avgPerformance, 0) / filteredData.length
-        ).toFixed(1)
-      : 0;
+      ? Object.entries(
+          filteredData.reduce((acc, ex) => {
+            acc[ex.region] = (acc[ex.region] || 0) + ex.total;
+            return acc;
+          }, {} as Record<string, number>)
+        ).sort((a, b) => b[1] - a[1])[0][0]
+      : "N/A";
+
   const topExchange =
     filteredData.length > 0
-      ? filteredData.reduce((top, ex) => (ex.avgPerformance > top.avgPerformance ? ex : top))
-          .exchange
+      ? filteredData.reduce((top, ex) => (ex.total > top.total ? ex : top)).exchange
       : "N/A";
-  const totalRegions = new Set(filteredData.flatMap((ex) => ex.regions)).size;
+
+  const totalRegions = new Set(filteredData.flatMap((ex) => ex.region)).size;
+
+  const totalExchanges = filteredData.length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -48,10 +54,10 @@ export default function ExchangeAnalyticsPage() {
         />
 
         <ExchangeSummaryCards
-          totalExchanges={totalExchanges}
-          avgPerformance={avgPerformance}
+          topRegion={topRegion}
           topExchange={topExchange}
           totalRegions={totalRegions}
+          totalExchanges={totalExchanges}
         />
 
         <ExchangeReportControlsPanel

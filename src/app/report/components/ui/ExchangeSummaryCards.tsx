@@ -20,31 +20,25 @@ const SummaryCard = ({ icon: Icon, iconColor, label, value }: SummaryCardProps) 
 );
 
 type ExchangeSummaryCardsProps = {
-  totalExchanges: number;
-  avgPerformance: string | number;
+  topRegion: string;
   topExchange: string;
   totalRegions: number;
+  totalExchanges: number;
 };
 
 export default function ExchangeSummaryCards({
-  totalExchanges,
-  avgPerformance,
+  topRegion,
   topExchange,
-  totalRegions
+  totalRegions,
+  totalExchanges
 }: ExchangeSummaryCardsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
       <SummaryCard
-        icon={Building2}
-        iconColor="text-blue-400"
-        label="Total Exchanges"
-        value={totalExchanges}
-      />
-      <SummaryCard
         icon={TrendingUp}
         iconColor="text-green-400"
-        label="Avg Performance"
-        value={avgPerformance}
+        label="Top Region"
+        value={topRegion}
       />
       <SummaryCard
         icon={Award}
@@ -55,8 +49,14 @@ export default function ExchangeSummaryCards({
       <SummaryCard
         icon={MapPin}
         iconColor="text-purple-400"
-        label="Active Regions"
+        label="Total Regions"
         value={totalRegions}
+      />
+      <SummaryCard
+        icon={Building2}
+        iconColor="text-blue-400"
+        label="Total Exchanges"
+        value={totalExchanges}
       />
     </div>
   );

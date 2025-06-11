@@ -38,8 +38,6 @@ export async function POST(req: NextRequest) {
           })
         : [];
 
-    console.log(fsaEntries.length);
-
     const entryMap = new Map<
       bigint,
       { entryCount: number; cnt: number; avg: number; min: number; max: number }
@@ -98,8 +96,13 @@ export async function POST(req: NextRequest) {
       };
     });
 
-    report.sort((a, b) => b.entryCount - a.entryCount);
-    return NextResponse.json(report, { status: 200 });
+    return NextResponse.json(
+      report
+        .sort((a, b) => b.entryCount - a.entryCount)
+        .map((a) => ({ ...a, region: a.region.replace(/_/g, "-") }))
+        .map((a) => ({ ...a, exchange: a.exchange.replace(/_/g, " ") })),
+      { status: 200 }
+    );
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

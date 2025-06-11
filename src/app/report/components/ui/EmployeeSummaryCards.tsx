@@ -7,7 +7,7 @@ type SummaryCardProps = {
   value: string | number;
 };
 
-const SummaryCard = ({ icon: Icon, iconColor, label, value }: SummaryCardProps) => (
+const EmployeeSummaryCard = ({ icon: Icon, iconColor, label, value }: SummaryCardProps) => (
   <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
     <div className="flex items-center gap-3">
       <Icon className={`w-8 h-8 ${iconColor}`} />
@@ -32,19 +32,19 @@ export default function SummaryCards({
 }: SummaryCardsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <SummaryCard
+      <EmployeeSummaryCard
         icon={Users}
         iconColor="text-blue-400"
         label="Total Employees"
         value={totalEmployees}
       />
-      <SummaryCard
+      <EmployeeSummaryCard
         icon={TrendingUp}
         iconColor="text-green-400"
         label="Avg Entry Count"
         value={avgEntryCount}
       />
-      <SummaryCard
+      <EmployeeSummaryCard
         icon={Calendar}
         iconColor="text-red-400"
         label="Total Absent Days"

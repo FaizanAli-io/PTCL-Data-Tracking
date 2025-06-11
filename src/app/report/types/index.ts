@@ -24,11 +24,11 @@ export type EmployeeAnalytics = {
 
 export type ExchangeAnalytics = {
   exchange: string;
-  totalEmployees: number;
-  avgEntryCount: number;
-  totalEntries: number;
-  totalAbsent: number;
-  avgPerformance: number;
-  topPerformer: string;
-  regions: string[];
+  region: string;
+  headcount: number;
+  min: number;
+  max: number;
+  avg: number;
+  total: number;
+  absent: number;
 };
