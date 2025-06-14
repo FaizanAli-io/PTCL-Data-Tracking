@@ -68,7 +68,7 @@ export default function MainForm() {
 
     const body = {
       ...form,
-      epi: parseInt(employee.epi),
+      epi: BigInt(employee.epi),
       currentInternetPrice: form.currentInternetPrice
         ? parseInt(form.currentInternetPrice.replace(/\D/g, ""))
         : null,
@@ -87,31 +87,58 @@ export default function MainForm() {
     setSubmitted(true);
   };
 
+  const [error, setError] = useState("");
+
   const getEmployeeData = async () => {
-    const res = await fetch(`/api/employee/${epiLast4}`);
-    if (res.ok) {
-      const data = await res.json();
-      setEmployee(data);
-      setSubmitted(false);
+    try {
+      if (epiLast4.length !== 4 || !/^\d+$/.test(epiLast4)) {
+        setError("Please enter a valid 4 digit number");
+        return;
+      }
+
+      const res = await fetch(`/api/employee/${epiLast4}`);
+      if (res.ok) {
+        const data = await res.json();
+        setError("");
+        setEmployee(data);
+        setSubmitted(false);
+      } else if (res.status === 404) {
+        setError(`Employee (${epiLast4}) not found. Please check the EPI number and try again.`);
+      } else {
+        setError("An unknown error occurred. Please try again.");
+      }
+    } catch (err) {
+      setError("Failed to fetch employee data. Please try again.");
     }
   };
 
-  if (!employee)
+  if (!employee) {
     return (
       <div className="max-w-md mx-auto mt-10 space-y-4">
         <input
           type="text"
           placeholder="Enter Last 4 digits of EPI"
           value={epiLast4}
-          onChange={(e) => setEpiLast4(e.target.value)}
+          onChange={(e) => {
+            setEpiLast4(e.target.value);
+            setError("");
+          }}
           className="p-2 border w-full rounded"
         />
-        <button onClick={getEmployeeData} className="w-full p-2 bg-blue-600 text-white rounded">
+
+        <button
+          onClick={getEmployeeData}
+          className="w-full p-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
           Fetch Employee Data
         </button>
+
+        {error && (
+          <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>
+        )}
       </div>
     );
-
+  }
   const isFieldAgent = employee.role === "FSA";
   const { form, onChange } = isFieldAgent ? fsaState : tsaState;
 

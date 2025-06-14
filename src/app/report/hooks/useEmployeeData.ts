@@ -3,6 +3,7 @@ import { EmployeeAnalytics, DateMode, FilterState } from "../types";
 
 export const useEmployeeData = () => {
   const [loading, setLoading] = useState(false);
+  const [filterLoading, setFilterLoading] = useState(false);
   const [data, setData] = useState<EmployeeAnalytics[]>([]);
   const [filteredData, setFilteredData] = useState<EmployeeAnalytics[]>([]);
   const [filters, setFilters] = useState<FilterState>({
@@ -11,6 +12,27 @@ export const useEmployeeData = () => {
     region: "",
     exchange: ""
   });
+  const [filterOptions, setFilterOptions] = useState({
+    roles: [] as string[],
+    types: [] as string[],
+    regions: [] as string[],
+    exchanges: [] as string[]
+  });
+
+  const fetchFilterOptions = async () => {
+    setFilterLoading(true);
+    try {
+      const res = await fetch("/api/report/filter-values");
+      const result = await res.json();
+      if (result.success) {
+        setFilterOptions(result.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch filter options:", error);
+    } finally {
+      setFilterLoading(false);
+    }
+  };
 
   const fetchData = async (
     mode: DateMode,
@@ -23,13 +45,7 @@ export const useEmployeeData = () => {
       const res = await fetch("/api/report/employee", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mode,
-          date: startDate,
-          from: startDate,
-          to: endDate,
-          workingDays
-        })
+        body: JSON.stringify({ mode, startDate, endDate, workingDays })
       });
       const result = await res.json();
       setData(result);
@@ -40,6 +56,10 @@ export const useEmployeeData = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchFilterOptions();
+  }, []);
 
   useEffect(() => {
     setFilteredData(
@@ -53,20 +73,15 @@ export const useEmployeeData = () => {
     );
   }, [filters, data]);
 
-  const filterOptions = {
-    roles: Array.from(new Set(data.map((d) => d.role))),
-    types: Array.from(new Set(data.map((d) => d.type))),
-    regions: Array.from(new Set(data.map((d) => d.region))),
-    exchanges: Array.from(new Set(data.map((d) => d.exchange)))
-  };
-
   return {
     data,
     filteredData,
     loading,
+    filterLoading,
     filters,
     setFilters,
     filterOptions,
-    fetchData
+    fetchData,
+    refreshFilters: fetchFilterOptions
   };
 };

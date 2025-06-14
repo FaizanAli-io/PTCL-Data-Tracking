@@ -6,12 +6,35 @@ export const useExchangeData = () => {
   const [exchangeData, setExchangeData] = useState<ExchangeAnalytics[]>([]);
   const [filteredData, setFilteredData] = useState<ExchangeAnalytics[]>([]);
   const [loading, setLoading] = useState(false);
+  const [filterLoading, setFilterLoading] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     role: "",
     type: "",
     region: "",
     exchange: ""
   });
+  const [filterOptions, setFilterOptions] = useState({
+    roles: [] as string[],
+    types: [] as string[],
+    regions: [] as string[],
+    exchanges: [] as string[]
+  });
+
+  // Fetch filter options from API
+  const fetchFilterOptions = async () => {
+    setFilterLoading(true);
+    try {
+      const res = await fetch("/api/report/filter-values");
+      const result = await res.json();
+      if (result.success) {
+        setFilterOptions(result.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch filter options:", error);
+    } finally {
+      setFilterLoading(false);
+    }
+  };
 
   const fetchData = async (
     mode: DateMode,
@@ -26,10 +49,11 @@ export const useExchangeData = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           mode,
-          date: startDate,
-          from: startDate,
-          to: endDate,
-          workingDays
+          endDate,
+          startDate,
+          workingDays,
+          role: filters.role,
+          type: filters.type
         })
       });
       const result = await res.json();
@@ -45,28 +69,29 @@ export const useExchangeData = () => {
   };
 
   useEffect(() => {
+    fetchFilterOptions();
+  }, []);
+
+  useEffect(() => {
     setFilteredData(
       exchangeData.filter(
         (item) =>
-          (filters.exchange ? item.exchange === filters.exchange : true) &&
-          (filters.region ? item.region.includes(filters.region) : true)
+          (filters.region ? item.region === filters.region : true) &&
+          (filters.exchange ? item.exchange === filters.exchange : true)
       )
     );
   }, [filters, exchangeData]);
-
-  const filterOptions = {
-    regions: Array.from(new Set(data.map((d) => d.region))),
-    exchanges: Array.from(new Set(data.map((d) => d.exchange)))
-  };
 
   return {
     data,
     exchangeData,
     filteredData,
     loading,
+    filterLoading,
     filters,
     setFilters,
     filterOptions,
-    fetchData
+    fetchData,
+    refreshFilters: fetchFilterOptions
   };
 };

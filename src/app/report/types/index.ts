@@ -1,4 +1,4 @@
-export type DateMode = "date" | "range";
+export type DateMode = "yesterday" | "today" | "mtd" | "ytd" | "custom-date" | "custom-range";
 
 export type FilterState = {
   role: string;
@@ -23,12 +23,11 @@ export type EmployeeAnalytics = {
 };
 
 export type ExchangeAnalytics = {
-  exchange: string;
   region: string;
-  headcount: number;
+  exchange: string;
+  headCount: number;
+  missing: number;
   min: number;
   max: number;
   avg: number;
-  total: number;
-  absent: number;
 };

@@ -16,6 +16,6 @@ export async function GET(
   const matchEmployee = employees.find((e) => String(e.epi).endsWith(epiLast4));
 
   return matchEmployee
-    ? NextResponse.json(matchEmployee)
+    ? NextResponse.json({ ...matchEmployee, epi: matchEmployee.epi.toString() })
     : NextResponse.json({ error: "No matching employee found" }, { status: 404 });
 }

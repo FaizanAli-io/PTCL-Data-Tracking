@@ -19,14 +19,13 @@ export default function ExchangeTable({ data, totalCount }: ExchangeTableProps) 
         <table className="w-full">
           <thead className="bg-white/5">
             <tr>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Exchange</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Region</th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Exchange</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Headcount</th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Missing</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Min</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Avg</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Max</th>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Total</th>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Absent</th>
             </tr>
           </thead>
           <tbody>
@@ -43,22 +42,21 @@ export default function ExchangeTable({ data, totalCount }: ExchangeTableProps) 
                   </span>
                 </td>
                 <td className="py-4 px-6 text-white">{exchange.region}</td>
-                <td className="py-4 px-6 text-white">{exchange.headcount}</td>
-                <td className="py-4 px-6 text-white">{exchange.min}</td>
-                <td className="py-4 px-6 text-white">{exchange.avg.toFixed(1)}</td>
-                <td className="py-4 px-6 text-white">{exchange.max}</td>
-                <td className="py-4 px-6 text-white">{exchange.total}</td>
+                <td className="py-4 px-6 text-white">{exchange.headCount}</td>
                 <td className="py-4 px-6">
                   <span
                     className={`px-2 py-1 rounded-full text-sm ${
-                      exchange.absent > 0
+                      exchange.missing > 0
                         ? "bg-red-600/20 text-red-300"
                         : "bg-green-600/20 text-green-300"
                     }`}
                   >
-                    {exchange.absent}
+                    {exchange.missing.toFixed(1)}
                   </span>
                 </td>
+                <td className="py-4 px-6 text-white">{exchange.min.toFixed(1)}</td>
+                <td className="py-4 px-6 text-white">{exchange.avg.toFixed(1)}</td>
+                <td className="py-4 px-6 text-white">{exchange.max.toFixed(1)}</td>
               </tr>
             ))}
           </tbody>

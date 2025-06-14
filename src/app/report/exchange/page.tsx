@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { DateMode } from "../types";
-import { Building2 } from "lucide-react";
 import { formatDate, addDays } from "../utils/dateUtils";
 import { useExchangeData } from "../hooks/useExchangeData";
+import { Building2, MapPin, Award, TrendingUp, Users, Activity, CalendarCheck } from "lucide-react";
 
 import PageHeader from "../components/ui/PageHeader";
+import SummaryCards from "../components/ui/SummaryCards";
 import ExchangeTable from "../components/tables/ExchangeTable";
-import ExchangeSummaryCards from "../components/ui/ExchangeSummaryCards";
-import ExchangeReportControlsPanel from "../components/controls/ExchangeReportControlsPanel";
+import ReportControlsPanel from "../components/controls/ReportControlsPanel";
 
 export default function ExchangeAnalyticsPage() {
   const { exchangeData, filteredData, loading, filters, setFilters, filterOptions, fetchData } =
@@ -18,31 +18,72 @@ export default function ExchangeAnalyticsPage() {
   const [startDate, setStartDate] = useState(formatDate(new Date()));
   const [endDate, setEndDate] = useState(formatDate(addDays(new Date(), 1)));
   const [workingDays, setWorkingDays] = useState<number>(0);
-  const [mode, setMode] = useState<DateMode>("date");
+  const [mode, setMode] = useState<DateMode>("today");
 
   const handleFetchData = () => {
     fetchData(mode, startDate, endDate, workingDays);
   };
 
-  // Calculate summary stats
-  const topRegion =
-    filteredData.length > 0
-      ? Object.entries(
-          filteredData.reduce((acc, ex) => {
-            acc[ex.region] = (acc[ex.region] || 0) + ex.total;
-            return acc;
-          }, {} as Record<string, number>)
-        ).sort((a, b) => b[1] - a[1])[0][0]
-      : "N/A";
-
-  const topExchange =
-    filteredData.length > 0
-      ? filteredData.reduce((top, ex) => (ex.total > top.total ? ex : top)).exchange
-      : "N/A";
-
-  const totalRegions = new Set(filteredData.flatMap((ex) => ex.region)).size;
-
+  // Summary calculations
   const totalExchanges = filteredData.length;
+
+  // Best exchange by avg
+  const bestExchange = filteredData.reduce(
+    (best, current) => (current.avg > best.avg ? current : best),
+    filteredData[0]
+  );
+
+  // Best region by avg across all exchanges
+  const regionMap = new Map<string, { total: number; count: number }>();
+  for (const ex of filteredData) {
+    if (!regionMap.has(ex.region)) regionMap.set(ex.region, { total: 0, count: 0 });
+    const r = regionMap.get(ex.region)!;
+    r.total += ex.avg;
+    r.count += 1;
+  }
+
+  let bestRegion = "";
+  let bestRegionAvg = -Infinity;
+  for (const [region, { total, count }] of regionMap.entries()) {
+    const avg = total / count;
+    if (avg > bestRegionAvg) {
+      bestRegion = region;
+      bestRegionAvg = avg;
+    }
+  }
+
+  const totalRegions = regionMap.size;
+
+  const exchangeStats = [
+    {
+      icon: Building2,
+      color: "text-purple-400",
+      label: "Total Exchanges",
+      value: totalExchanges,
+      description: "Active locations"
+    },
+    {
+      icon: MapPin,
+      color: "text-cyan-400",
+      label: "Total Regions",
+      value: totalRegions,
+      description: "Regions represented"
+    },
+    {
+      icon: TrendingUp,
+      color: "text-pink-400",
+      label: "Best Exchange",
+      value: bestExchange?.exchange ?? "-",
+      description: `Avg: ${bestExchange?.avg.toFixed(2) ?? "0"}`
+    },
+    {
+      icon: Award,
+      color: "text-orange-400",
+      label: "Best Region",
+      value: bestRegion,
+      description: `Avg: ${bestRegionAvg.toFixed(2)}`
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -50,17 +91,12 @@ export default function ExchangeAnalyticsPage() {
         <PageHeader
           icon={Building2}
           title="Exchange Analytics Dashboard"
-          subtitle="Analyze performance metrics across different exchanges"
+          subtitle="Performance metrics across different exchanges"
         />
 
-        <ExchangeSummaryCards
-          topRegion={topRegion}
-          topExchange={topExchange}
-          totalRegions={totalRegions}
-          totalExchanges={totalExchanges}
-        />
+        <SummaryCards items={exchangeStats} columns={4} className="mb-6" />
 
-        <ExchangeReportControlsPanel
+        <ReportControlsPanel
           mode={mode}
           setMode={setMode}
           startDate={startDate}

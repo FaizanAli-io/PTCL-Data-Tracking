@@ -1,110 +1,133 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
+// Helper function to process date ranges
+const getDateConditions = (mode: string, startDate: string, endDate?: string) => {
+  return mode === "date"
+    ? { createdAt: new Date(startDate) }
+    : {
+        createdAt: {
+          gte: new Date(startDate),
+          lte: new Date(endDate || startDate)
+        }
+      };
+};
+
+// Helper function to compute statistics
+const computeEmployeeStats = (entries: { epi: bigint; createdAt: Date }[]) => {
+  const statsMap = new Map<
+    bigint,
+    { entryCount: number; cnt: number; avg: number; min: number; max: number }
+  >();
+
+  // Group entries by EPI and day
+  const groupedByEpiAndDay = entries.reduce((acc, { epi, createdAt }) => {
+    const day = createdAt.toISOString().split("T")[0];
+    if (!acc.has(epi)) acc.set(epi, new Map<string, number>());
+    const dayMap = acc.get(epi)!;
+    dayMap.set(day, (dayMap.get(day) || 0) + 1);
+    return acc;
+  }, new Map<bigint, Map<string, number>>());
+
+  // Calculate statistics for each employee
+  groupedByEpiAndDay.forEach((dayMap, epi) => {
+    const counts = Array.from(dayMap.values());
+    const sum = counts.reduce((a, b) => a + b, 0);
+    const cnt = dayMap.size;
+    const avg = sum / cnt;
+    const min = Math.min(...counts);
+    const max = Math.max(...counts);
+
+    statsMap.set(epi, { entryCount: sum, cnt, avg, min, max });
+  });
+
+  return statsMap;
+};
+
 export async function POST(req: NextRequest) {
   try {
-    const { mode, date, from, to, workingDays } = await req.json();
+    const { mode, startDate, endDate, workingDays } = await req.json();
+    const dateMode = ["yesterday", "today", "custom-date"].includes(mode) ? "date" : "range";
 
-    const employees = await prisma.employee.findMany();
+    // Fetch all employees and group by role in a single query
+    const employees = await prisma.employee.findMany({
+      select: {
+        epi: true,
+        name: true,
+        role: true,
+        type: true,
+        region: true,
+        exchange: true,
+        joinDate: true
+      }
+    });
 
-    const fsaEpis = employees.filter((e) => e.role === "FSA").map((e) => e.epi);
-    const tsaEpis = employees.filter((e) => e.role === "TSA").map((e) => e.epi);
+    // Get EPIs by role
+    const roleEpis = employees.reduce((acc, emp) => {
+      if (!acc[emp.role]) acc[emp.role] = [];
+      acc[emp.role].push(emp.epi);
+      return acc;
+    }, {} as Record<string, bigint[]>);
 
-    const fsaEntries =
-      fsaEpis.length > 0
-        ? await prisma.fSA.findMany({
-            where:
-              mode === "date"
-                ? { epi: { in: fsaEpis }, createdAt: new Date(date) }
-                : { epi: { in: fsaEpis }, createdAt: { gte: new Date(from), lte: new Date(to) } },
-            select: {
-              epi: true,
-              createdAt: true
-            }
+    // Process FSA and TSA entries in parallel
+    const [fsaEntries, tsaEntries] = await Promise.all([
+      roleEpis["FSA"]?.length
+        ? prisma.fSA.findMany({
+            where: {
+              epi: { in: roleEpis["FSA"] },
+              ...getDateConditions(dateMode, startDate, endDate)
+            },
+            select: { epi: true, createdAt: true }
           })
-        : [];
-
-    const tsaEntries =
-      tsaEpis.length > 0
-        ? await prisma.tSA.findMany({
-            where:
-              mode === "date"
-                ? { epi: { in: tsaEpis }, createdAt: new Date(date) }
-                : { epi: { in: tsaEpis }, createdAt: { gte: new Date(from), lte: new Date(to) } },
-            select: {
-              epi: true,
-              createdAt: true
-            }
+        : [],
+      roleEpis["TSA"]?.length
+        ? prisma.tSA.findMany({
+            where: {
+              epi: { in: roleEpis["TSA"] },
+              ...getDateConditions(dateMode, startDate, endDate)
+            },
+            select: { epi: true, createdAt: true }
           })
-        : [];
+        : []
+    ]);
 
-    const entryMap = new Map<
-      bigint,
-      { entryCount: number; cnt: number; avg: number; min: number; max: number }
-    >();
+    // Combine all entries and compute statistics
+    const allEntries = [...fsaEntries, ...tsaEntries];
+    const statsMap = computeEmployeeStats(allEntries);
 
-    const computeStats = (entries: { epi: bigint; createdAt: Date }[]) => {
-      const grouped = new Map<bigint, string[]>();
-      entries.forEach(({ epi, createdAt }) => {
-        const day = createdAt.toISOString().split("T")[0];
-        if (!grouped.has(epi)) grouped.set(epi, []);
-        grouped.get(epi)!.push(day);
-      });
-
-      grouped.forEach((days, epi) => {
-        const counts = Object.values(
-          days.reduce((acc, d) => {
-            acc[d] = (acc[d] || 0) + 1;
-            return acc;
-          }, {} as Record<string, number>)
-        );
-        const sum = counts.reduce((a, b) => a + b, 0);
-        const cnt = counts.length;
-        const avg = sum / cnt;
-        const min = Math.min(...counts);
-        const max = Math.max(...counts);
-        entryMap.set(epi, { entryCount: sum, cnt, avg, min, max });
-      });
-    };
-
-    computeStats(fsaEntries);
-    computeStats(tsaEntries);
-
+    // Generate report
     const report = employees.map((emp) => {
-      const stats = entryMap.get(emp.epi) || {
+      const stats = statsMap.get(emp.epi) || {
         entryCount: 0,
         cnt: 0,
         avg: 0,
         min: 0,
         max: 0
       };
-      const absent = mode === "range" && workingDays != null ? workingDays - stats.cnt : 0;
+
+      const absent =
+        dateMode === "range" && workingDays != null ? Math.max(0, workingDays - stats.cnt) : 0;
 
       return {
+        ...emp,
         epi: Number(emp.epi),
-        name: emp.name,
-        role: emp.role,
-        type: emp.type,
-        region: emp.region,
-        exchange: emp.exchange,
         joinDate: emp.joinDate.toISOString(),
         entryCount: stats.entryCount,
         avg: stats.avg,
         min: stats.min,
         max: stats.max,
-        absent: absent
+        absent,
+        region: emp.region,
+        exchange: emp.exchange
       };
     });
 
-    return NextResponse.json(
-      report
-        .sort((a, b) => b.entryCount - a.entryCount)
-        .map((a) => ({ ...a, region: a.region.replace(/_/g, "-") }))
-        .map((a) => ({ ...a, exchange: a.exchange.replace(/_/g, " ") })),
-      { status: 200 }
-    );
+    // Sort by entryCount descending
+    report.sort((a, b) => b.entryCount - a.entryCount);
+
+    return NextResponse.json(report, { status: 200 });
   } catch (e) {
-    console.error(e);
+    console.error("Error generating report:", e);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

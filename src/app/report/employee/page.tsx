@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { DateMode } from "../types";
-import { BarChart3 } from "lucide-react";
 import { formatDate, addDays } from "../utils/dateUtils";
 import { useEmployeeData } from "../hooks/useEmployeeData";
+import { BarChart3, Users, Clock, UserX } from "lucide-react";
 
 import PageHeader from "../components/ui/PageHeader";
+import SummaryCards from "../components/ui/SummaryCards";
 import EmployeeTable from "../components/tables/EmployeeTable";
-import EmployeeSummaryCards from "../components/ui/EmployeeSummaryCards";
-import EmployeeReportControlsPanel from "../components/controls/EmployeeReportControlsPanel";
+import ReportControlsPanel from "../components/controls/ReportControlsPanel";
 
 export default function EmployeeAnalyticsPage() {
   const { data, filteredData, loading, filters, setFilters, filterOptions, fetchData } =
@@ -18,7 +18,7 @@ export default function EmployeeAnalyticsPage() {
   const [startDate, setStartDate] = useState(formatDate(new Date()));
   const [endDate, setEndDate] = useState(formatDate(addDays(new Date(), 1)));
   const [workingDays, setWorkingDays] = useState<number>(0);
-  const [mode, setMode] = useState<DateMode>("date");
+  const [mode, setMode] = useState<DateMode>("today");
 
   const handleFetchData = () => {
     fetchData(mode, startDate, endDate, workingDays);
@@ -26,14 +26,46 @@ export default function EmployeeAnalyticsPage() {
 
   // Calculate summary stats
   const totalEmployees = filteredData.length;
-  const avgEntryCount =
-    filteredData.length > 0
-      ? (filteredData.reduce((sum, emp) => sum + emp.entryCount, 0) / filteredData.length).toFixed(
-          1
-        )
-      : 0;
-  const totalAbsent =
-    mode === "range" ? filteredData.reduce((sum, emp) => sum + (emp.absent || 0), 0) : 0;
+
+  const missingEmployees = filteredData.reduce(
+    (sum, emp) => sum + (emp.entryCount === 0 ? 1 : 0),
+    0
+  );
+
+  const rangeInput = ["mtd", "ytd", "custom-range"].includes(mode);
+
+  const avgEntryCount = (
+    filteredData.reduce((sum, emp) => sum + (emp.avg || 0), 0) /
+    (totalEmployees - (rangeInput ? 0 : missingEmployees))
+  ).toFixed(1);
+
+  const totalMissing = rangeInput
+    ? (filteredData.reduce((sum, emp) => sum + (emp.absent || 0), 0) / totalEmployees).toFixed(1)
+    : missingEmployees;
+
+  const employeeStats = [
+    {
+      icon: Users,
+      color: "text-blue-400",
+      label: "Total Employees",
+      value: totalEmployees,
+      description: "Currently active"
+    },
+    {
+      icon: Clock,
+      color: "text-green-400",
+      label: "Avg. Entries",
+      value: isNaN(Number(avgEntryCount)) ? "0.0" : avgEntryCount,
+      description: "Per employee"
+    },
+    {
+      icon: UserX,
+      color: "text-red-400",
+      label: rangeInput ? "Avg. Missing" : "Missing Today",
+      value: totalMissing,
+      description: rangeInput ? "Per employee" : "No entries"
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -44,13 +76,9 @@ export default function EmployeeAnalyticsPage() {
           subtitle="Track and analyze employee performance metrics"
         />
 
-        <EmployeeSummaryCards
-          totalEmployees={totalEmployees}
-          avgEntryCount={avgEntryCount}
-          totalAbsent={totalAbsent}
-        />
+        <SummaryCards items={employeeStats} columns={3} className="mb-6" />
 
-        <EmployeeReportControlsPanel
+        <ReportControlsPanel
           mode={mode}
           setMode={setMode}
           startDate={startDate}

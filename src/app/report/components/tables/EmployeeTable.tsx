@@ -7,6 +7,8 @@ type EmployeeTableProps = {
 };
 
 export default function EmployeeTable({ data, totalCount, mode }: EmployeeTableProps) {
+  const rangeInput = ["mtd", "ytd", "custom-range"].includes(mode);
+
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 overflow-hidden">
       <div className="p-6 border-b border-white/20">
@@ -26,13 +28,13 @@ export default function EmployeeTable({ data, totalCount, mode }: EmployeeTableP
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Type</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Region</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Exchange</th>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Entry Count</th>
-              {mode === "range" && (
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">DDS Count</th>
+              {rangeInput && (
                 <>
-                  <th className="text-left py-4 px-6 text-slate-300 font-semibold">Avg</th>
                   <th className="text-left py-4 px-6 text-slate-300 font-semibold">Min</th>
+                  <th className="text-left py-4 px-6 text-slate-300 font-semibold">Avg</th>
                   <th className="text-left py-4 px-6 text-slate-300 font-semibold">Max</th>
-                  <th className="text-left py-4 px-6 text-slate-300 font-semibold">Absent</th>
+                  <th className="text-left py-4 px-6 text-slate-300 font-semibold">Missing</th>
                 </>
               )}
             </tr>
@@ -70,10 +72,10 @@ export default function EmployeeTable({ data, totalCount, mode }: EmployeeTableP
                     {emp.entryCount}
                   </span>
                 </td>
-                {mode === "range" && (
+                {rangeInput && (
                   <>
-                    <td className="py-4 px-6 text-white">{emp.avg?.toFixed(1)}</td>
                     <td className="py-4 px-6 text-white">{emp.min}</td>
+                    <td className="py-4 px-6 text-white">{emp.avg?.toFixed(1)}</td>
                     <td className="py-4 px-6 text-white">{emp.max}</td>
                     <td className="py-4 px-6">
                       <span
