@@ -1,4 +1,5 @@
 import { ExchangeAnalytics } from "../../types";
+import DownloadExcelButton from "./DownloadExcelButton";
 
 type ExchangeTableProps = {
   data: ExchangeAnalytics[];
@@ -8,11 +9,20 @@ type ExchangeTableProps = {
 export default function ExchangeTable({ data, totalCount }: ExchangeTableProps) {
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 overflow-hidden">
-      <div className="p-6 border-b border-white/20">
-        <h2 className="text-xl font-semibold text-white">Exchange Analytics</h2>
-        <p className="text-slate-300 text-sm mt-1">
-          Showing {data.length} of {totalCount} exchanges
-        </p>
+      <div className="p-6 border-b border-white/20 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-semibold text-white">Exchange Analytics</h2>
+          <p className="text-slate-300 text-sm mt-1">
+            Showing {data.length} of {totalCount} exchanges
+          </p>
+        </div>
+
+        <DownloadExcelButton
+          data={data}
+          filename="exchange_analytics.xlsx"
+          sheetName="Exchanges"
+          className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition font-semibold text-sm md:text-base"
+        />
       </div>
 
       <div className="overflow-x-auto">

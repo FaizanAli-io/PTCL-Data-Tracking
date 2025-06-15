@@ -1,17 +1,31 @@
 import { prisma, formatEnum } from "@/lib";
-import { X } from "lucide-react";
 import { NextRequest, NextResponse } from "next/server";
 
-// Helper function to process date ranges
-const getDateConditions = (mode: string, startDate: string, endDate?: string) => {
-  return mode === "date"
-    ? { createdAt: new Date(startDate) }
-    : {
-        createdAt: {
-          gte: new Date(startDate),
-          lte: new Date(endDate || startDate)
-        }
-      };
+const getDateConditions = (dateMode: boolean, startDate: string, endDate?: string) => {
+  const start = new Date(startDate);
+  const end = new Date(endDate || startDate);
+
+  if (dateMode) {
+    const dayStart = new Date(start);
+    dayStart.setHours(0, 0, 0, 0);
+
+    const dayEnd = new Date(start);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    return {
+      createdAt: {
+        gte: dayStart,
+        lte: dayEnd
+      }
+    };
+  }
+
+  return {
+    createdAt: {
+      gte: new Date(start.setHours(0, 0, 0, 0)),
+      lte: new Date(end.setHours(23, 59, 59, 999))
+    }
+  };
 };
 
 // Helper function to compute statistics
@@ -48,7 +62,7 @@ const computeEmployeeStats = (entries: { epi: string; createdAt: Date }[]) => {
 export async function POST(req: NextRequest) {
   try {
     const { mode, startDate, endDate, workingDays } = await req.json();
-    const dateMode = ["yesterday", "today", "custom-date"].includes(mode) ? "date" : "range";
+    const dateMode = ["yesterday", "today", "custom-date"].includes(mode);
 
     // Fetch all employees and group by role in a single query
     const employees = await prisma.employee.findMany({
@@ -58,38 +72,28 @@ export async function POST(req: NextRequest) {
         role: true,
         type: true,
         region: true,
-        exchange: true,
-        joinDate: true
+        exchange: true
       }
     });
 
-    // Get EPIs by role
-    const roleEpis = employees.reduce((acc, emp) => {
-      if (!acc[emp.role]) acc[emp.role] = [];
-      acc[emp.role].push(emp.epi);
-      return acc;
-    }, {} as Record<string, string[]>);
+    const epis = employees.map((e) => e.epi);
 
     // Process FSA and TSA entries in parallel
     const [fsaEntries, tsaEntries] = await Promise.all([
-      roleEpis["FSA"]?.length
-        ? prisma.fSA.findMany({
-            where: {
-              epi: { in: roleEpis["FSA"] },
-              ...getDateConditions(dateMode, startDate, endDate)
-            },
-            select: { epi: true, createdAt: true }
-          })
-        : [],
-      roleEpis["TSA"]?.length
-        ? prisma.tSA.findMany({
-            where: {
-              epi: { in: roleEpis["TSA"] },
-              ...getDateConditions(dateMode, startDate, endDate)
-            },
-            select: { epi: true, createdAt: true }
-          })
-        : []
+      prisma.fSA.findMany({
+        where: {
+          epi: { in: epis },
+          ...getDateConditions(dateMode, startDate, endDate)
+        },
+        select: { epi: true, createdAt: true }
+      }),
+      prisma.tSA.findMany({
+        where: {
+          epi: { in: epis },
+          ...getDateConditions(dateMode, startDate, endDate)
+        },
+        select: { epi: true, createdAt: true }
+      })
     ]);
 
     // Combine all entries and compute statistics
@@ -106,20 +110,18 @@ export async function POST(req: NextRequest) {
         max: 0
       };
 
-      const absent =
-        dateMode === "range" && workingDays != null ? Math.max(0, workingDays - stats.cnt) : 0;
+      const absent = !dateMode && workingDays != null ? Math.max(0, workingDays - stats.cnt) : 0;
 
       return {
         ...emp,
-        epi: Number(emp.epi),
-        joinDate: emp.joinDate.toISOString(),
-        entryCount: stats.entryCount,
+        absent,
+        epi: emp.epi,
         avg: stats.avg,
         min: stats.min,
         max: stats.max,
-        absent,
         region: emp.region,
-        exchange: emp.exchange
+        exchange: emp.exchange,
+        entryCount: stats.entryCount
       };
     });
 

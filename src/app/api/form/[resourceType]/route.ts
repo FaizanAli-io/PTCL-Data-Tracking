@@ -35,7 +35,7 @@ export async function GET(
 
     const { resourceType } = await params;
     const data = await getPrismaHandler(resourceType).findMany({ where });
-    return new NextResponse(JSON.stringify(data), { status: 200 });
+    return new NextResponse(JSON.stringify(data.slice(-10)), { status: 200 });
   } catch {
     return new NextResponse(JSON.stringify({ error: "Failed to fetch records" }), { status: 500 });
   }

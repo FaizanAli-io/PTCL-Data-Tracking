@@ -22,11 +22,13 @@ enum JobRole {
 }
 
 enum Region {
+  KTR_N
   KTR_II
   KTR_III
 }
 
 enum Exchange {
+  Exchange_N
   KAP
   SITE
   Hijri

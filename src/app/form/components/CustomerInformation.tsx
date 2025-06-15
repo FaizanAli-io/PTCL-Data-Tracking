@@ -7,7 +7,7 @@ export const CustomerInformation = ({ form, onChange }: any) => (
       { name: "customerName", label: "* Customer Name", type: "text" },
       {
         name: "customerMobile",
-        label: "* Customer Mobile (03xxxxxxxxx)",
+        label: "Customer Mobile (03xxxxxxxxx)",
         type: "tel",
         maxLength: 11,
         validator: isValidPhone

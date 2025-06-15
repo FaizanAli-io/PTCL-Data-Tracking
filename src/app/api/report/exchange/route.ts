@@ -1,16 +1,31 @@
 import { prisma, formatEnum } from "@/lib";
 import { NextRequest, NextResponse } from "next/server";
 
-// Get Prisma date filter condition
-const getDateConditions = (mode: boolean, startDate: string, endDate?: string) => {
-  return mode
-    ? { createdAt: new Date(startDate) }
-    : {
-        createdAt: {
-          gte: new Date(startDate),
-          lte: new Date(endDate || startDate)
-        }
-      };
+const getDateConditions = (dateMode: boolean, startDate: string, endDate?: string) => {
+  const start = new Date(startDate);
+  const end = new Date(endDate || startDate);
+
+  if (dateMode) {
+    const dayStart = new Date(start);
+    dayStart.setHours(0, 0, 0, 0);
+
+    const dayEnd = new Date(start);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    return {
+      createdAt: {
+        gte: dayStart,
+        lte: dayEnd
+      }
+    };
+  }
+
+  return {
+    createdAt: {
+      gte: new Date(start.setHours(0, 0, 0, 0)),
+      lte: new Date(end.setHours(23, 59, 59, 999))
+    }
+  };
 };
 
 // Compute exchange-wise statistics

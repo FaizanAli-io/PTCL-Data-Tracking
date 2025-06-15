@@ -44,13 +44,13 @@ export default function MainForm() {
     if (form.customerPSTN && !/^021\d{7}$/.test(form.customerPSTN))
       errs.push("Invalid PSTN (must start with 021 and have 10 digits).");
 
-    if (!/^03\d{9}$/.test(form.customerMobile))
+    if (form.customerMobile && !/^03\d{9}$/.test(form.customerMobile))
       errs.push("Invalid mobile number (must start with 03 and have 11 digits).");
 
-    if (!form.currentInternetProvider.trim()) errs.push("Current internet provider is required.");
+    // if (!form.currentInternetProvider.trim()) errs.push("Current internet provider is required.");
     if (!form.customerAddress.trim()) errs.push("Customer address is required.");
     if (!form.customerName.trim()) errs.push("Customer name is required.");
-    if (!form.reason.trim()) errs.push("Reason is required.");
+    // if (!form.reason.trim()) errs.push("Reason is required.");
 
     setErrors(errs);
     return errs.length === 0;
