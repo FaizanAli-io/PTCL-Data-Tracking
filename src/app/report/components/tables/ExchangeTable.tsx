@@ -22,7 +22,7 @@ export default function ExchangeTable({ data, totalCount }: ExchangeTableProps) 
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Region</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Exchange</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Headcount</th>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Missing</th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Missing Days</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Min</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Avg</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Max</th>

@@ -196,26 +196,6 @@ export default function DateControls({
             </div>
           )}
         </div>
-
-        <div className="flex items-end">
-          <button
-            onClick={onFetchData}
-            disabled={loading}
-            className="w-full px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-600 text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Loading...
-              </>
-            ) : (
-              <>
-                <Search className="w-4 h-4" />
-                Generate Report
-              </>
-            )}
-          </button>
-        </div>
       </div>
     </div>
   );

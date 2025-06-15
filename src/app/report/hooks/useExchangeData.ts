@@ -24,7 +24,7 @@ export const useExchangeData = () => {
   const fetchFilterOptions = async () => {
     setFilterLoading(true);
     try {
-      const res = await fetch("/api/report/filter-values");
+      const res = await fetch("/api/report/enum-values");
       const result = await res.json();
       if (result.success) {
         setFilterOptions(result.data);
