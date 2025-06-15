@@ -3,9 +3,9 @@ import { InputBox } from "./InputBox";
 export const ServiceDetails = ({ form, onChange }: any) => (
   <>
     {[
-      { name: "currentInternetProvider", label: "Current ISP" },
+      { name: "currentInternetProvider", label: "* Current ISP" },
       { name: "currentInternetPrice", label: "Rs. XXXX (Monthly Price)" },
-      { name: "reason", label: "Reason for Decline" },
+      { name: "reason", label: "* Reason for Decline" },
       { name: "remarks", label: "Remarks (Optional)" }
     ].map(({ name, label }) => (
       <div className="mb-4" key={name}>

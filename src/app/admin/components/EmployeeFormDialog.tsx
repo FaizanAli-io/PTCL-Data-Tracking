@@ -26,13 +26,25 @@ export default function EmployeeFormDialog({
   });
 
   useEffect(() => {
-    if (initialData) {
+    if (initialData && open) {
       setForm({
         ...initialData,
         joinDate: new Date(initialData.joinDate).toISOString().slice(0, 10)
       });
+    } else if (!initialData && open) {
+      setForm({
+        epi: "",
+        name: "",
+        type: "",
+        role: "",
+        region: "",
+        exchange: "",
+        joinDate: new Date().toISOString().slice(0, 10)
+      });
     }
-  }, [initialData]);
+  }, [initialData, open]);
+
+  const isEdit = !!initialData;
 
   const [options, setOptions] = useState({
     roles: [],
@@ -53,7 +65,7 @@ export default function EmployeeFormDialog({
   };
 
   const handleSubmit = () => {
-    const data = { ...form, epi: form.epi.toString(), joinDate: new Date(form.joinDate) };
+    const data = { ...form, joinDate: new Date(form.joinDate) };
     onSubmit(data);
     setOpen(false);
     setForm({
@@ -78,14 +90,17 @@ export default function EmployeeFormDialog({
           >
             <X size={20} />
           </button>
-          <DialogTitle className="text-lg font-semibold">Add New Employee</DialogTitle>
+          <DialogTitle className="text-lg font-semibold">
+            {isEdit ? "Edit Employee" : "Add New Employee"}
+          </DialogTitle>
 
           <div className="grid grid-cols-2 gap-4">
             <input
               name="epi"
               type="number"
-              placeholder="EPI"
               value={form.epi}
+              disabled={isEdit}
+              placeholder="EPI"
               onChange={handleChange}
               className="px-3 py-2 rounded bg-purple-950 text-white border border-white/20 focus:outline-none"
             />
@@ -167,7 +182,7 @@ export default function EmployeeFormDialog({
               onClick={handleSubmit}
               className="mt-4 px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all"
             >
-              Save Employee
+              {isEdit ? "Update Employee" : "Create Employee"}
             </button>
           </div>
         </DialogPanel>

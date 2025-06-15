@@ -1,36 +1,51 @@
-import { prisma } from "@/lib/prisma";
-import { serializeBigInt } from "@/lib/serialize";
 import { NextRequest, NextResponse } from "next/server";
+import { prisma, formatEmployee } from "@/lib";
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ epi: string }> }) {
   const { epi } = await params;
-  const suffix = Number(epi);
-  if (isNaN(suffix)) {
-    return NextResponse.json({ error: "Invalid EPI" }, { status: 400 });
+
+  const employee = await prisma.employee.findFirst({ where: { epi: { endsWith: epi } } });
+
+  if (!employee) {
+    return NextResponse.json({ error: "Employee not found" }, { status: 404 });
   }
 
-  const employees = await prisma.employee.findMany();
-  const matchEmployee = employees.find((e) => String(e.epi).endsWith(epi));
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
 
-  return matchEmployee
-    ? NextResponse.json({ ...matchEmployee, epi: matchEmployee.epi.toString() })
-    : NextResponse.json({ error: "No matching employee found" }, { status: 404 });
+  const startOfTomorrow = new Date(startOfToday);
+  startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+
+  const handler =
+    employee.role === "FSA"
+      ? (data: any) => prisma.fSA.count({ where: data })
+      : (data: any) => prisma.tSA.count({ where: data });
+
+  const entryCount = await handler({
+    epi: employee.epi,
+    createdAt: {
+      gte: startOfToday,
+      lt: startOfTomorrow
+    }
+  });
+
+  return NextResponse.json({ ...formatEmployee(employee), entryCount });
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ epi: string }> }) {
   const { epi } = await params;
   const data = await req.json();
   const updated = await prisma.employee.update({
-    where: { epi: BigInt(epi) },
+    where: { epi },
     data
   });
-  return NextResponse.json(serializeBigInt(updated));
+  return NextResponse.json(formatEmployee(updated));
 }
 
 export async function DELETE(_: NextRequest, { params }: { params: Promise<{ epi: string }> }) {
   const { epi } = await params;
   await prisma.employee.delete({
-    where: { epi: BigInt(epi) }
+    where: { epi }
   });
   return NextResponse.json({ success: true });
 }

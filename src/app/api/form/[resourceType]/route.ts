@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
 import { getPrismaHandler } from "../prismaHandler";
+import { NextRequest, NextResponse } from "next/server";
 
 type ResourceType = "fsa" | "tsa";
 

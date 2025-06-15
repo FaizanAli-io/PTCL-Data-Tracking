@@ -1,4 +1,5 @@
-import { prisma } from "@/lib/prisma";
+import { prisma, formatEnum } from "@/lib";
+import { X } from "lucide-react";
 import { NextRequest, NextResponse } from "next/server";
 
 // Helper function to process date ranges
@@ -14,9 +15,9 @@ const getDateConditions = (mode: string, startDate: string, endDate?: string) =>
 };
 
 // Helper function to compute statistics
-const computeEmployeeStats = (entries: { epi: bigint; createdAt: Date }[]) => {
+const computeEmployeeStats = (entries: { epi: string; createdAt: Date }[]) => {
   const statsMap = new Map<
-    bigint,
+    string,
     { entryCount: number; cnt: number; avg: number; min: number; max: number }
   >();
 
@@ -27,7 +28,7 @@ const computeEmployeeStats = (entries: { epi: bigint; createdAt: Date }[]) => {
     const dayMap = acc.get(epi)!;
     dayMap.set(day, (dayMap.get(day) || 0) + 1);
     return acc;
-  }, new Map<bigint, Map<string, number>>());
+  }, new Map<string, Map<string, number>>());
 
   // Calculate statistics for each employee
   groupedByEpiAndDay.forEach((dayMap, epi) => {
@@ -67,7 +68,7 @@ export async function POST(req: NextRequest) {
       if (!acc[emp.role]) acc[emp.role] = [];
       acc[emp.role].push(emp.epi);
       return acc;
-    }, {} as Record<string, bigint[]>);
+    }, {} as Record<string, string[]>);
 
     // Process FSA and TSA entries in parallel
     const [fsaEntries, tsaEntries] = await Promise.all([
@@ -123,7 +124,9 @@ export async function POST(req: NextRequest) {
     });
 
     // Sort by entryCount descending
-    report.sort((a, b) => b.entryCount - a.entryCount);
+    report
+      .sort((a, b) => b.entryCount - a.entryCount)
+      .map((x) => ({ ...x, region: formatEnum(x.region), exchange: formatEnum(x.exchange) }));
 
     return NextResponse.json(report, { status: 200 });
   } catch (e) {

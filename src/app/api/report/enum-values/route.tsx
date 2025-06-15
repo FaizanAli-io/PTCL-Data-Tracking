@@ -1,4 +1,5 @@
 import { JobRole, JobType, Region, Exchange } from "@/generated/prisma";
+import { formatEnum } from "@/lib";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -6,8 +7,8 @@ export async function GET() {
     const enums = {
       roles: Object.values(JobRole),
       types: Object.values(JobType),
-      regions: Object.values(Region),
-      exchanges: Object.values(Exchange)
+      regions: Object.values(Region).map((x) => formatEnum(x)),
+      exchanges: Object.values(Exchange).map((x) => formatEnum(x))
     };
 
     return NextResponse.json({

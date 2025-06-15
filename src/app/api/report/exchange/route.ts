@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma, formatEnum } from "@/lib";
 import { NextRequest, NextResponse } from "next/server";
 
 // Get Prisma date filter condition
@@ -15,13 +15,13 @@ const getDateConditions = (mode: boolean, startDate: string, endDate?: string) =
 
 // Compute exchange-wise statistics
 const computeExchangeStats = (
-  employees: { epi: bigint; region: string; exchange: string }[],
-  entries: { epi: bigint; createdAt: Date }[],
+  employees: { epi: string; region: string; exchange: string }[],
+  entries: { epi: string; createdAt: Date }[],
   dateMode: boolean,
   workingDays: number
 ) => {
-  const exchangeMap = new Map<string, { epis: bigint[]; region: string }>();
-  const epiDayMap = new Map<bigint, Map<string, number>>();
+  const exchangeMap = new Map<string, { epis: string[]; region: string }>();
+  const epiDayMap = new Map<string, Map<string, number>>();
 
   // Group employees by exchange
   for (const emp of employees) {
@@ -86,7 +86,9 @@ const computeExchangeStats = (
     });
   }
 
-  return results.sort((a, b) => b.avg - a.avg);
+  return results
+    .sort((a, b) => b.avg - a.avg)
+    .map((x) => ({ ...x, region: formatEnum(x.region), exchange: formatEnum(x.exchange) }));
 };
 
 export async function POST(req: NextRequest) {

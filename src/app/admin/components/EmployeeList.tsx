@@ -14,7 +14,7 @@ export default function EmployeeList({
   loading
 }: {
   employees: any[];
-  onDelete: (epi: bigint) => void;
+  onDelete: (epi: string) => void;
   onEdit: (employee: any) => void;
   loading: boolean;
 }) {
@@ -87,7 +87,7 @@ export default function EmployeeList({
                     Edit
                   </button>
                   <button
-                    onClick={() => onDelete(BigInt(e.epi))}
+                    onClick={() => onDelete(e.epi)}
                     className="text-sm px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white transition"
                   >
                     Delete

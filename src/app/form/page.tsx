@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { BaseForm } from "./BaseForm";
+import { useState, useRef, useEffect } from "react";
 import { useFormState } from "./hooks/useFormState";
 
 export default function MainForm() {
@@ -9,6 +9,7 @@ export default function MainForm() {
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [employee, setEmployee] = useState<any>(null);
+  const [isFieldAgent, setFieldAgent] = useState(false);
 
   const fsaInitial = {
     customerName: "",
@@ -47,13 +48,8 @@ export default function MainForm() {
       errs.push("Invalid mobile number (must start with 03 and have 11 digits).");
 
     if (!form.currentInternetProvider.trim()) errs.push("Current internet provider is required.");
-
-    if (!form.currentInternetPrice.trim()) errs.push("Current internet price is required.");
-
     if (!form.customerAddress.trim()) errs.push("Customer address is required.");
-
     if (!form.customerName.trim()) errs.push("Customer name is required.");
-
     if (!form.reason.trim()) errs.push("Reason is required.");
 
     setErrors(errs);
@@ -63,26 +59,27 @@ export default function MainForm() {
   const submit = async () => {
     if (!isValid()) return;
 
-    const isFSA = employee.role === "FSA";
-    const form = isFSA ? fsaState.form : tsaState.form;
+    const form = isFieldAgent ? fsaState.form : tsaState.form;
 
     const body = {
       ...form,
-      epi: BigInt(employee.epi),
+      epi: employee.epi,
       currentInternetPrice: form.currentInternetPrice
         ? parseInt(form.currentInternetPrice.replace(/\D/g, ""))
         : null,
-      ...(isFSA && {
+      ...(isFieldAgent && {
         customerLatitude: parseFloat(form.customerLatitude),
         customerLongitude: parseFloat(form.customerLongitude)
       })
     };
 
-    await fetch(`/api/form/${isFSA ? "fsa" : "tsa"}`, {
+    await fetch(`/api/form/${isFieldAgent ? "fsa" : "tsa"}`, {
       method: "POST",
       body: JSON.stringify(body)
     });
-    isFSA ? fsaState.reset() : tsaState.reset();
+
+    setEmployee({ ...employee, entryCount: employee.entryCount + 1 });
+    isFieldAgent ? fsaState.reset() : tsaState.reset();
     window.scrollTo(0, 0);
     setSubmitted(true);
   };
@@ -102,6 +99,7 @@ export default function MainForm() {
         setError("");
         setEmployee(data);
         setSubmitted(false);
+        setFieldAgent(["FSA", "FFO", "MGT"].includes(data.role));
       } else if (res.status === 404) {
         setError(`Employee (${epiLast4}) not found. Please check the EPI number and try again.`);
       } else {
@@ -111,6 +109,24 @@ export default function MainForm() {
       setError("Failed to fetch employee data. Please try again.");
     }
   };
+
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        setSubmitted(false);
+      }
+    };
+
+    if (submitted) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [submitted]);
 
   if (!employee) {
     return (
@@ -139,17 +155,40 @@ export default function MainForm() {
       </div>
     );
   }
-  const isFieldAgent = employee.role === "FSA";
+
   const { form, onChange } = isFieldAgent ? fsaState : tsaState;
 
   return (
-    <BaseForm
-      form={form}
-      errors={errors}
-      onSubmit={submit}
-      onChange={onChange}
-      employee={employee}
-      isFieldAgent={isFieldAgent}
-    />
+    <>
+      {submitted && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div
+            ref={modalRef}
+            className="bg-white rounded-xl p-6 max-w-md w-full text-center shadow-2xl space-y-4"
+          >
+            <h2 className="text-2xl font-semibold text-gray-800">Thank you for your submission!</h2>
+            <p className="text-gray-600">
+              You have submitted <span className="font-bold">{employee.entryCount}</span>{" "}
+              {employee.entryCount === 1 ? "entry" : "entries"} today.
+            </p>
+            <button
+              className="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-500"
+              onClick={() => setSubmitted(false)}
+            >
+              Submit Again
+            </button>
+          </div>
+        </div>
+      )}
+
+      <BaseForm
+        form={form}
+        errors={errors}
+        onSubmit={submit}
+        onChange={onChange}
+        employee={employee}
+        isFieldAgent={isFieldAgent}
+      />
+    </>
   );
 }

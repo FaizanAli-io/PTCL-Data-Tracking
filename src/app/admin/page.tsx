@@ -9,7 +9,7 @@ import EmployeeList from "./components/EmployeeList";
 import EmployeeFormDialog from "./components/EmployeeFormDialog";
 
 type Employee = {
-  epi: bigint | number | string;
+  epi: string;
   name: string;
   role: string;
   type: string;
@@ -24,13 +24,15 @@ export default function EmployeePage() {
   const [filtered, setFiltered] = useState<Employee[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [editingEmployee, setEditingEmployee] = useState<any | null>(null);
-
   const [filters, setFilters] = useState<Record<string, string>>({
     role: "",
     type: "",
     region: "",
     exchange: ""
   });
+
+  const [authorized, setAuthorized] = useState(false);
+  const [password, setPassword] = useState("");
 
   const handleEdit = (employee: any) => {
     setEditingEmployee(employee);
@@ -52,8 +54,8 @@ export default function EmployeePage() {
   };
 
   useEffect(() => {
-    fetchEmployees();
-  }, []);
+    if (authorized) fetchEmployees();
+  }, [authorized]);
 
   useEffect(() => {
     handleSearch("");
@@ -63,8 +65,7 @@ export default function EmployeePage() {
     const lower = term.toLowerCase();
 
     const result = employees.filter((e) => {
-      const matchesSearch =
-        e.name.toLowerCase().includes(lower) || e.epi.toString().includes(lower);
+      const matchesSearch = e.name.toLowerCase().includes(lower) || e.epi.includes(lower);
 
       const matchesFilters =
         (!filters.role || e.role === filters.role) &&
@@ -90,7 +91,7 @@ export default function EmployeePage() {
     } else toast.error("Failed to add employee");
   };
 
-  const handleUpdate = async (epi: bigint, updatedData: any) => {
+  const handleUpdate = async (epi: string, updatedData: any) => {
     const res = await fetch(`/api/employee/${epi}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -103,13 +104,42 @@ export default function EmployeePage() {
     } else toast.error("Failed to update employee");
   };
 
-  const handleDelete = async (epi: bigint) => {
+  const handleDelete = async (epi: string) => {
     const res = await fetch(`/api/employee/${epi}`, { method: "DELETE" });
     if (res.ok) {
       toast.success("Employee deleted");
       fetchEmployees();
     } else toast.error("Failed to delete employee");
   };
+
+  if (!authorized) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-90 z-50">
+        <div className="bg-white p-6 rounded shadow-lg space-y-4 w-full max-w-sm text-black">
+          <h2 className="text-xl font-bold">Enter Admin Password</h2>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-2 border rounded"
+            placeholder="Password"
+          />
+          <button
+            onClick={() => {
+              if (password === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
+                setAuthorized(true);
+              } else {
+                toast.error("Incorrect password");
+              }
+            }}
+            className="w-full bg-purple-600 text-white p-2 rounded hover:bg-purple-700"
+          >
+            Enter
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2a064f] to-[#1a0644] text-white p-6 space-y-6">
@@ -149,7 +179,7 @@ export default function EmployeePage() {
         }}
         initialData={editingEmployee}
         onSubmit={(data: Employee) => {
-          if (editingEmployee) handleUpdate(BigInt(editingEmployee.epi), data);
+          if (editingEmployee) handleUpdate(editingEmployee.epi, data);
           else handleCreate(data);
         }}
       />
