@@ -86,8 +86,6 @@ const computeExchangeStats = (
     });
   }
 
-  console.log(results);
-
   return results.sort((a, b) => b.avg - a.avg);
 };
 

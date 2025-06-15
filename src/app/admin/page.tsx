@@ -1,19 +1,36 @@
 "use client";
 
+import { toast } from "react-hot-toast";
 import { useEffect, useState } from "react";
 
-import { toast } from "react-hot-toast";
+import Filters from "./components/Filters";
 import SearchBar from "./components/SearchBar";
 import EmployeeList from "./components/EmployeeList";
 import EmployeeFormDialog from "./components/EmployeeFormDialog";
 
+type Employee = {
+  epi: bigint | number | string;
+  name: string;
+  role: string;
+  type: string;
+  region: string;
+  exchange: string;
+  joinDate: string | Date;
+};
+
 export default function EmployeePage() {
-  const [employees, setEmployees] = useState([]);
-  const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [formOpen, setFormOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [filtered, setFiltered] = useState<Employee[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [editingEmployee, setEditingEmployee] = useState<any | null>(null);
+
+  const [filters, setFilters] = useState<Record<string, string>>({
+    role: "",
+    type: "",
+    region: "",
+    exchange: ""
+  });
 
   const handleEdit = (employee: any) => {
     setEditingEmployee(employee);
@@ -38,13 +55,27 @@ export default function EmployeePage() {
     fetchEmployees();
   }, []);
 
+  useEffect(() => {
+    handleSearch("");
+  }, [filters]);
+
   const handleSearch = (term: string) => {
     const lower = term.toLowerCase();
-    setFiltered(
-      employees.filter(
-        (e) => e.name.toLowerCase().includes(lower) || e.epi.toString().includes(lower)
-      )
-    );
+
+    const result = employees.filter((e) => {
+      const matchesSearch =
+        e.name.toLowerCase().includes(lower) || e.epi.toString().includes(lower);
+
+      const matchesFilters =
+        (!filters.role || e.role === filters.role) &&
+        (!filters.type || e.type === filters.type) &&
+        (!filters.region || e.region === filters.region) &&
+        (!filters.exchange || e.exchange === filters.exchange);
+
+      return matchesSearch && matchesFilters;
+    });
+
+    setFiltered(result);
   };
 
   const handleCreate = async (data: any) => {
@@ -57,14 +88,6 @@ export default function EmployeePage() {
       toast.success("Employee added");
       fetchEmployees();
     } else toast.error("Failed to add employee");
-  };
-
-  const handleDelete = async (epi: bigint) => {
-    const res = await fetch(`/api/employee/${epi}`, { method: "DELETE" });
-    if (res.ok) {
-      toast.success("Employee deleted");
-      fetchEmployees();
-    } else toast.error("Failed to delete employee");
   };
 
   const handleUpdate = async (epi: bigint, updatedData: any) => {
@@ -80,18 +103,35 @@ export default function EmployeePage() {
     } else toast.error("Failed to update employee");
   };
 
-  return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold text-purple-300">Employee Management</h1>
+  const handleDelete = async (epi: bigint) => {
+    const res = await fetch(`/api/employee/${epi}`, { method: "DELETE" });
+    if (res.ok) {
+      toast.success("Employee deleted");
+      fetchEmployees();
+    } else toast.error("Failed to delete employee");
+  };
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <SearchBar onSearch={handleSearch} />
-        <button
-          onClick={() => setFormOpen(true)}
-          className="bg-purple-700 hover:bg-purple-800 text-white px-5 py-2 rounded"
-        >
-          Add Employee
-        </button>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#2a064f] to-[#1a0644] text-white p-6 space-y-6">
+      <div>
+        <h1 className="text-4xl font-bold flex items-center gap-3">
+          <span className="bg-purple-600 text-white p-2 rounded-lg">📊</span>
+          Exchange Analytics Dashboard
+        </h1>
+        <p className="text-sm text-white/70 mt-1">Performance metrics across different exchanges</p>
+      </div>
+
+      <div className="space-y-4 bg-white/5 backdrop-blur p-4 rounded-xl border border-white/10 shadow-inner">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <SearchBar onSearch={handleSearch} />
+          <button
+            onClick={() => setDialogOpen(true)}
+            className="bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white px-5 py-2 rounded shadow"
+          >
+            Add Employee
+          </button>
+        </div>
+        <Filters onFilterChange={setFilters} />
       </div>
 
       <EmployeeList
@@ -103,12 +143,12 @@ export default function EmployeePage() {
 
       <EmployeeFormDialog
         open={dialogOpen}
-        setOpen={(val) => {
+        setOpen={(val: boolean) => {
           setDialogOpen(val);
           if (!val) setEditingEmployee(null);
         }}
         initialData={editingEmployee}
-        onSubmit={(data) => {
+        onSubmit={(data: Employee) => {
           if (editingEmployee) handleUpdate(BigInt(editingEmployee.epi), data);
           else handleCreate(data);
         }}

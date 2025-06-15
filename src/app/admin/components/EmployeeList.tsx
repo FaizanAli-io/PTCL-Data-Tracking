@@ -4,7 +4,7 @@ const badgeColors: Record<string, string> = {
   FSA: "bg-blue-600 text-white",
   TSA: "bg-green-600 text-white",
   OSP: "bg-orange-500 text-white",
-  DSP: "bg-pink-500 text-white"
+  Regular: "bg-pink-500 text-white"
 };
 
 export default function EmployeeList({
@@ -22,7 +22,7 @@ export default function EmployeeList({
   if (!employees.length) return <p className="text-white">No employees found.</p>;
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-white/10 bg-gradient-to-br from-purple-900/30 to-indigo-900/30 p-2 shadow-inner">
+    <div className="overflow-x-auto rounded-xl border border-white/10 bg-white/5 backdrop-blur p-4 shadow-inner">
       <table className="min-w-full text-sm text-white">
         <thead className="bg-white/10 rounded-t-2xl">
           <tr>
