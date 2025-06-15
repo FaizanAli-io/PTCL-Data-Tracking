@@ -1,8 +1,8 @@
 "use client";
 
 import { BaseForm } from "./BaseForm";
-import { useState, useRef, useEffect } from "react";
 import { useFormState } from "./hooks/useFormState";
+import { useState, useRef, useEffect } from "react";
 
 export default function MainForm() {
   const [epiLast4, setEpiLast4] = useState("");
@@ -41,16 +41,19 @@ export default function MainForm() {
   const isValid = () => {
     const errs: string[] = [];
 
-    if (form.customerPSTN && !/^021\d{7}$/.test(form.customerPSTN))
-      errs.push("Invalid PSTN (must start with 021 and have 10 digits).");
+    if (form.customerPSTN && !/^021\d{8}$/.test(form.customerPSTN))
+      errs.push("Invalid PSTN (must start with 021 and have 11 digits).");
 
     if (form.customerMobile && !/^03\d{9}$/.test(form.customerMobile))
       errs.push("Invalid mobile number (must start with 03 and have 11 digits).");
 
-    // if (!form.currentInternetProvider.trim()) errs.push("Current internet provider is required.");
-    if (!form.customerAddress.trim()) errs.push("Customer address is required.");
-    if (!form.customerName.trim()) errs.push("Customer name is required.");
     // if (!form.reason.trim()) errs.push("Reason is required.");
+
+    if (!form.customerName.trim()) errs.push("Customer name is required.");
+
+    if (!form.customerAddress.trim()) errs.push("Customer address is required.");
+
+    // if (!form.currentInternetProvider.trim()) errs.push("Current internet provider is required.");
 
     setErrors(errs);
     return errs.length === 0;
