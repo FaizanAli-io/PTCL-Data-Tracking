@@ -16,10 +16,9 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ epi: s
   const startOfTomorrow = new Date(startOfToday);
   startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
 
-  const handler =
-    employee.role === "FSA"
-      ? (data: any) => prisma.fSA.count({ where: data })
-      : (data: any) => prisma.tSA.count({ where: data });
+  const handler = ["FSA", "FFO", "MGT"].includes(employee.role)
+    ? (data: any) => prisma.fSA.count({ where: data })
+    : (data: any) => prisma.tSA.count({ where: data });
 
   const entryCount = await handler({
     epi: employee.epi,
