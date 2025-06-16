@@ -4,30 +4,11 @@ import fs from "fs/promises";
 import { getDistance } from "geolib";
 import { NextRequest, NextResponse } from "next/server";
 
-type Coord = { latitude: number; longitude: number };
-
-function getTopNearest<T extends Record<string, any>>(
-  data: T[],
-  latKey: string,
-  lngKey: string,
-  target: Coord,
-  n = 5
-): T[] {
-  return data
-    .map((item) => ({
-      ...item,
-      distance: getDistance(target, {
-        latitude: parseFloat(item[latKey]),
-        longitude: parseFloat(item[lngKey])
-      })
-    }))
-    .sort((a, b) => a.distance - b.distance)
-    .slice(0, n);
-}
-
 export async function GET(req: NextRequest) {
   const lat = parseFloat(req.nextUrl.searchParams.get("lat") || "");
   const lng = parseFloat(req.nextUrl.searchParams.get("lng") || "");
+  const limit = parseInt(req.nextUrl.searchParams.get("limit") || "5");
+  const threshold = parseFloat(req.nextUrl.searchParams.get("threshold") || "0");
 
   if (isNaN(lat) || isNaN(lng)) {
     return NextResponse.json({ error: "Invalid coordinates" }, { status: 400 });
@@ -52,8 +33,28 @@ export async function GET(req: NextRequest) {
   const allFDH = [...ktr2.fdh, ...ktr3.fdh];
   const allFAT = [...ktr2.fat, ...ktr3.fat];
 
-  const nearestFDH = getTopNearest(allFDH, "LAT", "LOG", { latitude: lat, longitude: lng });
-  const nearestFAT = getTopNearest(allFAT, "LAT", "LOG", { latitude: lat, longitude: lng });
+  const filterAndSort = <T extends Record<string, any>>(
+    data: T[],
+    latKey: string,
+    lngKey: string
+  ): T[] =>
+    data
+      .map((item) => ({
+        ...item,
+        distance: getDistance(
+          { latitude: lat, longitude: lng },
+          {
+            latitude: parseFloat(item[latKey]),
+            longitude: parseFloat(item[lngKey])
+          }
+        )
+      }))
+      .filter((item) => !threshold || item.distance <= threshold)
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, limit);
+
+  const nearestFDH = filterAndSort(allFDH, "LAT", "LOG");
+  const nearestFAT = filterAndSort(allFAT, "LAT", "LOG");
 
   return NextResponse.json({ fdh: nearestFDH, fat: nearestFAT });
 }

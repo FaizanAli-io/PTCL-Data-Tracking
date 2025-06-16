@@ -1,9 +1,10 @@
 "use client";
 
 import L from "leaflet";
-import { useEffect, useMemo } from "react";
 import "leaflet/dist/leaflet.css";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useEffect, useMemo } from "react";
+import LegendControl from "./LegendControl";
+import { MapContainer, TileLayer, Marker, Popup, Tooltip } from "react-leaflet";
 
 type Props = {
   userPos: { lat: number; lng: number };
@@ -12,7 +13,6 @@ type Props = {
 };
 
 export default function MapView({ userPos, fdh, fat }: Props) {
-  // Create custom icons
   const userIcon = useMemo(
     () =>
       new L.Icon({
@@ -54,7 +54,7 @@ export default function MapView({ userPos, fdh, fat }: Props) {
     () =>
       new L.Icon({
         iconUrl:
-          "data:image/svg+xml;base64=" +
+          "data:image/svg+xml;base64," +
           btoa(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="26" height="26">
         <rect x="3" y="3" width="18" height="18" rx="4" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5"/>
@@ -69,7 +69,6 @@ export default function MapView({ userPos, fdh, fat }: Props) {
   );
 
   useEffect(() => {
-    // Fix default markers
     delete (L.Icon.Default.prototype as any)._getIconUrl;
     L.Icon.Default.mergeOptions({
       iconUrl: "/leaflet/images/marker-icon.png",
@@ -77,7 +76,6 @@ export default function MapView({ userPos, fdh, fat }: Props) {
       iconRetinaUrl: "/leaflet/images/marker-icon-2x.png"
     });
 
-    // Add custom CSS for map styling
     const style = document.createElement("style");
     style.textContent = `
       .leaflet-popup-content-wrapper {
@@ -119,9 +117,18 @@ export default function MapView({ userPos, fdh, fat }: Props) {
       .leaflet-control-attribution a {
         color: #e5e7eb;
       }
+      .leaflet-tooltip.label-tooltip {
+        background: rgba(0, 0, 0, 0.75);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        pointer-events: none;
+      }
     `;
-    document.head.appendChild(style);
 
+    document.head.appendChild(style);
     return () => {
       document.head.removeChild(style);
     };
@@ -140,11 +147,16 @@ export default function MapView({ userPos, fdh, fat }: Props) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
 
-      {/* User position marker */}
+      <LegendControl
+        userIconUrl={userIcon.options.iconUrl as string}
+        fdhIconUrl={fdhIcon.options.iconUrl as string}
+        fatIconUrl={fatIcon.options.iconUrl as string}
+      />
+
       <Marker position={[userPos.lat, userPos.lng]} icon={userIcon}>
         <Popup>
           <div className="text-center">
-            <div className="font-semibold text-base mb-1">📍 Your Location</div>
+            <div className="font-semibold text-base mb-1">\ud83d\udccd Your Location</div>
             <div className="text-sm opacity-90">
               {userPos.lat.toFixed(6)}, {userPos.lng.toFixed(6)}
             </div>
@@ -152,64 +164,49 @@ export default function MapView({ userPos, fdh, fat }: Props) {
         </Popup>
       </Marker>
 
-      {/* FDH markers */}
       {fdh.map((item, i) => {
         const lat = parseFloat(item.LAT);
         const lng = parseFloat(item.LOG);
-
+        const id = item["FDH MXID"];
         if (isNaN(lat) || isNaN(lng)) return null;
-
         return (
           <Marker key={`fdh-${i}`} position={[lat, lng]} icon={fdhIcon}>
-            <Popup>
-              <div className="text-center">
-                <div className="font-semibold text-base mb-2">🏢 FDH Location</div>
-                <div className="text-sm space-y-1">
-                  <div>
-                    <strong>ID:</strong> {item["FDH NO"] || item["FDH"] || "N/A"}
-                  </div>
-                  <div className="opacity-90">
-                    📍 {lat.toFixed(6)}, {lng.toFixed(6)}
-                  </div>
-                  {item.ADDRESS && (
-                    <div className="mt-2 pt-2 border-t border-purple-300/30">
-                      <strong>Address:</strong> {item.ADDRESS}
-                    </div>
-                  )}
+            <Tooltip direction="top" offset={[0, -10]} className="label-tooltip" sticky>
+              <div className="space-y-1 text-xs">
+                <div>
+                  <strong>{item.Region}</strong> / {item.Exchange.slice(4)}
                 </div>
+                <div>ID: {id}</div>
+                <div>
+                  Capacity: {item["Spare Capacity"]} / {item["Capacity FDH"]}
+                </div>
+                <div>Loading: {(item["% LOADING"] * 100).toFixed(1)}%</div>
+                <div>FATs: {item["FAT COUNT"]}</div>
+                <div>{(item.distance / 1000).toFixed(2)} km</div>
               </div>
-            </Popup>
+            </Tooltip>
           </Marker>
         );
       })}
 
-      {/* FAT markers */}
       {fat.map((item, i) => {
         const lat = parseFloat(item.LAT);
         const lng = parseFloat(item.LOG);
-
+        const id = item["FAT MXID"];
         if (isNaN(lat) || isNaN(lng)) return null;
-
         return (
           <Marker key={`fat-${i}`} position={[lat, lng]} icon={fatIcon}>
-            <Popup>
-              <div className="text-center">
-                <div className="font-semibold text-base mb-2">📡 FAT Location</div>
-                <div className="text-sm space-y-1">
-                  <div>
-                    <strong>ID:</strong> {item["FAT#"] || "N/A"}
-                  </div>
-                  <div className="opacity-90">
-                    📍 {lat.toFixed(6)}, {lng.toFixed(6)}
-                  </div>
-                  {item.ADDRESS && (
-                    <div className="mt-2 pt-2 border-t border-purple-300/30">
-                      <strong>Address:</strong> {item.ADDRESS}
-                    </div>
-                  )}
+            <Tooltip direction="top" offset={[0, -10]} className="label-tooltip" sticky>
+              <div className="space-y-1 text-xs">
+                <div>
+                  <strong>{item.Region}</strong> / {item.Division}
                 </div>
+                <div>ID: {id}</div>
+                <div>FDH: {item["FDH MXID"]}</div>
+                <div>Capacity: {item.CAPACITY}</div>
+                <div>{(item.distance / 1000).toFixed(2)} km</div>
               </div>
-            </Popup>
+            </Tooltip>
           </Marker>
         );
       })}
