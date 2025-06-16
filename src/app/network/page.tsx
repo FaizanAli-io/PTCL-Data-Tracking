@@ -1,57 +1,78 @@
 "use client";
-import { useState } from "react";
 
-export default function NearestNetworkPage() {
-  const [lat, setLat] = useState("");
-  const [lng, setLng] = useState("");
-  const [results, setResults] = useState([]);
+import { useCallback } from "react";
+import { useGeolocation } from "./hooks/useGeolocation";
+import { useNetworkData } from "./hooks/useNetworkData";
+import { DataTable } from "./components/data/DataTable";
+import { MapSection } from "./components/data/MapSection";
+import { EmptyState } from "./components/data/EmptyState";
+import { PageHeader } from "./components/layout/PageHeader";
+import { ControlPanel } from "./components/form/ControlPanel";
+import { BackgroundEffects } from "./components/layout/BackgroundEffects";
 
-  const fetchNearest = async () => {
-    const res = await fetch("/api/network", {
-      method: "POST",
-      body: JSON.stringify({ lat, lng }),
-      headers: { "Content-Type": "application/json" }
-    });
-    const data = await res.json();
-    setResults(data);
-  };
+export default function NetworkPage() {
+  const { lat, lng, isGettingLocation, getCurrentPosition, setCoordinates } = useGeolocation();
+  const { fdh, fat, isLoading, fetchNetworkData } = useNetworkData();
+
+  const handleLatChange = useCallback(
+    (value: string) => {
+      setCoordinates(value, lng);
+    },
+    [lng, setCoordinates]
+  );
+
+  const handleLngChange = useCallback(
+    (value: string) => {
+      setCoordinates(lat, value);
+    },
+    [lat, setCoordinates]
+  );
+
+  const handleSearch = useCallback(() => {
+    fetchNetworkData(lat, lng);
+  }, [lat, lng, fetchNetworkData]);
+
+  const showEmptyState =
+    Boolean(lat) && Boolean(lng) && fdh.length === 0 && fat.length === 0 && !isLoading;
+  const showResults = fdh.length > 0 && fat.length > 0;
 
   return (
-    <div className="p-6 space-y-4 text-white">
-      <h2 className="text-2xl font-bold">Find Nearest Network Entries</h2>
-      <div className="flex gap-4">
-        <input
-          type="number"
-          placeholder="Latitude"
-          value={lat}
-          onChange={(e) => setLat(e.target.value)}
-          className="bg-gray-800 px-3 py-2 rounded"
-        />
-        <input
-          type="number"
-          placeholder="Longitude"
-          value={lng}
-          onChange={(e) => setLng(e.target.value)}
-          className="bg-gray-800 px-3 py-2 rounded"
-        />
-        <button
-          onClick={fetchNearest}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
-        >
-          Submit
-        </button>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-950 via-indigo-950 to-purple-900 p-4 sm:p-6">
+      <BackgroundEffects />
 
-      {results.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-          {results.map((entry: any, i) => (
-            <div key={i} className="bg-gray-900 p-4 rounded shadow">
-              <p className="text-lg font-semibold">{entry.name}</p>
-              <p className="text-sm text-gray-400">Distance: {entry.distance.toFixed(2)} km</p>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="relative z-10 max-w-7xl mx-auto space-y-8">
+        <PageHeader />
+
+        <ControlPanel
+          lat={lat}
+          lng={lng}
+          isGettingLocation={isGettingLocation}
+          isLoading={isLoading}
+          onGetLocation={getCurrentPosition}
+          onLatChange={handleLatChange}
+          onLngChange={handleLngChange}
+          onSearch={handleSearch}
+        />
+
+        <MapSection lat={lat} lng={lng} fdh={fdh} fat={fat} />
+
+        {showResults && (
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <DataTable
+              title="Nearest FDH Locations"
+              description="Fiber Distribution Hub locations in your area"
+              data={fdh}
+            />
+            <DataTable
+              title="Nearest FAT Locations"
+              description="Fiber Access Terminal locations in your area"
+              data={fat}
+            />
+          </div>
+        )}
+
+        <EmptyState show={showEmptyState} />
+      </div>
     </div>
   );
 }

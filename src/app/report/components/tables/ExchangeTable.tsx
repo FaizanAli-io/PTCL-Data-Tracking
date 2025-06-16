@@ -46,12 +46,12 @@ export default function ExchangeTable({ data, totalCount }: ExchangeTableProps) 
                   index % 2 === 0 ? "bg-white/2" : ""
                 }`}
               >
+                <td className="py-4 px-6 text-white">{exchange.region}</td>
                 <td className="py-4 px-6">
                   <span className="px-3 py-1 bg-purple-600/20 text-purple-300 rounded-full text-sm font-semibold">
                     {exchange.exchange}
                   </span>
                 </td>
-                <td className="py-4 px-6 text-white">{exchange.region}</td>
                 <td className="py-4 px-6 text-white">{exchange.headCount}</td>
                 <td className="py-4 px-6">
                   <span

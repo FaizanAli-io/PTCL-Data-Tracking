@@ -5,7 +5,7 @@ import { useFormState } from "./hooks/useFormState";
 import { useState, useRef, useEffect } from "react";
 
 export default function MainForm() {
-  const [epiLast4, setEpiLast4] = useState("");
+  const [epiLast5, setEpiLast5] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [employee, setEmployee] = useState<any>(null);
@@ -91,12 +91,12 @@ export default function MainForm() {
 
   const getEmployeeData = async () => {
     try {
-      if (epiLast4.length !== 4 || !/^\d+$/.test(epiLast4)) {
-        setError("Please enter a valid 4 digit number");
+      if (epiLast5.length !== 5 || !/^\d+$/.test(epiLast5)) {
+        setError("Please enter a valid 5 digit number");
         return;
       }
 
-      const res = await fetch(`/api/employee/${epiLast4}`);
+      const res = await fetch(`/api/employee/${epiLast5}`);
       if (res.ok) {
         const data = await res.json();
         setError("");
@@ -104,7 +104,7 @@ export default function MainForm() {
         setSubmitted(false);
         setFieldAgent(["FSA", "FFO", "MGT"].includes(data.role));
       } else if (res.status === 404) {
-        setError(`Employee (${epiLast4}) not found. Please check the EPI number and try again.`);
+        setError(`Employee (${epiLast5}) not found. Please check the EPI number and try again.`);
       } else {
         setError("An unknown error occurred. Please try again.");
       }
@@ -136,10 +136,10 @@ export default function MainForm() {
       <div className="max-w-md mx-auto mt-10 space-y-4">
         <input
           type="text"
-          placeholder="Enter Last 4 digits of EPI"
-          value={epiLast4}
+          placeholder="Enter Last 5 digits of EPI"
+          value={epiLast5}
           onChange={(e) => {
-            setEpiLast4(e.target.value);
+            setEpiLast5(e.target.value);
             setError("");
           }}
           className="p-2 border w-full rounded"

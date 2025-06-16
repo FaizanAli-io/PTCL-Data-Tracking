@@ -79,11 +79,17 @@ export default function EmployeePage() {
     setFiltered(result);
   };
 
+  function sanitizeEmployee(data: Employee) {
+    if (data.region) data.region = data.region.replace(/\s+/g, "_");
+    if (data.exchange) data.exchange = data.exchange.replace(/\s+/g, "_");
+    return data;
+  }
+
   const handleCreate = async (data: any) => {
     const res = await fetch("/api/employee", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      body: JSON.stringify(sanitizeEmployee(data))
     });
     if (res.ok) {
       toast.success("Employee added");
@@ -95,7 +101,7 @@ export default function EmployeePage() {
     const res = await fetch(`/api/employee/${epi}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedData)
+      body: JSON.stringify(sanitizeEmployee(updatedData))
     });
 
     if (res.ok) {
