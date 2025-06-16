@@ -1,5 +1,7 @@
 import clsx from "clsx";
 
+import Link from "next/link";
+
 const badgeColors: Record<string, string> = {
   FSA: "bg-blue-600 text-white",
   TSA: "bg-green-600 text-white",
@@ -46,7 +48,11 @@ export default function EmployeeList({
               )}
             >
               <td className="px-4 py-3 font-semibold">{e.epi}</td>
-              <td className="px-4 py-3">{e.name}</td>
+              <td className="px-4 py-3">
+                <Link href={`/detail/${e.epi}`} className="hover:underline text-emerald-300">
+                  {e.name}
+                </Link>
+              </td>
               <td className="px-4 py-3">
                 <span
                   className={clsx(

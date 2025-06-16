@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import DownloadExcelButton from "./DownloadExcelButton";
 import { EmployeeAnalytics, DateMode } from "../../types";
 
@@ -58,7 +60,11 @@ export default function EmployeeTable({ data, totalCount, mode }: EmployeeTableP
                 }`}
               >
                 <td className="py-4 px-6 text-white font-mono">{emp.epi}</td>
-                <td className="py-4 px-6 text-white font-medium">{emp.name}</td>
+                <td className="py-4 px-6 text-white font-medium">
+                  <Link href={`/detail/${emp.epi}`} className="hover:underline text-emerald-300">
+                    {emp.name}
+                  </Link>
+                </td>
                 <td className="py-4 px-6">
                   <span className="px-2 py-1 bg-blue-600/20 text-blue-300 rounded-full text-sm">
                     {emp.role}

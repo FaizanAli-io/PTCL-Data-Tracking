@@ -16,7 +16,7 @@ export default function NetworkPage() {
 
   const [thresholdEnabled, setThresholdEnabled] = useState(false);
   const [threshold, setThreshold] = useState("10000");
-  const [limit, setLimit] = useState("10");
+  const [limit, setLimit] = useState("5");
 
   const cleanFDH = fdh.map((row) => ({
     Region: row.Region,

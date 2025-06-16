@@ -17,8 +17,8 @@ export default function Home() {
     { href: "/admin", label: "Admin Panel" },
     { href: "/report/employee", label: "Employee Report" },
     { href: "/report/exchange", label: "Exchange Report" },
-    { href: "#network", label: "Network Insights (Under Construction)" },
-    { href: "#graph", label: "Graphical Visualizer (Under Construction)" }
+    { href: "/network", label: "Network Insights" },
+    { href: "#graph", label: "Graphical Visualizer (TBD)" }
   ];
 
   return (
