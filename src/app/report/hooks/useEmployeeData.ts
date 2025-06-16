@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
+import { useFilterOptions } from "./useFilterOptions";
 import { EmployeeAnalytics, DateMode, FilterState } from "../types";
 
 export const useEmployeeData = () => {
   const [loading, setLoading] = useState(false);
-  const [filterLoading, setFilterLoading] = useState(false);
   const [data, setData] = useState<EmployeeAnalytics[]>([]);
   const [filteredData, setFilteredData] = useState<EmployeeAnalytics[]>([]);
   const [filters, setFilters] = useState<FilterState>({
@@ -12,27 +12,8 @@ export const useEmployeeData = () => {
     region: "",
     exchange: ""
   });
-  const [filterOptions, setFilterOptions] = useState({
-    roles: [] as string[],
-    types: [] as string[],
-    regions: [] as string[],
-    exchanges: [] as string[]
-  });
 
-  const fetchFilterOptions = async () => {
-    setFilterLoading(true);
-    try {
-      const res = await fetch("/api/report/enum-values");
-      const result = await res.json();
-      if (result.success) {
-        setFilterOptions(result.data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch filter options:", error);
-    } finally {
-      setFilterLoading(false);
-    }
-  };
+  const { filterOptions, filterLoading } = useFilterOptions();
 
   const fetchData = async (
     mode: DateMode,
@@ -58,17 +39,13 @@ export const useEmployeeData = () => {
   };
 
   useEffect(() => {
-    fetchFilterOptions();
-  }, []);
-
-  useEffect(() => {
     setFilteredData(
       data.filter(
         (item) =>
-          (filters.role ? item.role === filters.role : true) &&
-          (filters.type ? item.type === filters.type : true) &&
-          (filters.region ? item.region === filters.region : true) &&
-          (filters.exchange ? item.exchange === filters.exchange : true)
+          (!filters.role || item.role === filters.role) &&
+          (!filters.type || item.type === filters.type) &&
+          (!filters.region || item.region === filters.region) &&
+          (!filters.exchange || item.exchange === filters.exchange)
       )
     );
   }, [filters, data]);
@@ -81,7 +58,6 @@ export const useEmployeeData = () => {
     filters,
     setFilters,
     filterOptions,
-    fetchData,
-    refreshFilters: fetchFilterOptions
+    fetchData
   };
 };

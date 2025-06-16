@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { DateMode } from "../types";
+import { useState, useEffect } from "react";
 import { formatDate, addDays } from "../utils/dateUtils";
 import { useExchangeData } from "../hooks/useExchangeData";
-import { Building2, MapPin, Award, TrendingUp, Users, Activity, CalendarCheck } from "lucide-react";
+import { Building2, MapPin, Award, TrendingUp } from "lucide-react";
 
 import PageHeader from "../components/ui/PageHeader";
 import SummaryCards from "../components/ui/SummaryCards";
@@ -20,20 +20,48 @@ export default function ExchangeAnalyticsPage() {
   const [workingDays, setWorkingDays] = useState<number>(0);
   const [mode, setMode] = useState<DateMode>("today");
 
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(30);
+
+  const refreshRate = 30;
+
   const handleFetchData = () => {
     fetchData(mode, startDate, endDate, workingDays);
+    setRefreshKey((prev) => prev + 1);
+    setTimeLeft(refreshRate);
+    setAutoRefresh(true);
   };
+
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    const interval = setInterval(() => {
+      fetchData(mode, startDate, endDate, workingDays);
+      setTimeLeft(refreshRate);
+    }, refreshRate * 1000);
+
+    return () => clearInterval(interval);
+  }, [autoRefresh, refreshKey, mode, startDate, endDate, workingDays, fetchData]);
+
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    const countdown = setInterval(() => {
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : refreshRate));
+    }, 1000);
+
+    return () => clearInterval(countdown);
+  }, [autoRefresh]);
 
   // Summary calculations
   const totalExchanges = filteredData.length;
 
-  // Best exchange by avg
   const bestExchange = filteredData.reduce(
     (best, current) => (current.avg > best.avg ? current : best),
     filteredData[0]
   );
 
-  // Best region by avg across all exchanges
   const regionMap = new Map<string, { total: number; count: number }>();
   for (const ex of filteredData) {
     if (!regionMap.has(ex.region)) regionMap.set(ex.region, { total: 0, count: 0 });
@@ -74,14 +102,14 @@ export default function ExchangeAnalyticsPage() {
       color: "text-pink-400",
       label: "Best Exchange",
       value: bestExchange?.exchange ?? "-",
-      description: `Avg: ${bestExchange?.avg.toFixed(2) ?? "0"}`
+      description: `Averaging ${bestExchange?.avg.toFixed(2) ?? "0"} entries`
     },
     {
       icon: Award,
       color: "text-orange-400",
       label: "Best Region",
       value: bestRegion,
-      description: `Avg: ${bestRegionAvg.toFixed(2)}`
+      description: `Averaging ${bestRegionAvg.toFixed(2)} entries`
     }
   ];
 
@@ -110,9 +138,11 @@ export default function ExchangeAnalyticsPage() {
           filters={filters}
           setFilters={setFilters}
           filterOptions={filterOptions}
+          autoRefresh={autoRefresh}
+          timeLeft={timeLeft}
         />
 
-        <ExchangeTable data={filteredData} totalCount={exchangeData.length} />
+        <ExchangeTable data={filteredData} totalCount={exchangeData.length} mode={mode} />
       </div>
     </div>
   );

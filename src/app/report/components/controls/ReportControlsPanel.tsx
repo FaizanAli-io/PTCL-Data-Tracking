@@ -22,6 +22,8 @@ type ReportControlsPanelProps = {
     regions: string[];
     exchanges: string[];
   };
+  autoRefresh: boolean;
+  timeLeft: number;
 };
 
 export default function ReportControlsPanel({
@@ -37,7 +39,9 @@ export default function ReportControlsPanel({
   onFetchData,
   filters,
   setFilters,
-  filterOptions
+  filterOptions,
+  autoRefresh,
+  timeLeft
 }: ReportControlsPanelProps) {
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 mb-8 space-y-6">
@@ -66,7 +70,13 @@ export default function ReportControlsPanel({
           <FilterControls filters={filters} setFilters={setFilters} options={filterOptions} />
         </div>
 
-        <div className="flex justify-end pt-6">
+        <div className="flex flex-col items-end pt-6">
+          {autoRefresh && (
+            <div className="text-sm text-white/70 mb-2 mr-6 w-full text-right">
+              Refreshing in {timeLeft} second{timeLeft !== 1 ? "s" : ""}
+            </div>
+          )}
+
           <button
             onClick={onFetchData}
             disabled={loading}

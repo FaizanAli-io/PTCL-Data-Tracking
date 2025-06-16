@@ -28,7 +28,6 @@ const getDateConditions = (dateMode: boolean, startDate: string, endDate?: strin
   };
 };
 
-// Compute exchange-wise statistics
 const computeExchangeStats = (
   employees: { epi: string; region: string; exchange: string }[],
   entries: { epi: string; createdAt: Date }[],
@@ -38,14 +37,12 @@ const computeExchangeStats = (
   const exchangeMap = new Map<string, { epis: string[]; region: string }>();
   const epiDayMap = new Map<string, Map<string, number>>();
 
-  // Group employees by exchange
   for (const emp of employees) {
     if (!exchangeMap.has(emp.exchange))
       exchangeMap.set(emp.exchange, { epis: [], region: emp.region });
     exchangeMap.get(emp.exchange)!.epis.push(emp.epi);
   }
 
-  // Count entries per day per employee
   for (const { epi, createdAt } of entries) {
     const day = createdAt.toISOString().split("T")[0];
     if (!epiDayMap.has(epi)) epiDayMap.set(epi, new Map());
@@ -55,7 +52,6 @@ const computeExchangeStats = (
 
   workingDays = dateMode ? 1 : workingDays;
 
-  // Compute stats for each exchange
   const results = [];
   for (const [exchange, { epis, region }] of exchangeMap.entries()) {
     let missingTotal = 0;
@@ -111,22 +107,13 @@ export async function POST(req: NextRequest) {
     const { mode, startDate, endDate, workingDays, role, type } = await req.json();
     const dateMode = ["yesterday", "today", "custom-date"].includes(mode);
 
-    // Fetch employees with optional role/type filters
     const employees = await prisma.employee.findMany({
-      where: {
-        ...(role && { role }),
-        ...(type && { type })
-      },
-      select: {
-        epi: true,
-        region: true,
-        exchange: true
-      }
+      select: { epi: true, region: true, exchange: true },
+      where: { ...(role && { role }), ...(type && { type }), NOT: { role: "MGT", type: "MGT" } }
     });
 
     const epis = employees.map((e) => e.epi);
 
-    // Get entries from both FSA and TSA
     const [fsaEntries, tsaEntries] = await Promise.all([
       prisma.fSA.findMany({
         where: {

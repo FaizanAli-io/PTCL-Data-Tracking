@@ -1,12 +1,15 @@
-import { ExchangeAnalytics } from "../../types";
 import DownloadExcelButton from "./DownloadExcelButton";
+import { ExchangeAnalytics, DateMode } from "../../types";
 
 type ExchangeTableProps = {
   data: ExchangeAnalytics[];
   totalCount: number;
+  mode: DateMode;
 };
 
-export default function ExchangeTable({ data, totalCount }: ExchangeTableProps) {
+export default function ExchangeTable({ data, totalCount, mode }: ExchangeTableProps) {
+  const rangeInput = ["mtd", "ytd", "custom-range"].includes(mode);
+
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 overflow-hidden">
       <div className="p-6 border-b border-white/20 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -32,7 +35,9 @@ export default function ExchangeTable({ data, totalCount }: ExchangeTableProps) 
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Region</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Exchange</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Headcount</th>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Missing Days</th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">
+                Missing {rangeInput ? " Days" : " People"}
+              </th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Min</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Avg</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Max</th>

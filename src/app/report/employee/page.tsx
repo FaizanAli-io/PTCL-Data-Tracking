@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { DateMode } from "../types";
+import { useState, useEffect } from "react";
 import { formatDate, addDays } from "../utils/dateUtils";
 import { useEmployeeData } from "../hooks/useEmployeeData";
-import { BarChart3, Users, Clock, UserX } from "lucide-react";
+import { BarChart3, Users, Clock, UserX, Star } from "lucide-react";
 
 import PageHeader from "../components/ui/PageHeader";
 import SummaryCards from "../components/ui/SummaryCards";
@@ -20,11 +20,41 @@ export default function EmployeeAnalyticsPage() {
   const [workingDays, setWorkingDays] = useState<number>(0);
   const [mode, setMode] = useState<DateMode>("today");
 
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(30);
+
+  const refreshRate = 30;
+
   const handleFetchData = () => {
     fetchData(mode, startDate, endDate, workingDays);
+    setRefreshKey((prev) => prev + 1);
+    setTimeLeft(refreshRate);
+    setAutoRefresh(true);
   };
 
-  // Calculate summary stats
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    const interval = setInterval(() => {
+      fetchData(mode, startDate, endDate, workingDays);
+      setTimeLeft(refreshRate);
+    }, refreshRate * 1000);
+
+    return () => clearInterval(interval);
+  }, [autoRefresh, refreshKey, mode, startDate, endDate, workingDays, fetchData]);
+
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    const countdown = setInterval(() => {
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : refreshRate));
+    }, 1000);
+
+    return () => clearInterval(countdown);
+  }, [autoRefresh]);
+
+  // Summary Stats
   const totalEmployees = filteredData.length;
 
   const missingEmployees = filteredData.reduce(
@@ -42,6 +72,14 @@ export default function EmployeeAnalyticsPage() {
   const totalMissing = rangeInput
     ? (filteredData.reduce((sum, emp) => sum + (emp.absent || 0), 0) / totalEmployees).toFixed(1)
     : missingEmployees;
+
+  const topEmployee =
+    filteredData.length > 0
+      ? filteredData.reduce(
+          (best, emp) => (emp.entryCount > best.entryCount ? emp : best),
+          filteredData[0]
+        )
+      : null;
 
   const employeeStats = [
     {
@@ -63,7 +101,14 @@ export default function EmployeeAnalyticsPage() {
       color: "text-red-400",
       label: rangeInput ? "Avg. Missing" : "Missing Today",
       value: totalMissing,
-      description: rangeInput ? "Per employee" : "No entries"
+      description: rangeInput ? "Per employee" : "With no entries"
+    },
+    {
+      icon: Star,
+      color: "text-yellow-400",
+      label: "Top Performer",
+      value: topEmployee ? topEmployee.name : "N/A",
+      description: topEmployee ? `Exchange: ${topEmployee.exchange}` : "No data"
     }
   ];
 
@@ -76,7 +121,7 @@ export default function EmployeeAnalyticsPage() {
           subtitle="Track and analyze employee performance metrics"
         />
 
-        <SummaryCards items={employeeStats} columns={3} className="mb-6" />
+        <SummaryCards items={employeeStats} columns={4} className="mb-6" />
 
         <ReportControlsPanel
           mode={mode}
@@ -92,6 +137,8 @@ export default function EmployeeAnalyticsPage() {
           filters={filters}
           setFilters={setFilters}
           filterOptions={filterOptions}
+          autoRefresh={autoRefresh}
+          timeLeft={timeLeft}
         />
 
         <EmployeeTable data={filteredData} totalCount={data.length} mode={mode} />

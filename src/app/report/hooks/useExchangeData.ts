@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useFilterOptions } from "./useFilterOptions";
 import { EmployeeAnalytics, DateMode, FilterState, ExchangeAnalytics } from "../types";
 
 export const useExchangeData = () => {
@@ -6,35 +7,15 @@ export const useExchangeData = () => {
   const [exchangeData, setExchangeData] = useState<ExchangeAnalytics[]>([]);
   const [filteredData, setFilteredData] = useState<ExchangeAnalytics[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filterLoading, setFilterLoading] = useState(false);
+
   const [filters, setFilters] = useState<FilterState>({
     role: "",
     type: "",
     region: "",
     exchange: ""
   });
-  const [filterOptions, setFilterOptions] = useState({
-    roles: [] as string[],
-    types: [] as string[],
-    regions: [] as string[],
-    exchanges: [] as string[]
-  });
 
-  // Fetch filter options from API
-  const fetchFilterOptions = async () => {
-    setFilterLoading(true);
-    try {
-      const res = await fetch("/api/report/enum-values");
-      const result = await res.json();
-      if (result.success) {
-        setFilterOptions(result.data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch filter options:", error);
-    } finally {
-      setFilterLoading(false);
-    }
-  };
+  const { filterOptions, filterLoading } = useFilterOptions();
 
   const fetchData = async (
     mode: DateMode,
@@ -69,15 +50,11 @@ export const useExchangeData = () => {
   };
 
   useEffect(() => {
-    fetchFilterOptions();
-  }, []);
-
-  useEffect(() => {
     setFilteredData(
       exchangeData.filter(
         (item) =>
-          (filters.region ? item.region === filters.region : true) &&
-          (filters.exchange ? item.exchange === filters.exchange : true)
+          (!filters.region || item.region === filters.region) &&
+          (!filters.exchange || item.exchange === filters.exchange)
       )
     );
   }, [filters, exchangeData]);
@@ -91,7 +68,6 @@ export const useExchangeData = () => {
     filters,
     setFilters,
     filterOptions,
-    fetchData,
-    refreshFilters: fetchFilterOptions
+    fetchData
   };
 };

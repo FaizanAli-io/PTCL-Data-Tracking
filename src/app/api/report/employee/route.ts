@@ -28,14 +28,12 @@ const getDateConditions = (dateMode: boolean, startDate: string, endDate?: strin
   };
 };
 
-// Helper function to compute statistics
 const computeEmployeeStats = (entries: { epi: string; createdAt: Date }[]) => {
   const statsMap = new Map<
     string,
     { entryCount: number; cnt: number; avg: number; min: number; max: number }
   >();
 
-  // Group entries by EPI and day
   const groupedByEpiAndDay = entries.reduce((acc, { epi, createdAt }) => {
     const day = createdAt.toISOString().split("T")[0];
     if (!acc.has(epi)) acc.set(epi, new Map<string, number>());
@@ -44,7 +42,6 @@ const computeEmployeeStats = (entries: { epi: string; createdAt: Date }[]) => {
     return acc;
   }, new Map<string, Map<string, number>>());
 
-  // Calculate statistics for each employee
   groupedByEpiAndDay.forEach((dayMap, epi) => {
     const counts = Array.from(dayMap.values());
     const sum = counts.reduce((a, b) => a + b, 0);
@@ -64,21 +61,13 @@ export async function POST(req: NextRequest) {
     const { mode, startDate, endDate, workingDays } = await req.json();
     const dateMode = ["yesterday", "today", "custom-date"].includes(mode);
 
-    // Fetch all employees and group by role in a single query
     const employees = await prisma.employee.findMany({
-      select: {
-        epi: true,
-        name: true,
-        role: true,
-        type: true,
-        region: true,
-        exchange: true
-      }
+      select: { epi: true, name: true, role: true, type: true, region: true, exchange: true },
+      where: { NOT: { role: "MGT", type: "MGT" } }
     });
 
     const epis = employees.map((e) => e.epi);
 
-    // Process FSA and TSA entries in parallel
     const [fsaEntries, tsaEntries] = await Promise.all([
       prisma.fSA.findMany({
         where: {
@@ -96,11 +85,9 @@ export async function POST(req: NextRequest) {
       })
     ]);
 
-    // Combine all entries and compute statistics
     const allEntries = [...fsaEntries, ...tsaEntries];
     const statsMap = computeEmployeeStats(allEntries);
 
-    // Generate report
     const report = employees.map((emp) => {
       const stats = statsMap.get(emp.epi) || {
         entryCount: 0,
@@ -119,17 +106,13 @@ export async function POST(req: NextRequest) {
         avg: stats.avg,
         min: stats.min,
         max: stats.max,
-        region: emp.region,
-        exchange: emp.exchange,
-        entryCount: stats.entryCount
+        entryCount: stats.entryCount,
+        region: formatEnum(emp.region),
+        exchange: formatEnum(emp.exchange)
       };
     });
 
-    // Sort by entryCount descending
-    report
-      .sort((a, b) => b.entryCount - a.entryCount)
-      .map((x) => ({ ...x, region: formatEnum(x.region), exchange: formatEnum(x.exchange) }));
-
+    report.sort((a, b) => b.entryCount - a.entryCount);
     return NextResponse.json(report, { status: 200 });
   } catch (e) {
     console.error("Error generating report:", e);
