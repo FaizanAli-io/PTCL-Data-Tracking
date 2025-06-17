@@ -108,7 +108,7 @@ export default function DateControls({
   };
 
   return (
-    <div className="mb-6">
+    <div>
       <div className="flex flex-wrap gap-4 mb-4">
         {(["yesterday", "today", "mtd", "ytd", "custom-date", "custom-range"] as DateMode[]).map(
           (option) => (

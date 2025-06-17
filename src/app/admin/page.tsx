@@ -8,6 +8,8 @@ import SearchBar from "./components/SearchBar";
 import EmployeeList from "./components/EmployeeList";
 import EmployeeFormDialog from "./components/EmployeeFormDialog";
 
+import PasswordGate from "@/components/PasswordGate";
+
 type Employee = {
   epi: string;
   name: string;
@@ -31,9 +33,6 @@ export default function EmployeePage() {
     exchange: ""
   });
 
-  const [authorized, setAuthorized] = useState(false);
-  const [password, setPassword] = useState("");
-
   const handleEdit = (employee: any) => {
     setEditingEmployee(employee);
     setDialogOpen(true);
@@ -54,8 +53,8 @@ export default function EmployeePage() {
   };
 
   useEffect(() => {
-    if (authorized) fetchEmployees();
-  }, [authorized]);
+    fetchEmployees();
+  }, []);
 
   useEffect(() => {
     handleSearch("");
@@ -118,77 +117,52 @@ export default function EmployeePage() {
     } else toast.error("Failed to delete employee");
   };
 
-  if (!authorized) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-90 z-50">
-        <div className="bg-white p-6 rounded shadow-lg space-y-4 w-full max-w-sm text-black">
-          <h2 className="text-xl font-bold">Enter Admin Password</h2>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border rounded"
-            placeholder="Password"
-          />
-          <button
-            onClick={() => {
-              if (password === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
-                setAuthorized(true);
-              } else {
-                toast.error("Incorrect password");
-              }
-            }}
-            className="w-full bg-purple-600 text-white p-2 rounded hover:bg-purple-700"
-          >
-            Enter
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2a064f] to-[#1a0644] text-white p-6 space-y-6">
-      <div>
-        <h1 className="text-4xl font-bold flex items-center gap-3">
-          <span className="bg-purple-600 text-white p-2 rounded-lg">📊</span>
-          Exchange Analytics Dashboard
-        </h1>
-        <p className="text-sm text-white/70 mt-1">Performance metrics across different exchanges</p>
-      </div>
-
-      <div className="space-y-4 bg-white/5 backdrop-blur p-4 rounded-xl border border-white/10 shadow-inner">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <SearchBar onSearch={handleSearch} />
-          <button
-            onClick={() => setDialogOpen(true)}
-            className="bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white px-5 py-2 rounded shadow"
-          >
-            Add Employee
-          </button>
+    <PasswordGate>
+      <div className="min-h-screen bg-gradient-to-br from-[#2a064f] to-[#1a0644] text-white p-6 space-y-6">
+        <div>
+          <h1 className="text-4xl font-bold flex items-center gap-3">
+            <span className="bg-purple-600 text-white p-2 rounded-lg">📊</span>
+            Employee Administration Dashboard
+          </h1>
+          <p className="text-sm text-white/70 mt-1 ml-20">
+            Centralized interface to manage, monitor, and maintain employee records and analytics.
+          </p>
         </div>
-        <Filters onFilterChange={setFilters} />
+
+        <div className="space-y-4 bg-white/5 backdrop-blur p-4 rounded-xl border border-white/10 shadow-inner">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <SearchBar onSearch={handleSearch} />
+            <button
+              onClick={() => setDialogOpen(true)}
+              className="bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white px-5 py-2 rounded shadow"
+            >
+              Add Employee
+            </button>
+          </div>
+          <Filters onFilterChange={setFilters} />
+        </div>
+
+        <EmployeeList
+          employees={filtered}
+          onDelete={handleDelete}
+          onEdit={handleEdit}
+          loading={loading}
+        />
+
+        <EmployeeFormDialog
+          open={dialogOpen}
+          setOpen={(val: boolean) => {
+            setDialogOpen(val);
+            if (!val) setEditingEmployee(null);
+          }}
+          initialData={editingEmployee}
+          onSubmit={(data: Employee) => {
+            if (editingEmployee) handleUpdate(editingEmployee.epi, data);
+            else handleCreate(data);
+          }}
+        />
       </div>
-
-      <EmployeeList
-        employees={filtered}
-        onDelete={handleDelete}
-        onEdit={handleEdit}
-        loading={loading}
-      />
-
-      <EmployeeFormDialog
-        open={dialogOpen}
-        setOpen={(val: boolean) => {
-          setDialogOpen(val);
-          if (!val) setEditingEmployee(null);
-        }}
-        initialData={editingEmployee}
-        onSubmit={(data: Employee) => {
-          if (editingEmployee) handleUpdate(editingEmployee.epi, data);
-          else handleCreate(data);
-        }}
-      />
-    </div>
+    </PasswordGate>
   );
 }

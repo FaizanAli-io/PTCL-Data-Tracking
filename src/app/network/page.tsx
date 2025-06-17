@@ -10,6 +10,8 @@ import { PageHeader } from "./components/layout/PageHeader";
 import { ControlPanel } from "./components/form/ControlPanel";
 import { BackgroundEffects } from "./components/layout/BackgroundEffects";
 
+import PasswordGate from "@/components/PasswordGate";
+
 export default function NetworkPage() {
   const { lat, lng, isGettingLocation, getCurrentPosition, setCoordinates } = useGeolocation();
   const { fdh, fat, isLoading, fetchNetworkData } = useNetworkData();
@@ -68,48 +70,50 @@ export default function NetworkPage() {
   const showResults = fdh.length > 0 && fat.length > 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-950 via-indigo-950 to-purple-900 p-4 sm:p-6">
-      <BackgroundEffects />
+    <PasswordGate>
+      <div className="min-h-screen bg-gradient-to-br from-purple-950 via-indigo-950 to-purple-900 p-4 sm:p-6">
+        <BackgroundEffects />
 
-      <div className="relative z-10 max-w-7xl mx-auto space-y-8">
-        <PageHeader />
+        <div className="relative z-10 max-w-7xl mx-auto space-y-8">
+          <PageHeader />
 
-        <ControlPanel
-          lat={lat}
-          lng={lng}
-          isGettingLocation={isGettingLocation}
-          isLoading={isLoading}
-          onGetLocation={getCurrentPosition}
-          onLatChange={handleLatChange}
-          onLngChange={handleLngChange}
-          onSearch={handleSearch}
-          thresholdEnabled={thresholdEnabled}
-          threshold={threshold}
-          limit={limit}
-          onThresholdToggle={setThresholdEnabled}
-          onThresholdChange={setThreshold}
-          onLimitChange={setLimit}
-        />
+          <ControlPanel
+            lat={lat}
+            lng={lng}
+            isGettingLocation={isGettingLocation}
+            isLoading={isLoading}
+            onGetLocation={getCurrentPosition}
+            onLatChange={handleLatChange}
+            onLngChange={handleLngChange}
+            onSearch={handleSearch}
+            thresholdEnabled={thresholdEnabled}
+            threshold={threshold}
+            limit={limit}
+            onThresholdToggle={setThresholdEnabled}
+            onThresholdChange={setThreshold}
+            onLimitChange={setLimit}
+          />
 
-        <MapSection lat={lat} lng={lng} fdh={fdh} fat={fat} />
+          <MapSection lat={lat} lng={lng} fdh={fdh} fat={fat} />
 
-        {showResults && (
-          <div className="space-y-8">
-            <DataTable
-              title="Nearest FDH Locations"
-              description="Fiber Distribution Hub locations in your area"
-              data={cleanFDH}
-            />
-            <DataTable
-              title="Nearest FAT Locations"
-              description="Fiber Access Terminal locations in your area"
-              data={cleanFAT}
-            />
-          </div>
-        )}
+          {showResults && (
+            <div className="space-y-8">
+              <DataTable
+                title="Nearest FDH Locations"
+                description="Fiber Distribution Hub locations in your area"
+                data={cleanFDH}
+              />
+              <DataTable
+                title="Nearest FAT Locations"
+                description="Fiber Access Terminal locations in your area"
+                data={cleanFAT}
+              />
+            </div>
+          )}
 
-        <EmptyState show={showEmptyState} />
+          <EmptyState show={showEmptyState} />
+        </div>
       </div>
-    </div>
+    </PasswordGate>
   );
 }

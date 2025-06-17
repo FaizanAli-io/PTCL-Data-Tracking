@@ -22,7 +22,7 @@ export default function FilterControls({ filters, setFilters, options }: FilterC
       <select
         value={filters[key]}
         onChange={(e) => updateFilter(key, e.target.value)}
-        className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-600 text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+        className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
       >
         <option value="">All {label}</option>
         {items.map((item) => (

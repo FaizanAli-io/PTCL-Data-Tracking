@@ -39,9 +39,7 @@ export default function ReportControlsPanel({
   onFetchData,
   filters,
   setFilters,
-  filterOptions,
-  autoRefresh,
-  timeLeft
+  filterOptions
 }: ReportControlsPanelProps) {
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 mb-8 space-y-6">
@@ -51,40 +49,28 @@ export default function ReportControlsPanel({
       </h2>
 
       <div className="grid gap-6">
-        <div>
-          <DateControls
-            mode={mode}
-            setMode={setMode}
-            startDate={startDate}
-            setStartDate={setStartDate}
-            endDate={endDate}
-            setEndDate={setEndDate}
-            workingDays={workingDays}
-            setWorkingDays={setWorkingDays}
-            loading={loading}
-            onFetchData={onFetchData}
-          />
-        </div>
+        <DateControls
+          mode={mode}
+          setMode={setMode}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+          workingDays={workingDays}
+          setWorkingDays={setWorkingDays}
+          loading={loading}
+          onFetchData={onFetchData}
+        />
 
-        <div>
-          <FilterControls filters={filters} setFilters={setFilters} options={filterOptions} />
-        </div>
+        <FilterControls filters={filters} setFilters={setFilters} options={filterOptions} />
 
-        <div className="flex flex-col items-end pt-6">
-          {autoRefresh && (
-            <div className="text-sm text-white/70 mb-2 mr-6 w-full text-right">
-              Refreshing in {timeLeft} second{timeLeft !== 1 ? "s" : ""}
-            </div>
-          )}
-
-          <button
-            onClick={onFetchData}
-            disabled={loading}
-            className="px-8 py-3 text-lg rounded-xl text-white bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 disabled:opacity-50 transition-all duration-200 shadow-lg"
-          >
-            {loading ? "Generating..." : "Generate Report"}
-          </button>
-        </div>
+        <button
+          onClick={onFetchData}
+          disabled={loading}
+          className="px-8 py-3 mt-4 text-lg rounded-xl text-white bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 disabled:opacity-50 transition-all duration-200 shadow-lg"
+        >
+          {loading ? "Generating..." : "Generate Report"}
+        </button>
       </div>
     </div>
   );
