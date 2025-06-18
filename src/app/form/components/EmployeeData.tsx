@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export const EmployeeData = ({ employee }: { employee: any }) => {
+export const EmployeeData = ({ form, employee }: { form: any; employee: any }) => {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -25,10 +25,22 @@ export const EmployeeData = ({ employee }: { employee: any }) => {
         <Field label="Time" value={time.toLocaleTimeString()} />
       </div>
 
-      <div className="flex justify-center items-center">
+      <div className="flex justify-between items-center mt-4 flex-col sm:flex-row gap-4">
+        {employee.role !== "TSA" && (
+          <select
+            value={form.type}
+            onChange={(e) => (form.type = e.target.value)}
+            className="px-6 py-2 rounded-xl text-black font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg backdrop-blur-md border border-white/20 transition-all duration-300 relative overflow-hidden"
+          >
+            <option value="DDS">DDS (Default)</option>
+            <option value="Float">Float</option>
+            <option value="Kiosk">Kiosk</option>
+          </select>
+        )}
+
         <a
           href={`/detail/${employee.epi}`}
-          className="mt-4 px-6 py-2 rounded-xl text-white font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg backdrop-blur-md border border-white/20 transition-all duration-300 relative overflow-hidden"
+          className="px-6 py-2 rounded-xl text-white font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-lg backdrop-blur-md border border-white/20 transition-all duration-300 relative overflow-hidden"
         >
           <span className="relative z-10">View Entries</span>
           <div className="absolute inset-0 bg-white/10 opacity-20 blur-md pointer-events-none" />

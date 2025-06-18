@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Map } from "./components/Map";
+
 import { EmployeeData } from "./components/EmployeeData";
 import { ServiceDetails } from "./components/ServiceDetails";
+import { LocationAndAddress } from "./components/LocationAndAddress";
 import { CustomerInformation } from "./components/CustomerInformation";
-import { DisabledInput, InputBox } from "./components/InputBox";
 
 export const BaseForm = ({
   form,
@@ -13,6 +13,8 @@ export const BaseForm = ({
   onChange,
   onSubmit,
   employee,
+  submitting,
+  cooldownLeft,
   isFieldAgent
 }: {
   form: any;
@@ -20,6 +22,8 @@ export const BaseForm = ({
   onChange: (name: string, value: string) => void;
   onSubmit: () => void;
   employee: any;
+  submitting: boolean;
+  cooldownLeft: number;
   isFieldAgent: boolean;
 }) => {
   const [gpsAccuracy, setGpsAccuracy] = useState("");
@@ -66,69 +70,19 @@ export const BaseForm = ({
       }}
       className="max-w-xl mx-auto p-6 bg-white/80 backdrop-blur-sm border border-gray-300 shadow-lg rounded-xl space-y-4 text-gray-900"
     >
-      <EmployeeData employee={employee} />
+      <EmployeeData form={form} employee={employee} />
 
-      <h2 className="text-lg font-semibold mt-4 text-gray-700">Customer Information</h2>
       <CustomerInformation form={form} onChange={onChange} />
 
-      {isFieldAgent && (
-        <>
-          <div className="grid grid-cols-3 gap-2">
-            <DisabledInput label="* Latitude" value={form.customerLatitude} />
-            <DisabledInput label="* Longitude" value={form.customerLongitude} />
-            <DisabledInput label="Accuracy (m)" value={gpsAccuracy} />
-          </div>
+      <LocationAndAddress
+        form={form}
+        gpsAccuracy={gpsAccuracy}
+        isFieldAgent={isFieldAgent}
+        getLocation={getLocation}
+        generateAddress={generateAddress}
+        onChange={onChange}
+      />
 
-          <button
-            type="button"
-            onClick={getLocation}
-            className="w-full p-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-semibold"
-          >
-            Get Location
-          </button>
-
-          <div className="flex gap-2 items-end">
-            <div className="w-[75%]">
-              <label htmlFor="customerAddress" className="block text-sm font-medium text-gray-700">
-                * Address
-              </label>
-              <input
-                id="customerAddress"
-                type="text"
-                value={form.customerAddress}
-                onChange={(e) => onChange("customerAddress", e.target.value)}
-                className="mt-1 block w-full rounded-md bg-white text-gray-900 border border-gray-300 placeholder-gray-400 shadow-inner focus:ring-blue-500 focus:border-blue-500 h-[42px]"
-              />
-            </div>
-            <button
-              type="button"
-              onClick={generateAddress}
-              disabled={!form.customerLatitude || !form.customerLongitude}
-              className={`p-2 h-[42px] rounded w-[25%] font-semibold transition ${
-                !form.customerLatitude || !form.customerLongitude
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-500"
-              }`}
-            >
-              Find Address
-            </button>
-          </div>
-
-          <Map lat={form.customerLatitude} lng={form.customerLongitude} />
-        </>
-      )}
-
-      {!isFieldAgent && (
-        <InputBox
-          id="customerAddress"
-          type="text"
-          label="Address"
-          value={form.customerAddress}
-          onChange={(e) => onChange("customerAddress", e.target.value)}
-        />
-      )}
-
-      <h2 className="text-lg font-semibold mt-4 text-gray-700">Customer Service Details</h2>
       <ServiceDetails form={form} onChange={onChange} />
 
       {(errors.length > 0 || localErrors.length > 0) && (
@@ -141,9 +95,14 @@ export const BaseForm = ({
 
       <button
         type="submit"
-        className="w-full p-2 bg-green-600 hover:bg-green-500 text-white rounded font-semibold"
+        disabled={submitting || cooldownLeft > 0}
+        className={`w-full p-2 rounded font-semibold ${
+          submitting || cooldownLeft > 0
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-green-600 hover:bg-green-500 text-white"
+        }`}
       >
-        Submit
+        {submitting ? "Submitting..." : cooldownLeft > 0 ? `Wait ${cooldownLeft}s` : "Submit"}
       </button>
     </form>
   );

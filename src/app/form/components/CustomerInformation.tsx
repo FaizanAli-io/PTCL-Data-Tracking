@@ -3,6 +3,7 @@ import { isValidPhone, isValidPSTN } from "../utils/validation";
 
 export const CustomerInformation = ({ form, onChange }: any) => (
   <>
+    <h2 className="text-lg font-semibold mt-4 text-gray-700">Customer Information</h2>
     {[
       { name: "customerName", label: "* Customer Name", type: "text" },
       {

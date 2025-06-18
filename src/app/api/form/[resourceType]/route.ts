@@ -1,3 +1,4 @@
+import { startOfToday } from "date-fns";
 import { getPrismaHandler } from "../prismaHandler";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,9 +11,34 @@ export async function POST(
   try {
     const body = await req.json();
     const { resourceType } = await params;
-    const result = await getPrismaHandler(resourceType).create(body);
+    const prisma = getPrismaHandler(resourceType);
+
+    const { customerName, customerAddress, epi } = body;
+
+    if (!customerName || !customerAddress) {
+      return new NextResponse(
+        JSON.stringify({ error: "Customer name and address are required." }),
+        { status: 400 }
+      );
+    }
+
+    const existing = await prisma.findFirst({
+      epi,
+      createdAt: { gte: startOfToday() },
+      OR: [{ customerName }, { customerAddress }]
+    });
+
+    if (existing) {
+      return new NextResponse(
+        JSON.stringify({ error: "Duplicate entry: Same name or address already used today." }),
+        { status: 400 }
+      );
+    }
+
+    const result = await prisma.create(body);
     return new NextResponse(JSON.stringify(result), { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error("[ERROR]:", error);
     return new NextResponse(JSON.stringify({ error: "Failed to create record" }), { status: 500 });
   }
 }

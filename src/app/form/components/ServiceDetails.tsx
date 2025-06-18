@@ -2,6 +2,7 @@ import { InputBox } from "./InputBox";
 
 export const ServiceDetails = ({ form, onChange }: any) => (
   <>
+    <h2 className="text-lg font-semibold mt-4 text-gray-700">Customer Service Details</h2>
     {[
       { name: "currentInternetProvider", label: "Current ISP" },
       { name: "currentInternetPrice", label: "Monthly Price" },

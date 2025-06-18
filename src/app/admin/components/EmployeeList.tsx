@@ -3,8 +3,10 @@ import clsx from "clsx";
 import Link from "next/link";
 
 const badgeColors: Record<string, string> = {
+  MGT: "bg-black text-white",
   FSA: "bg-blue-600 text-white",
   TSA: "bg-green-600 text-white",
+  FFO: "bg-yellow-600 text-white",
   OSP: "bg-orange-500 text-white",
   Regular: "bg-pink-500 text-white"
 };
@@ -93,7 +95,15 @@ export default function EmployeeList({
                     Edit
                   </button>
                   <button
-                    onClick={() => onDelete(e.epi)}
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          `Are you sure you want to delete ${e.name}? All their entries will be deleted as well...`
+                        )
+                      ) {
+                        onDelete(e.epi);
+                      }
+                    }}
                     className="text-sm px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white transition"
                   >
                     Delete

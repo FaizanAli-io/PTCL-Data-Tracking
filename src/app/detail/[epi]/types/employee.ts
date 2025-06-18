@@ -11,6 +11,7 @@ export interface Employee {
 export interface EmployeeEntry {
   id: number;
   epi: string;
+  type: string;
   customerName: string;
   customerPSTN: string;
   customerMobile: string;

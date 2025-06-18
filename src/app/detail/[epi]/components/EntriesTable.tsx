@@ -48,6 +48,7 @@ export const EntriesTable = ({ entries, date }: EntriesTableProps) => {
             <thead className="sticky top-0 bg-purple-800/50 backdrop-blur-sm border-b border-purple-500/30">
               <tr>
                 <th className="px-4 py-3 text-left font-semibold text-purple-200">Time</th>
+                <th className="px-4 py-3 text-left font-semibold text-purple-200">Type</th>
                 <th className="px-4 py-3 text-left font-semibold text-purple-200">Customer</th>
                 <th className="px-4 py-3 text-left font-semibold text-purple-200">Contact</th>
                 <th className="px-4 py-3 text-left font-semibold text-purple-200">Address</th>
@@ -70,6 +71,9 @@ export const EntriesTable = ({ entries, date }: EntriesTableProps) => {
                       <Clock className="w-4 h-4 text-purple-400" />
                       {formatDateTime(entry.createdAt)}
                     </div>
+                  </td>
+                  <td className="px-4 py-3 text-purple-100 max-w-xs">
+                    <div className="truncate font-medium">{entry.type || "-"}</div>
                   </td>
                   <td className="px-4 py-3 text-purple-100 max-w-xs">
                     <div className="truncate font-medium">{entry.customerName}</div>

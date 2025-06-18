@@ -44,6 +44,12 @@ enum Exchange {
   North_Karachi
 }
 
+enum EntryType {
+  DDS
+  Float
+  Kiosk
+}
+
 model Employee {
   epi      String   @id
   name     String
@@ -52,11 +58,15 @@ model Employee {
   region   Region
   exchange Exchange
   joinDate DateTime
+  FSA      FSA[]
+  TSA      TSA[]
 }
 
 model FSA {
-  id                      Int      @id @default(autoincrement())
+  id                      Int       @id @default(autoincrement())
   epi                     String
+  employee                Employee  @relation(fields: [epi], references: [epi], onDelete: Cascade)
+  type                    EntryType @default(DDS)
   customerName            String
   customerPSTN            String?
   customerMobile          String
@@ -67,12 +77,13 @@ model FSA {
   currentInternetProvider String
   reason                  String
   remarks                 String?
-  createdAt               DateTime @default(now())
+  createdAt               DateTime  @default(now())
 }
 
 model TSA {
   id                      Int      @id @default(autoincrement())
   epi                     String
+  employee                Employee @relation(fields: [epi], references: [epi], onDelete: Cascade)
   customerName            String
   customerPSTN            String?
   customerMobile          String
