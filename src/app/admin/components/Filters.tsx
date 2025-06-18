@@ -1,40 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-type OptionSet = {
-  roles: string[];
-  types: string[];
-  regions: string[];
-  exchanges: string[];
-};
+import { useEffect } from "react";
 
 export default function Filters({
+  options,
+  filters,
+  setFilters,
   onFilterChange
 }: {
+  options: Record<string, string[]>;
+  filters: Record<string, string>;
+  setFilters: (filters: Record<string, string>) => void;
   onFilterChange: (filters: Record<string, string>) => void;
 }) {
-  const [options, setOptions] = useState<OptionSet>({
-    roles: [],
-    types: [],
-    regions: [],
-    exchanges: []
-  });
-
-  const [filters, setFilters] = useState<Record<string, string>>({
-    role: "",
-    type: "",
-    region: "",
-    exchange: ""
-  });
-
-  useEffect(() => {
-    fetch("/api/report/enum-values")
-      .then((res) => res.json())
-      .then((json) => setOptions(json.data))
-      .catch(() => setOptions({ roles: [], types: [], regions: [], exchanges: [] }));
-  }, []);
-
   useEffect(() => {
     onFilterChange(filters);
   }, [filters]);
@@ -43,7 +21,7 @@ export default function Filters({
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <select
         value={filters.role}
-        onChange={(e) => setFilters((f) => ({ ...f, role: e.target.value }))}
+        onChange={(e) => setFilters({ ...filters, role: e.target.value })}
         className="bg-zinc-900 text-white border border-white/20 rounded px-3 py-2"
       >
         <option value="">All Roles</option>
@@ -56,7 +34,7 @@ export default function Filters({
 
       <select
         value={filters.type}
-        onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value }))}
+        onChange={(e) => setFilters({ ...filters, type: e.target.value })}
         className="bg-zinc-900 text-white border border-white/20 rounded px-3 py-2"
       >
         <option value="">All Types</option>
@@ -69,7 +47,7 @@ export default function Filters({
 
       <select
         value={filters.region}
-        onChange={(e) => setFilters((f) => ({ ...f, region: e.target.value }))}
+        onChange={(e) => setFilters({ ...filters, region: e.target.value })}
         className="bg-zinc-900 text-white border border-white/20 rounded px-3 py-2"
       >
         <option value="">All Regions</option>
@@ -82,7 +60,7 @@ export default function Filters({
 
       <select
         value={filters.exchange}
-        onChange={(e) => setFilters((f) => ({ ...f, exchange: e.target.value }))}
+        onChange={(e) => setFilters({ ...filters, exchange: e.target.value })}
         className="bg-zinc-900 text-white border border-white/20 rounded px-3 py-2"
       >
         <option value="">All Exchanges</option>

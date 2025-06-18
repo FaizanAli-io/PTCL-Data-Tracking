@@ -32,7 +32,8 @@ const computeExchangeStats = (
   employees: { epi: string; region: string; exchange: string }[],
   entries: { epi: string; createdAt: Date }[],
   dateMode: boolean,
-  workingDays: number
+  workingDays: number,
+  orderCountMap: Map<string, number>
 ) => {
   const exchangeMap = new Map<string, { epis: string[]; region: string }>();
   const epiDayMap = new Map<string, Map<string, number>>();
@@ -56,10 +57,13 @@ const computeExchangeStats = (
   for (const [exchange, { epis, region }] of exchangeMap.entries()) {
     let missingTotal = 0;
     let averageTotal = 0;
+    let exchangeOrderCount = 0;
     let minimumTotal = dateMode ? Infinity : 0;
     let maximumTotal = dateMode ? -Infinity : 0;
 
     for (const epi of epis) {
+      exchangeOrderCount += orderCountMap.get(epi) ?? 0;
+
       const dayMap = epiDayMap.get(epi);
 
       if (!dayMap) {
@@ -91,6 +95,7 @@ const computeExchangeStats = (
       exchange,
       headCount,
       missing,
+      orderCount: exchangeOrderCount,
       min: minimumTotal / (dateMode ? 1 : headCount),
       max: maximumTotal / (dateMode ? 1 : headCount),
       avg: averageTotal / (headCount - (dateMode ? missing : 0) || 1)
@@ -114,6 +119,13 @@ export async function POST(req: NextRequest) {
 
     const epis = employees.map((e) => e.epi);
 
+    const paidOrders = await prisma.paidOrders.findMany({
+      where: { epi: { in: epis } },
+      select: { epi: true, orderCount: true }
+    });
+
+    const orderCountMap = new Map(paidOrders.map((p) => [p.epi, p.orderCount]));
+
     const [fsaEntries, tsaEntries] = await Promise.all([
       prisma.fSA.findMany({
         where: {
@@ -133,7 +145,13 @@ export async function POST(req: NextRequest) {
 
     const allEntries = [...fsaEntries, ...tsaEntries];
 
-    const exchangeStats = computeExchangeStats(employees, allEntries, dateMode, workingDays || 1);
+    const exchangeStats = computeExchangeStats(
+      employees,
+      allEntries,
+      dateMode,
+      workingDays || 1,
+      orderCountMap
+    );
 
     return NextResponse.json(exchangeStats, { status: 200 });
   } catch (e) {

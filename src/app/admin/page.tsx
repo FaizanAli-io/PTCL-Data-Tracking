@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import Filters from "./components/Filters";
 import SearchBar from "./components/SearchBar";
 import EmployeeList from "./components/EmployeeList";
-import EmployeeFormDialog from "./components/EmployeeFormDialog";
+import EmployeeDialog from "./components/EmployeeDialog";
+import DownloadDialog from "./components/DownloadDialog";
 
 import PasswordGate from "@/components/PasswordGate";
 
@@ -23,6 +24,7 @@ type Employee = {
 export default function EmployeePage() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [downloadOpen, setDownloadOpen] = useState(false);
   const [filtered, setFiltered] = useState<Employee[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [editingEmployee, setEditingEmployee] = useState<any | null>(null);
@@ -31,6 +33,12 @@ export default function EmployeePage() {
     type: "",
     region: "",
     exchange: ""
+  });
+  const [options, setOptions] = useState<Record<string, string[]>>({
+    roles: [],
+    types: [],
+    regions: [],
+    exchanges: []
   });
 
   const handleEdit = (employee: any) => {
@@ -54,6 +62,13 @@ export default function EmployeePage() {
 
   useEffect(() => {
     fetchEmployees();
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/enum-values")
+      .then((res) => res.json())
+      .then((json) => setOptions(json.data))
+      .catch(() => setOptions({ roles: [], types: [], regions: [], exchanges: [] }));
   }, []);
 
   useEffect(() => {
@@ -117,6 +132,8 @@ export default function EmployeePage() {
     } else toast.error("Failed to delete employee");
   };
 
+  const handleDownloadAll = () => setDownloadOpen(true);
+
   return (
     <PasswordGate>
       <div className="min-h-screen bg-gradient-to-br from-[#2a064f] to-[#1a0644] text-white p-6 space-y-6">
@@ -131,16 +148,36 @@ export default function EmployeePage() {
         </div>
 
         <div className="space-y-4 bg-white/5 backdrop-blur p-4 rounded-xl border border-white/10 shadow-inner">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 flex-wrap">
             <SearchBar onSearch={handleSearch} />
-            <button
-              onClick={() => setDialogOpen(true)}
-              className="bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white px-5 py-2 rounded shadow"
-            >
-              Add Employee
-            </button>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={handleDownloadAll}
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-5 py-2 rounded shadow"
+              >
+                Download All Entries
+              </button>
+              <a
+                href="/orders"
+                className="bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 text-white px-5 py-2 rounded shadow flex items-center justify-center"
+              >
+                View Paid Orders
+              </a>
+              <button
+                onClick={() => setDialogOpen(true)}
+                className="bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white px-5 py-2 rounded shadow"
+              >
+                Add Employee
+              </button>
+            </div>
           </div>
-          <Filters onFilterChange={setFilters} />
+
+          <Filters
+            options={options}
+            filters={filters}
+            setFilters={setFilters}
+            onFilterChange={setFilters}
+          />
         </div>
 
         <EmployeeList
@@ -150,19 +187,21 @@ export default function EmployeePage() {
           loading={loading}
         />
 
-        <EmployeeFormDialog
+        <EmployeeDialog
           open={dialogOpen}
+          options={options}
           setOpen={(val: boolean) => {
             setDialogOpen(val);
             if (!val) setEditingEmployee(null);
           }}
-          initialData={editingEmployee}
           onSubmit={(data: Employee) => {
             if (editingEmployee) handleUpdate(editingEmployee.epi, data);
             else handleCreate(data);
           }}
+          initialData={editingEmployee}
         />
       </div>
+      <DownloadDialog open={downloadOpen} setOpen={setDownloadOpen} />
     </PasswordGate>
   );
 }

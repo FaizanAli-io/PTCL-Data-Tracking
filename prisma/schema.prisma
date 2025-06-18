@@ -11,7 +11,7 @@ datasource db {
 enum JobType {
   MGT
   OSP
-  Regular
+  REG
 }
 
 enum JobRole {
@@ -51,15 +51,16 @@ enum EntryType {
 }
 
 model Employee {
-  epi      String   @id
-  name     String
-  type     JobType
-  role     JobRole
-  region   Region
-  exchange Exchange
-  joinDate DateTime
-  FSA      FSA[]
-  TSA      TSA[]
+  epi        String       @id
+  name       String
+  type       JobType
+  role       JobRole
+  region     Region
+  exchange   Exchange
+  joinDate   DateTime
+  FSA        FSA[]
+  TSA        TSA[]
+  PaidOrders PaidOrders[]
 }
 
 model FSA {
@@ -93,4 +94,11 @@ model TSA {
   reason                  String
   remarks                 String?
   createdAt               DateTime @default(now())
+}
+
+model PaidOrders {
+  epi         String   @id
+  employee    Employee @relation(fields: [epi], references: [epi], onDelete: Cascade)
+  orderCount  Int
+  monthToDate Int
 }

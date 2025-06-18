@@ -4,13 +4,17 @@ import L from "leaflet";
 import { useEffect } from "react";
 import { useMap } from "react-leaflet";
 
-type Props = {
-  userIconUrl: string;
-  fdhIconUrl: string;
-  fatIconUrl: string;
+type LegendItem = {
+  label: string;
+  iconUrl: string;
 };
 
-export default function LegendControl({ userIconUrl, fdhIconUrl, fatIconUrl }: Props) {
+type Props = {
+  userIconUrl: string;
+  entries: LegendItem[];
+};
+
+export default function LegendControl({ userIconUrl, entries }: Props) {
   const map = useMap();
 
   useEffect(() => {
@@ -20,6 +24,16 @@ export default function LegendControl({ userIconUrl, fdhIconUrl, fatIconUrl }: P
 
     legend.onAdd = function () {
       const div = L.DomUtil.create("div", "info legend");
+      const entryHTML = entries
+        .map(
+          (entry) => `
+        <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+          <img src="${entry.iconUrl}" width="20" height="20" />
+          <span>${entry.label}</span>
+        </div>`
+        )
+        .join("");
+
       div.innerHTML = `
         <div style="background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); padding: 10px 12px; border-radius: 12px; color: white; font-size: 13px; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
           <div style="margin-bottom: 6px;">🔍 <strong>Legend</strong></div>
@@ -27,14 +41,7 @@ export default function LegendControl({ userIconUrl, fdhIconUrl, fatIconUrl }: P
             <img src="${userIconUrl}" width="20" height="20" />
             <span>Your Location</span>
           </div>
-          <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
-            <img src="${fdhIconUrl}" width="20" height="20" />
-            <span>FDH</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
-            <img src="${fatIconUrl}" width="20" height="20" />
-            <span>FAT</span>
-          </div>
+          ${entryHTML}
         </div>
       `;
       return div;
@@ -44,7 +51,7 @@ export default function LegendControl({ userIconUrl, fdhIconUrl, fatIconUrl }: P
     return () => {
       legend.remove();
     };
-  }, [map, userIconUrl, fdhIconUrl, fatIconUrl]);
+  }, [map, userIconUrl, entries]);
 
   return null;
 }

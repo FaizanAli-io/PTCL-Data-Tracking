@@ -14,9 +14,11 @@ interface ControlPanelProps {
   thresholdEnabled: boolean;
   threshold: string;
   limit: string;
+  type: string;
   onThresholdToggle: (enabled: boolean) => void;
   onThresholdChange: (value: string) => void;
   onLimitChange: (value: string) => void;
+  onTypeChange: (value: string) => void;
 }
 
 export const ControlPanel = ({
@@ -31,9 +33,11 @@ export const ControlPanel = ({
   thresholdEnabled,
   threshold,
   limit,
+  type,
   onThresholdToggle,
   onThresholdChange,
-  onLimitChange
+  onLimitChange,
+  onTypeChange
 }: ControlPanelProps) => (
   <div className="bg-gradient-to-br from-purple-900/40 to-indigo-900/40 backdrop-blur-xl border border-purple-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl">
     <div className="flex flex-col lg:flex-row gap-4 items-center">
@@ -59,9 +63,11 @@ export const ControlPanel = ({
           thresholdEnabled={thresholdEnabled}
           threshold={threshold}
           limit={limit}
+          type={type}
           onThresholdToggle={onThresholdToggle}
           onThresholdChange={onThresholdChange}
           onLimitChange={onLimitChange}
+          onTypeChange={onTypeChange}
         />
       </div>
 

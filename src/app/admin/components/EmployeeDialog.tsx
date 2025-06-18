@@ -6,16 +6,18 @@ import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 
 export default function EmployeeFormDialog({
   open,
+  options,
   setOpen,
   onSubmit,
   initialData
 }: {
   open: boolean;
+  options: Record<string, string[]>;
   setOpen: (val: boolean) => void;
   onSubmit: (data: any) => void;
   initialData?: any;
 }) {
-  const [form, setForm] = useState({
+  const freshForm = () => ({
     epi: "",
     name: "",
     type: "",
@@ -25,6 +27,8 @@ export default function EmployeeFormDialog({
     joinDate: new Date().toISOString().slice(0, 10)
   });
 
+  const [form, setForm] = useState(freshForm());
+
   useEffect(() => {
     if (initialData && open) {
       setForm({
@@ -32,33 +36,11 @@ export default function EmployeeFormDialog({
         joinDate: new Date(initialData.joinDate).toISOString().slice(0, 10)
       });
     } else if (!initialData && open) {
-      setForm({
-        epi: "",
-        name: "",
-        type: "",
-        role: "",
-        region: "",
-        exchange: "",
-        joinDate: new Date().toISOString().slice(0, 10)
-      });
+      setForm(freshForm());
     }
   }, [initialData, open]);
 
   const isEdit = !!initialData;
-
-  const [options, setOptions] = useState({
-    roles: [],
-    types: [],
-    regions: [],
-    exchanges: []
-  });
-
-  useEffect(() => {
-    fetch("/api/report/enum-values")
-      .then((res) => res.json())
-      .then((json) => setOptions(json.data))
-      .catch(() => setOptions({ roles: [], types: [], regions: [], exchanges: [] }));
-  }, []);
 
   const handleChange = (e: any) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -68,15 +50,7 @@ export default function EmployeeFormDialog({
     const data = { ...form, joinDate: new Date(form.joinDate) };
     onSubmit(data);
     setOpen(false);
-    setForm({
-      epi: "",
-      name: "",
-      type: "",
-      role: "",
-      region: "",
-      exchange: "",
-      joinDate: new Date().toISOString().slice(0, 10)
-    });
+    setForm(freshForm());
   };
 
   return (

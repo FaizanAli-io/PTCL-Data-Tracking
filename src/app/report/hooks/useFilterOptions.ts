@@ -19,7 +19,7 @@ export function useFilterOptions() {
   const fetchFilterOptions = async () => {
     setFilterLoading(true);
     try {
-      const res = await fetch("/api/report/enum-values");
+      const res = await fetch("/api/enum-values");
       const result = await res.json();
       if (result.success) {
         const data = result.data;

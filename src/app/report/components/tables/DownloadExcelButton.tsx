@@ -2,6 +2,7 @@
 
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { toast } from "react-hot-toast";
 
 type DownloadExcelButtonProps<T extends Record<string, any>> = {
   data: T[];
@@ -17,35 +18,47 @@ export default function DownloadExcelButton<T extends Record<string, any>>({
   className = ""
 }: DownloadExcelButtonProps<T>) {
   const handleDownload = () => {
-    if (data.length === 0) return;
+    if (data.length === 0) {
+      toast.error("No data to download");
+      return;
+    }
 
-    const cleanedData = data.map((row) => {
-      const newRow: Record<string, any> = {};
-      for (const [key, value] of Object.entries(row)) {
-        newRow[key] =
-          typeof value === "number"
-            ? value
-            : typeof value === "string"
-            ? value
-            : JSON.stringify(value);
+    toast.promise(
+      (async () => {
+        const cleanedData = data.map((row) => {
+          const newRow: Record<string, any> = {};
+          for (const [key, value] of Object.entries(row)) {
+            newRow[key] =
+              typeof value === "number"
+                ? value
+                : typeof value === "string"
+                ? value
+                : JSON.stringify(value);
+          }
+          return newRow;
+        });
+
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.json_to_sheet(cleanedData);
+        XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+        const excelBuffer = XLSX.write(workbook, {
+          bookType: "xlsx",
+          type: "array"
+        });
+
+        const blob = new Blob([excelBuffer], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        });
+
+        saveAs(blob, filename);
+      })(),
+      {
+        loading: "Generating Excel...",
+        success: "Download started!",
+        error: "Failed to generate file"
       }
-      return newRow;
-    });
-
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(cleanedData);
-    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array"
-    });
-
-    const blob = new Blob([excelBuffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    });
-
-    saveAs(blob, filename);
+    );
   };
 
   return (

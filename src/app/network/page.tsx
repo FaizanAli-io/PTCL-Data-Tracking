@@ -14,9 +14,10 @@ import PasswordGate from "@/components/PasswordGate";
 
 export default function NetworkPage() {
   const { lat, lng, isGettingLocation, getCurrentPosition, setCoordinates } = useGeolocation();
-  const { fdh, fat, isLoading, fetchNetworkData } = useNetworkData();
+  const { fdh, fat, dc, dp, isLoading, fetchNetworkData } = useNetworkData();
 
   const [thresholdEnabled, setThresholdEnabled] = useState(false);
+  const [type, setType] = useState<"GPON" | "XDSL">("GPON");
   const [threshold, setThreshold] = useState("10000");
   const [limit, setLimit] = useState("5");
 
@@ -43,6 +44,35 @@ export default function NetworkPage() {
     Distance: (row.distance / 1000).toFixed(2) + " km"
   }));
 
+  const cleanDC = dc.map((row) => ({
+    Region: row.Region,
+    Exchange: row.Exchange,
+    "DC Name": row["DC Name"],
+    "DC ID": row["DC ID"],
+    "DP Count": row["DP Count"],
+    Capacity: row["DC Capacity"],
+    Loading: row["DC Loading"],
+    "Loading %": (row["Loading %"] * 100).toFixed(1) + "%",
+    Spare: row["DC Spare Capacity"],
+    Latitude: row.LAT,
+    Longitude: row.LOG,
+    Distance: (row.distance / 1000).toFixed(2) + " km"
+  }));
+
+  const cleanDP = dp.map((row) => ({
+    Region: row.Region,
+    Exchange: row.Exchange,
+    "DC Name": row["DC Name"],
+    "DC MXID": row["DC MXID"],
+    "DP MXID": row["DP MXID"],
+    "DP Name": row["DP Name"],
+    Capacity: row["DP Capacity"],
+    Loading: row["DP Loading"],
+    Latitude: row.LAT,
+    Longitude: row.LOG,
+    Distance: (row.distance / 1000).toFixed(2) + " km"
+  }));
+
   const handleLatChange = useCallback(
     (value: string) => {
       setCoordinates(value, lng);
@@ -61,13 +91,21 @@ export default function NetworkPage() {
     fetchNetworkData(lat, lng, {
       threshold: parseFloat(threshold),
       limit: parseInt(limit),
-      thresholdEnabled
+      thresholdEnabled,
+      type
     });
-  }, [lat, lng, threshold, limit, thresholdEnabled, fetchNetworkData]);
+  }, [lat, lng, threshold, limit, thresholdEnabled, type, fetchNetworkData]);
 
   const showEmptyState =
-    Boolean(lat) && Boolean(lng) && fdh.length === 0 && fat.length === 0 && !isLoading;
-  const showResults = fdh.length > 0 && fat.length > 0;
+    Boolean(lat) &&
+    Boolean(lng) &&
+    !isLoading &&
+    ((type === "GPON" && fdh.length === 0 && fat.length === 0) ||
+      (type === "XDSL" && dc.length === 0 && dp.length === 0));
+
+  const showResults =
+    (type === "GPON" && fdh.length > 0 && fat.length > 0) ||
+    (type === "XDSL" && dc.length > 0 && dp.length > 0);
 
   return (
     <PasswordGate>
@@ -89,29 +127,66 @@ export default function NetworkPage() {
             thresholdEnabled={thresholdEnabled}
             threshold={threshold}
             limit={limit}
+            type={type}
             onThresholdToggle={setThresholdEnabled}
             onThresholdChange={setThreshold}
             onLimitChange={setLimit}
+            onTypeChange={(val) => setType(val as "GPON" | "XDSL")}
           />
 
-          <MapSection lat={lat} lng={lng} fdh={fdh} fat={fat} />
+          {type === "GPON" ? (
+            <MapSection
+              lat={lat}
+              lng={lng}
+              primaryData={fdh}
+              secondaryData={fat}
+              primaryLabel="FDH"
+              secondaryLabel="FAT"
+            />
+          ) : (
+            <MapSection
+              lat={lat}
+              lng={lng}
+              primaryData={dc}
+              secondaryData={dp}
+              primaryLabel="DC"
+              secondaryLabel="DP"
+            />
+          )}
 
           {showResults && (
             <div className="space-y-8">
-              <DataTable
-                title="Nearest FDH Locations"
-                description="Fiber Distribution Hub locations in your area"
-                data={cleanFDH}
-              />
-              <DataTable
-                title="Nearest FAT Locations"
-                description="Fiber Access Terminal locations in your area"
-                data={cleanFAT}
-              />
+              {type === "GPON" ? (
+                <>
+                  <DataTable
+                    title="Nearest FDH Locations"
+                    description="Fiber Distribution Hub locations in your area"
+                    data={cleanFDH}
+                  />
+                  <DataTable
+                    title="Nearest FAT Locations"
+                    description="Fiber Access Terminal locations in your area"
+                    data={cleanFAT}
+                  />
+                </>
+              ) : (
+                <>
+                  <DataTable
+                    title="Nearest DC Locations"
+                    description="Distribution Cabinet locations in your area"
+                    data={cleanDC}
+                  />
+                  <DataTable
+                    title="Nearest DP Locations"
+                    description="Distribution Point locations in your area"
+                    data={cleanDP}
+                  />
+                </>
+              )}
             </div>
           )}
 
-          <EmptyState show={showEmptyState} />
+          <EmptyState show={showEmptyState} type={type} />
         </div>
       </div>
     </PasswordGate>

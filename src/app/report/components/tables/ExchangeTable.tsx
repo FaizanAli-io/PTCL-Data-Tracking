@@ -34,6 +34,7 @@ export default function ExchangeTable({ data, totalCount, mode }: ExchangeTableP
             <tr>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Region</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Exchange</th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Order Count</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Headcount</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">
                 Missing {rangeInput ? " Days" : " People"}
@@ -55,6 +56,11 @@ export default function ExchangeTable({ data, totalCount, mode }: ExchangeTableP
                 <td className="py-4 px-6">
                   <span className="px-3 py-1 bg-purple-600/20 text-purple-300 rounded-full text-sm font-semibold">
                     {exchange.exchange}
+                  </span>
+                </td>
+                <td className="py-4 px-6">
+                  <span className="px-2 py-1 bg-green-600/40 text-purple-300 rounded-full text-sm font-semibold">
+                    {exchange.orderCount}
                   </span>
                 </td>
                 <td className="py-4 px-6 text-white">{exchange.headCount}</td>

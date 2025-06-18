@@ -15,6 +15,7 @@ export type EmployeeAnalytics = {
   region: string;
   exchange: string;
   joinDate: string;
+  orderCount: number;
   entryCount: number;
   avg?: number;
   min?: number;
@@ -25,6 +26,7 @@ export type EmployeeAnalytics = {
 export type ExchangeAnalytics = {
   region: string;
   exchange: string;
+  orderCount: number;
   headCount: number;
   missing: number;
   min: number;

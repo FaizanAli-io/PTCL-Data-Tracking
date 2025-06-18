@@ -40,6 +40,7 @@ export default function EmployeeTable({ data, totalCount, mode }: EmployeeTableP
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Type</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Region</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Exchange</th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Order Count</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">DDS Count</th>
               {rangeInput && (
                 <>
@@ -83,6 +84,11 @@ export default function EmployeeTable({ data, totalCount, mode }: EmployeeTableP
                 </td>
                 <td className="py-4 px-6 text-slate-300">{emp.region}</td>
                 <td className="py-4 px-6 text-slate-300">{emp.exchange}</td>
+                <td className="py-4 px-6">
+                  <span className="px-2 py-1 bg-green-600/40 text-purple-300 rounded-full text-sm font-semibold">
+                    {emp.orderCount}
+                  </span>
+                </td>
                 <td className="py-4 px-6">
                   <span className="px-2 py-1 bg-purple-600/20 text-purple-300 rounded-full text-sm font-semibold">
                     {emp.entryCount}

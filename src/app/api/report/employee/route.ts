@@ -68,6 +68,13 @@ export async function POST(req: NextRequest) {
 
     const epis = employees.map((e) => e.epi);
 
+    const paidOrders = await prisma.paidOrders.findMany({
+      where: { epi: { in: epis } },
+      select: { epi: true, orderCount: true }
+    });
+
+    const orderCountMap = new Map(paidOrders.map((p) => [p.epi, p.orderCount]));
+
     const [fsaEntries, tsaEntries] = await Promise.all([
       prisma.fSA.findMany({
         where: {
@@ -108,7 +115,8 @@ export async function POST(req: NextRequest) {
         max: stats.max,
         entryCount: stats.entryCount,
         region: formatEnum(emp.region),
-        exchange: formatEnum(emp.exchange)
+        exchange: formatEnum(emp.exchange),
+        orderCount: orderCountMap.get(emp.epi) ?? 0
       };
     });
 

@@ -6,13 +6,21 @@ import { useEffect, useMemo } from "react";
 import LegendControl from "./LegendControl";
 import { MapContainer, TileLayer, Marker, Popup, Tooltip } from "react-leaflet";
 
-type Props = {
+interface MapViewProps {
   userPos: { lat: number; lng: number };
-  fdh: any[];
-  fat: any[];
-};
+  primaryData: any[];
+  secondaryData: any[];
+  primaryLabel: string;
+  secondaryLabel: string;
+}
 
-export default function MapView({ userPos, fdh, fat }: Props) {
+export default function MapView({
+  userPos,
+  primaryData,
+  secondaryData,
+  primaryLabel,
+  secondaryLabel
+}: MapViewProps) {
   const userIcon = useMemo(
     () =>
       new L.Icon({
@@ -32,7 +40,7 @@ export default function MapView({ userPos, fdh, fat }: Props) {
     []
   );
 
-  const fdhIcon = useMemo(
+  const icon1 = useMemo(
     () =>
       new L.Icon({
         iconUrl:
@@ -50,7 +58,7 @@ export default function MapView({ userPos, fdh, fat }: Props) {
     []
   );
 
-  const fatIcon = useMemo(
+  const icon2 = useMemo(
     () =>
       new L.Icon({
         iconUrl:
@@ -134,6 +142,27 @@ export default function MapView({ userPos, fdh, fat }: Props) {
     };
   }, []);
 
+  const renderMarkers = (data: any[], icon: L.Icon, label: string) =>
+    data.map((item, i) => {
+      const lat = parseFloat(item.LAT);
+      const lng = parseFloat(item.LOG);
+      if (isNaN(lat) || isNaN(lng)) return null;
+
+      return (
+        <Marker key={`${label}-${i}`} position={[lat, lng]} icon={icon}>
+          <Tooltip direction="top" offset={[0, -10]} className="label-tooltip" sticky>
+            <div className="space-y-1 text-xs">
+              {Object.entries(item).map(([k, v]) => (
+                <div key={k}>
+                  <strong>{k}:</strong> {String(v)}
+                </div>
+              ))}
+            </div>
+          </Tooltip>
+        </Marker>
+      );
+    });
+
   return (
     <MapContainer
       center={[userPos.lat, userPos.lng]}
@@ -149,14 +178,16 @@ export default function MapView({ userPos, fdh, fat }: Props) {
 
       <LegendControl
         userIconUrl={userIcon.options.iconUrl as string}
-        fdhIconUrl={fdhIcon.options.iconUrl as string}
-        fatIconUrl={fatIcon.options.iconUrl as string}
+        entries={[
+          { iconUrl: icon1.options.iconUrl as string, label: "Primary" },
+          { iconUrl: icon2.options.iconUrl as string, label: "Secondary" }
+        ]}
       />
 
       <Marker position={[userPos.lat, userPos.lng]} icon={userIcon}>
         <Popup>
           <div className="text-center">
-            <div className="font-semibold text-base mb-1">\ud83d\udccd Your Location</div>
+            <div className="font-semibold text-base mb-1">📍 Your Location</div>
             <div className="text-sm opacity-90">
               {userPos.lat.toFixed(6)}, {userPos.lng.toFixed(6)}
             </div>
@@ -164,52 +195,8 @@ export default function MapView({ userPos, fdh, fat }: Props) {
         </Popup>
       </Marker>
 
-      {fdh.map((item, i) => {
-        const lat = parseFloat(item.LAT);
-        const lng = parseFloat(item.LOG);
-        const id = item["FDH MXID"];
-        if (isNaN(lat) || isNaN(lng)) return null;
-        return (
-          <Marker key={`fdh-${i}`} position={[lat, lng]} icon={fdhIcon}>
-            <Tooltip direction="top" offset={[0, -10]} className="label-tooltip" sticky>
-              <div className="space-y-1 text-xs">
-                <div>
-                  <strong>{item.Region}</strong> / {item.Exchange.slice(4)}
-                </div>
-                <div>ID: {id}</div>
-                <div>
-                  Capacity: {item["Spare Capacity"]} / {item["Capacity FDH"]}
-                </div>
-                <div>Loading: {(item["% LOADING"] * 100).toFixed(1)}%</div>
-                <div>FATs: {item["FAT COUNT"]}</div>
-                <div>{(item.distance / 1000).toFixed(2)} km</div>
-              </div>
-            </Tooltip>
-          </Marker>
-        );
-      })}
-
-      {fat.map((item, i) => {
-        const lat = parseFloat(item.LAT);
-        const lng = parseFloat(item.LOG);
-        const id = item["FAT MXID"];
-        if (isNaN(lat) || isNaN(lng)) return null;
-        return (
-          <Marker key={`fat-${i}`} position={[lat, lng]} icon={fatIcon}>
-            <Tooltip direction="top" offset={[0, -10]} className="label-tooltip" sticky>
-              <div className="space-y-1 text-xs">
-                <div>
-                  <strong>{item.Region}</strong> / {item.Division}
-                </div>
-                <div>ID: {id}</div>
-                <div>FDH: {item["FDH MXID"]}</div>
-                <div>Capacity: {item.CAPACITY}</div>
-                <div>{(item.distance / 1000).toFixed(2)} km</div>
-              </div>
-            </Tooltip>
-          </Marker>
-        );
-      })}
+      {renderMarkers(primaryData, icon1, primaryLabel)}
+      {renderMarkers(secondaryData, icon2, secondaryLabel)}
     </MapContainer>
   );
 }

@@ -16,25 +16,39 @@ const MapView = dynamic(() => import("./MapView"), {
 interface MapSectionProps {
   lat: string;
   lng: string;
-  fdh: any[];
-  fat: any[];
+  primaryData: any[];
+  secondaryData: any[];
+  primaryLabel: string;
+  secondaryLabel: string;
 }
 
-export const MapSection = ({ lat, lng, fdh, fat }: MapSectionProps) => {
-  if (!lat || !lng || (fdh.length === 0 && fat.length === 0)) {
-    return null;
-  }
+export const MapSection = ({
+  lat,
+  lng,
+  primaryData,
+  secondaryData,
+  primaryLabel,
+  secondaryLabel
+}: MapSectionProps) => {
+  if (!lat || !lng || (primaryData.length === 0 && secondaryData.length === 0)) return null;
 
   return (
     <div className="bg-gradient-to-br from-purple-900/40 to-indigo-900/40 backdrop-blur-xl border border-purple-500/30 rounded-3xl p-6 shadow-2xl">
       <div className="mb-4">
         <h2 className="text-2xl font-bold text-purple-100 mb-2">Network Map</h2>
         <p className="text-purple-200/70">
-          Interactive map showing your location and nearby network infrastructure
+          Interactive map showing your location and nearby {primaryLabel}/{secondaryLabel}{" "}
+          infrastructure
         </p>
       </div>
       <div className="rounded-2xl overflow-hidden border border-purple-500/30">
-        <MapView userPos={{ lat: parseFloat(lat), lng: parseFloat(lng) }} fdh={fdh} fat={fat} />
+        <MapView
+          userPos={{ lat: parseFloat(lat), lng: parseFloat(lng) }}
+          primaryData={primaryData}
+          secondaryData={secondaryData}
+          primaryLabel={primaryLabel}
+          secondaryLabel={secondaryLabel}
+        />
       </div>
     </div>
   );

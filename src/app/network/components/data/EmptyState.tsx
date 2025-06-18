@@ -2,9 +2,10 @@ import { Search } from "lucide-react";
 
 interface EmptyStateProps {
   show: boolean;
+  type: string;
 }
 
-export const EmptyState = ({ show }: EmptyStateProps) => {
+export const EmptyState = ({ show, type }: EmptyStateProps) => {
   if (!show) return null;
 
   return (
@@ -15,8 +16,8 @@ export const EmptyState = ({ show }: EmptyStateProps) => {
         </div>
         <h3 className="text-xl font-semibold text-purple-100">No Results Found</h3>
         <p className="text-purple-200/70">
-          No FDH or FAT locations found near the specified coordinates. Try adjusting your location
-          or search radius.
+          No {type === "GPON" ? "FDH or FAT" : "DP or DC"} locations found near the specified
+          coordinates. Try adjusting your location or search radius.
         </p>
       </div>
     </div>

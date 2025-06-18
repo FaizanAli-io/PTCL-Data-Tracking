@@ -8,7 +8,7 @@ const badgeColors: Record<string, string> = {
   TSA: "bg-green-600 text-white",
   FFO: "bg-yellow-600 text-white",
   OSP: "bg-orange-500 text-white",
-  Regular: "bg-pink-500 text-white"
+  REG: "bg-pink-500 text-white"
 };
 
 export default function EmployeeList({
