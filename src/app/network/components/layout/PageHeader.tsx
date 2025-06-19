@@ -11,8 +11,7 @@ export const PageHeader = () => (
       </h1>
     </div>
     <p className="text-purple-200/80 text-lg max-w-2xl mx-auto leading-relaxed">
-      Find the nearest FDH (Fiber Distribution Hub) and FAT (Fiber Access Terminal) locations based
-      on your coordinates
+      Find the nearest network point locations based on your coordinates
     </p>
   </div>
 );

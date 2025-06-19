@@ -25,7 +25,7 @@ export default function OrdersPage() {
   };
 
   useEffect(() => {
-    fetchOrderData;
+    fetchOrderData();
   }, []);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

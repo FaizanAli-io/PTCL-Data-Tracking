@@ -22,9 +22,10 @@ export async function POST(
       );
     }
 
+    const searchCriteria = { epi, createdAt: { gte: startOfToday() } };
+
     const existing = await prisma.findFirst({
-      epi,
-      createdAt: { gte: startOfToday() },
+      ...searchCriteria,
       OR: [{ customerName }, { customerAddress }]
     });
 
@@ -35,8 +36,9 @@ export async function POST(
       );
     }
 
-    const result = await prisma.create(body);
-    return new NextResponse(JSON.stringify(result), { status: 201 });
+    const entry = await prisma.create(body);
+    const entryCount = await prisma.count(searchCriteria);
+    return new NextResponse(JSON.stringify({ entry, entryCount }), { status: 201 });
   } catch (error) {
     console.error("[ERROR]:", error);
     return new NextResponse(JSON.stringify({ error: "Failed to create record" }), { status: 500 });
@@ -55,8 +57,8 @@ export async function GET(
     const where: any = {};
     if (from || to) {
       where.createdAt = {};
-      if (from) where.createdAt.gte = new Date(from);
       if (to) where.createdAt.lte = new Date(to);
+      if (from) where.createdAt.gte = new Date(from);
     }
 
     const { resourceType } = await params;

@@ -14,11 +14,11 @@ export default function Home() {
 
   const links = [
     { href: "/form", label: "DDS Form" },
-    { href: "/admin", label: "Admin Panel" },
+    { href: "/admin", label: "🔒 Admin Panel" },
+    { href: "#graph", label: "Graphical Visualizer" },
+    { href: "/network", label: "🔒 Network Insights" },
     { href: "/report/employee", label: "Employee Report" },
-    { href: "/report/exchange", label: "Exchange Report" },
-    { href: "/network", label: "Network Insights" },
-    { href: "#graph", label: "Graphical Visualizer (TBD)" }
+    { href: "/report/exchange", label: "Exchange Report" }
   ];
 
   return (

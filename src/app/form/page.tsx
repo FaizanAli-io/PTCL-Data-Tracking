@@ -89,7 +89,7 @@ export default function MainForm() {
 
       if (!res.ok) return handleError(result.error);
 
-      setEmployee({ ...employee, entryCount: employee.entryCount + 1 });
+      setEmployee({ ...employee, entryCount: result.entryCount });
       setLastSubmissionTime(now);
 
       if (isFieldAgent) {

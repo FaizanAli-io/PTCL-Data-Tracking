@@ -1,4 +1,4 @@
-import { Sparkles, Mail, Github, Linkedin } from "lucide-react";
+import { Sparkles, Mail, Github, Linkedin, Phone } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -16,24 +16,30 @@ export default function Footer() {
             All rights reserved. <br className="md:hidden" />
           </span>
         </div>
-        <div className="flex items-center gap-4 text-white/60">
-          <a href="mailto:thebyteoffice@gmail.com" className="hover:text-white transition">
-            <Mail size={18} />
-          </a>
-          <a
-            target="_blank"
-            href="https://github.com/FaizanAli-io"
-            className="hover:text-white transition"
-          >
-            <Github size={18} />
-          </a>
-          <a
-            target="_blank"
-            href="https://www.linkedin.com/in/faizan-ali-abdulali/"
-            className="hover:text-white transition"
-          >
-            <Linkedin size={18} />
-          </a>
+        <div className="flex flex-col items-start gap-2 text-white/60 w-max">
+          <div className="flex justify-between w-full min-w-[120px]">
+            <a href="mailto:thebyteoffice@gmail.com" className="hover:text-white transition">
+              <Mail size={18} />
+            </a>
+            <a
+              target="_blank"
+              href="https://github.com/FaizanAli-io"
+              className="hover:text-white transition"
+            >
+              <Github size={18} />
+            </a>
+            <a
+              target="_blank"
+              href="https://www.linkedin.com/in/faizan-ali-abdulali/"
+              className="hover:text-white transition"
+            >
+              <Linkedin size={18} />
+            </a>
+          </div>
+          <div className="flex items-center gap-2 text-white/70">
+            <Phone size={16} />
+            <strong>+92 313 2680496</strong>
+          </div>
         </div>
       </div>
     </footer>
