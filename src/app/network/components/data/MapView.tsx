@@ -2,7 +2,7 @@
 
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import LegendControl from "./LegendControl";
 import { MapContainer, TileLayer, Marker, Popup, Tooltip } from "react-leaflet";
 
@@ -12,6 +12,9 @@ interface MapViewProps {
   secondaryData: any[];
   primaryLabel: string;
   secondaryLabel: string;
+  userIcon: L.Icon;
+  primaryIcon: L.Icon;
+  secondaryIcon: L.Icon;
 }
 
 export default function MapView({
@@ -19,63 +22,11 @@ export default function MapView({
   primaryData,
   secondaryData,
   primaryLabel,
-  secondaryLabel
+  secondaryLabel,
+  userIcon,
+  primaryIcon,
+  secondaryIcon
 }: MapViewProps) {
-  const userIcon = useMemo(
-    () =>
-      new L.Icon({
-        iconUrl:
-          "data:image/svg+xml;base64," +
-          btoa(`
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32">
-        <circle cx="12" cy="12" r="10" fill="#8b5cf6" stroke="#ffffff" stroke-width="2"/>
-        <circle cx="12" cy="12" r="6" fill="#ffffff"/>
-        <circle cx="12" cy="12" r="3" fill="#8b5cf6"/>
-      </svg>
-    `),
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
-        popupAnchor: [0, -16]
-      }),
-    []
-  );
-
-  const icon1 = useMemo(
-    () =>
-      new L.Icon({
-        iconUrl:
-          "data:image/svg+xml;base64," +
-          btoa(`
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28">
-        <path d="M12 2L2 7v10c0 5.55 3.84 10 9 10s9-4.45 9-10V7l-8-5z" fill="#10b981" stroke="#ffffff" stroke-width="1.5"/>
-        <circle cx="12" cy="12" r="3" fill="#ffffff"/>
-      </svg>
-    `),
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
-        popupAnchor: [0, -14]
-      }),
-    []
-  );
-
-  const icon2 = useMemo(
-    () =>
-      new L.Icon({
-        iconUrl:
-          "data:image/svg+xml;base64," +
-          btoa(`
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="26" height="26">
-        <rect x="3" y="3" width="18" height="18" rx="4" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5"/>
-        <circle cx="12" cy="12" r="3" fill="#ffffff"/>
-      </svg>
-    `),
-        iconSize: [26, 26],
-        iconAnchor: [13, 13],
-        popupAnchor: [0, -13]
-      }),
-    []
-  );
-
   useEffect(() => {
     delete (L.Icon.Default.prototype as any)._getIconUrl;
     L.Icon.Default.mergeOptions({
@@ -165,11 +116,11 @@ export default function MapView({
 
   return (
     <MapContainer
-      center={[userPos.lat, userPos.lng]}
       zoom={14}
       scrollWheelZoom
-      style={{ height: "500px", width: "100%" }}
       className="rounded-2xl"
+      center={[userPos.lat, userPos.lng]}
+      style={{ height: "500px", width: "100%" }}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -179,8 +130,8 @@ export default function MapView({
       <LegendControl
         userIconUrl={userIcon.options.iconUrl as string}
         entries={[
-          { iconUrl: icon1.options.iconUrl as string, label: "Primary" },
-          { iconUrl: icon2.options.iconUrl as string, label: "Secondary" }
+          { iconUrl: primaryIcon.options.iconUrl as string, label: primaryLabel },
+          { iconUrl: secondaryIcon.options.iconUrl as string, label: secondaryLabel }
         ]}
       />
 
@@ -195,8 +146,8 @@ export default function MapView({
         </Popup>
       </Marker>
 
-      {renderMarkers(primaryData, icon1, primaryLabel)}
-      {renderMarkers(secondaryData, icon2, secondaryLabel)}
+      {renderMarkers(primaryData, primaryIcon, primaryLabel)}
+      {renderMarkers(secondaryData, secondaryIcon, secondaryLabel)}
     </MapContainer>
   );
 }

@@ -36,10 +36,6 @@ export default function Footer() {
               <Linkedin size={18} />
             </a>
           </div>
-          <div className="flex items-center gap-2 text-white/70">
-            <Phone size={16} />
-            <strong>+92 313 2680496</strong>
-          </div>
         </div>
       </div>
     </footer>

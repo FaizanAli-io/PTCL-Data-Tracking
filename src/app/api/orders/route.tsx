@@ -8,7 +8,7 @@ export async function GET() {
       include: { employee: { select: { name: true } } }
     });
 
-    return NextResponse.json(data);
+    return NextResponse.json(data.sort((a, b) => b.lastMonthPaid - a.lastMonthPaid));
   } catch (error) {
     console.error("Failed to fetch paid orders:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
@@ -20,18 +20,21 @@ export async function POST(req: Request) {
     const data = await req.json();
 
     for (const item of data) {
-      await prisma.paidOrders.upsert({
-        where: { epi: item.epi },
-        update: {
-          orderCount: item.orderCount,
-          monthToDate: item.monthToDate
-        },
-        create: {
-          epi: item.epi,
-          orderCount: item.orderCount,
-          monthToDate: item.monthToDate
-        }
-      });
+      const payload = {
+        lastMonthPaid: item.lastMonthPaid,
+        monthToDatePaid: item.monthToDatePaid,
+        monthToDateGenerated: item.monthToDateGenerated
+      };
+
+      try {
+        await prisma.paidOrders.upsert({
+          update: payload,
+          where: { epi: item.epi },
+          create: { epi: item.epi, ...payload }
+        });
+      } catch (err) {
+        console.error(`Failed to upsert for EPI ${item.epi}`);
+      }
     }
 
     return NextResponse.json({ success: true });

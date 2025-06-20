@@ -36,12 +36,18 @@ export default function EmployeeTable({ data, totalCount, mode }: EmployeeTableP
             <tr>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">EPI</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Name</th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">
+                Orders Paid Last Month
+              </th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Role</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Type</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Region</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Exchange</th>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Order Count</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">DDS Count</th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">
+                MTD Orders Generated
+              </th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">MTD Orders Paid</th>
               {rangeInput && (
                 <>
                   <th className="text-left py-4 px-6 text-slate-300 font-semibold">Min</th>
@@ -67,6 +73,11 @@ export default function EmployeeTable({ data, totalCount, mode }: EmployeeTableP
                   </Link>
                 </td>
                 <td className="py-4 px-6">
+                  <span className="px-2 py-1 bg-green-600/40 text-purple-300 rounded-full text-sm font-semibold">
+                    {emp.ordersInfo.lastMonthPaid}
+                  </span>
+                </td>
+                <td className="py-4 px-6">
                   <span className="px-2 py-1 bg-blue-600/20 text-blue-300 rounded-full text-sm">
                     {emp.role}
                   </span>
@@ -85,13 +96,18 @@ export default function EmployeeTable({ data, totalCount, mode }: EmployeeTableP
                 <td className="py-4 px-6 text-slate-300">{emp.region}</td>
                 <td className="py-4 px-6 text-slate-300">{emp.exchange}</td>
                 <td className="py-4 px-6">
-                  <span className="px-2 py-1 bg-green-600/40 text-purple-300 rounded-full text-sm font-semibold">
-                    {emp.orderCount}
+                  <span className="px-2 py-1 bg-purple-600/20 text-purple-300 rounded-full text-sm font-semibold">
+                    {emp.entryCount}
                   </span>
                 </td>
                 <td className="py-4 px-6">
-                  <span className="px-2 py-1 bg-purple-600/20 text-purple-300 rounded-full text-sm font-semibold">
-                    {emp.entryCount}
+                  <span className="px-2 py-1 bg-green-600/40 text-purple-300 rounded-full text-sm font-semibold">
+                    {emp.ordersInfo.monthToDateGenerated}
+                  </span>
+                </td>
+                <td className="py-4 px-6">
+                  <span className="px-2 py-1 bg-green-600/40 text-purple-300 rounded-full text-sm font-semibold">
+                    {emp.ordersInfo.monthToDatePaid}
                   </span>
                 </td>
                 {rangeInput && (

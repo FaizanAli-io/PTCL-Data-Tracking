@@ -33,7 +33,7 @@ const computeExchangeStats = (
   entries: { epi: string; createdAt: Date }[],
   dateMode: boolean,
   workingDays: number,
-  orderCountMap: Map<string, number>
+  orderCountMap: Map<string, any>
 ) => {
   const exchangeMap = new Map<string, { epis: string[]; region: string }>();
   const epiDayMap = new Map<string, Map<string, number>>();
@@ -57,12 +57,25 @@ const computeExchangeStats = (
   for (const [exchange, { epis, region }] of exchangeMap.entries()) {
     let missingTotal = 0;
     let averageTotal = 0;
-    let exchangeOrderCount = 0;
     let minimumTotal = dateMode ? Infinity : 0;
     let maximumTotal = dateMode ? -Infinity : 0;
 
+    let exchangeOrdersInfo = {
+      lastMonthPaid: 0,
+      monthToDatePaid: 0,
+      monthToDateGenerated: 0
+    };
+
     for (const epi of epis) {
-      exchangeOrderCount += orderCountMap.get(epi) ?? 0;
+      const ordersInfo = orderCountMap.get(epi) ?? {
+        lastMonthPaid: 0,
+        monthToDatePaid: 0,
+        monthToDateGenerated: 0
+      };
+
+      exchangeOrdersInfo.lastMonthPaid += ordersInfo.lastMonthPaid;
+      exchangeOrdersInfo.monthToDatePaid += ordersInfo.monthToDatePaid;
+      exchangeOrdersInfo.monthToDateGenerated += ordersInfo.monthToDateGenerated;
 
       const dayMap = epiDayMap.get(epi);
 
@@ -95,7 +108,7 @@ const computeExchangeStats = (
       exchange,
       headCount,
       missing,
-      orderCount: exchangeOrderCount,
+      ordersInfo: exchangeOrdersInfo,
       min: minimumTotal / (dateMode ? 1 : headCount),
       max: maximumTotal / (dateMode ? 1 : headCount),
       avg: averageTotal / (headCount - (dateMode ? missing : 0) || 1)
@@ -119,12 +132,9 @@ export async function POST(req: NextRequest) {
 
     const epis = employees.map((e) => e.epi);
 
-    const paidOrders = await prisma.paidOrders.findMany({
-      where: { epi: { in: epis } },
-      select: { epi: true, orderCount: true }
-    });
+    const paidOrders = await prisma.paidOrders.findMany({ where: { epi: { in: epis } } });
 
-    const orderCountMap = new Map(paidOrders.map((p) => [p.epi, p.orderCount]));
+    const orderCountMap = new Map(paidOrders.map((p) => [p.epi, p]));
 
     const [fsaEntries, tsaEntries] = await Promise.all([
       prisma.fSA.findMany({

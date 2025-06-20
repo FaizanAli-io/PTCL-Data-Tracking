@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   const sheets = getSheetNames();
 
   const readSheets = async (filename: string) => {
-    const filePath = path.join(process.cwd(), "public", filename);
+    const filePath = path.join(process.cwd(), "public/network", filename);
     const buffer = await fs.readFile(filePath);
     const workbook = XLSX.read(buffer, { type: "buffer" });
 

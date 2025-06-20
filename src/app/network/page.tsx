@@ -134,25 +134,13 @@ export default function NetworkPage() {
             onTypeChange={(val) => setType(val as "GPON" | "XDSL")}
           />
 
-          {type === "GPON" ? (
-            <MapSection
-              lat={lat}
-              lng={lng}
-              primaryData={fdh}
-              secondaryData={fat}
-              primaryLabel="FDH"
-              secondaryLabel="FAT"
-            />
-          ) : (
-            <MapSection
-              lat={lat}
-              lng={lng}
-              primaryData={dc}
-              secondaryData={dp}
-              primaryLabel="DC"
-              secondaryLabel="DP"
-            />
-          )}
+          <MapSection
+            lat={lat}
+            lng={lng}
+            type={type}
+            primaryData={type === "GPON" ? fdh : dc}
+            secondaryData={type === "GPON" ? fat : dp}
+          />
 
           {showResults && (
             <div className="space-y-8">

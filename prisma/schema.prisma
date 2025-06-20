@@ -97,8 +97,9 @@ model TSA {
 }
 
 model PaidOrders {
-  epi         String   @id
-  employee    Employee @relation(fields: [epi], references: [epi], onDelete: Cascade)
-  orderCount  Int
-  monthToDate Int
+  epi                  String   @id
+  employee             Employee @relation(fields: [epi], references: [epi], onDelete: Cascade)
+  lastMonthPaid        Int
+  monthToDatePaid      Int
+  monthToDateGenerated Int
 }

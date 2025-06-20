@@ -51,7 +51,7 @@ export const ControlPanel = ({
         ) : (
           <Navigation className="w-5 h-5" />
         )}
-        {isGettingLocation ? "Getting Location..." : "Get My Location"}
+        {isGettingLocation ? "Getting Location..." : "Get Customer Location"}
       </button>
 
       <CoordinateInput lat={lat} lng={lng} onLatChange={onLatChange} onLngChange={onLngChange} />

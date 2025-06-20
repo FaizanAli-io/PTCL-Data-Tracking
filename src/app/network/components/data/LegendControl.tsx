@@ -39,7 +39,7 @@ export default function LegendControl({ userIconUrl, entries }: Props) {
           <div style="margin-bottom: 6px;">🔍 <strong>Legend</strong></div>
           <div style="display: flex; align-items: center; gap: 6px;">
             <img src="${userIconUrl}" width="20" height="20" />
-            <span>Your Location</span>
+            <span>Customer</span>
           </div>
           ${entryHTML}
         </div>

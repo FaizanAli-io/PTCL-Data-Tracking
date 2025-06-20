@@ -198,69 +198,71 @@ export default function MainForm() {
     };
   }, [submitted]);
 
-  if (!employee) {
-    return (
-      <div className="max-w-md mx-auto mt-10 space-y-4">
-        <input
-          type="text"
-          placeholder="Enter Last 5 digits of EPI"
-          value={epiLast5}
-          onChange={(e) => {
-            setEpiLast5(e.target.value);
-            setError("");
-          }}
-          className="p-2 border w-full rounded"
-        />
-
-        <button
-          onClick={getEmployeeData}
-          className="w-full p-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Fetch Employee Data
-        </button>
-
-        {error && (
-          <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>
-        )}
-      </div>
-    );
-  }
-
   const { form, onChange } = isFieldAgent ? fsaState : tsaState;
 
   return (
-    <>
-      {submitted && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div
-            ref={modalRef}
-            className="bg-white rounded-xl p-6 max-w-md w-full text-center shadow-2xl space-y-4"
-          >
-            <h2 className="text-2xl font-semibold text-gray-800">Thank you for your submission!</h2>
-            <p className="text-gray-600">
-              You have submitted <span className="font-bold">{employee.entryCount}</span>{" "}
-              {employee.entryCount === 1 ? "entry" : "entries"} today.
-            </p>
+    <div className="relative z-20">
+      {employee ? (
+        <>
+          {submitted && (
+            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+              <div
+                ref={modalRef}
+                className="bg-white rounded-xl p-6 max-w-md w-full text-center shadow-2xl space-y-4 text-gray-800"
+              >
+                <h2 className="text-2xl font-semibold">Thank you for your submission!</h2>
+                <p>
+                  You have submitted <span className="font-bold">{employee.entryCount}</span>{" "}
+                  {employee.entryCount === 1 ? "entry" : "entries"} today.
+                </p>
+                <button
+                  className="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-500"
+                  onClick={() => setSubmitted(false)}
+                >
+                  Submit Again
+                </button>
+              </div>
+            </div>
+          )}
+
+          <BaseForm
+            form={form}
+            errors={errors}
+            onSubmit={submit}
+            onChange={onChange}
+            employee={employee}
+            submitting={submitting}
+            cooldownLeft={cooldownLeft}
+            isFieldAgent={isFieldAgent}
+          />
+        </>
+      ) : (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="max-w-md w-full bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-xl space-y-4">
+            <input
+              type="text"
+              placeholder="Enter Last 5 digits of EPI"
+              value={epiLast5}
+              onChange={(e) => {
+                setEpiLast5(e.target.value);
+                setError("");
+              }}
+              className="p-3 w-full rounded bg-white/20 text-white placeholder:text-white/70 border border-white/30 focus:outline-none focus:ring-2 focus:ring-purple-400"
+            />
             <button
-              className="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-500"
-              onClick={() => setSubmitted(false)}
+              onClick={getEmployeeData}
+              className="w-full p-3 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
             >
-              Submit Again
+              Fetch Employee Data
             </button>
+            {error && (
+              <div className="p-3 bg-red-200 text-red-800 rounded text-sm border border-red-400">
+                {error}
+              </div>
+            )}
           </div>
         </div>
       )}
-
-      <BaseForm
-        form={form}
-        errors={errors}
-        onSubmit={submit}
-        onChange={onChange}
-        employee={employee}
-        submitting={submitting}
-        cooldownLeft={cooldownLeft}
-        isFieldAgent={isFieldAgent}
-      />
-    </>
+    </div>
   );
 }

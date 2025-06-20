@@ -10,9 +10,17 @@ export const EmployeeData = ({ form, employee }: { form: any; employee: any }) =
 
   return (
     <div className="bg-gradient-to-br from-purple-800 via-purple-900 to-black text-white p-6 rounded-2xl shadow-xl space-y-4 border border-white/10">
-      <h1 className="text-3xl font-bold tracking-wide border-b border-purple-600 pb-3">
-        Welcome, <span className="text-purple-300">{employee.name}</span>
-      </h1>
+      <div className="flex items-center justify-between border-b border-purple-600 pb-3">
+        <h1 className="text-2xl font-semibold tracking-wide">
+          Welcome, <span className="text-purple-300">{employee.name}</span>
+        </h1>
+        <button
+          onClick={() => (window.location.href = "/gallery")}
+          className="bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+        >
+          View my Packages
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-base">
         <Field label="EPI" value={employee.epi} />

@@ -1,5 +1,8 @@
+"use client";
+
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
+import { getMapIcons } from "../../hooks/getMapIcons";
 
 const MapView = dynamic(() => import("./MapView"), {
   ssr: false,
@@ -18,27 +21,35 @@ interface MapSectionProps {
   lng: string;
   primaryData: any[];
   secondaryData: any[];
-  primaryLabel: string;
-  secondaryLabel: string;
+  type: "GPON" | "XDSL";
 }
 
-export const MapSection = ({
-  lat,
-  lng,
-  primaryData,
-  secondaryData,
-  primaryLabel,
-  secondaryLabel
-}: MapSectionProps) => {
+export const MapSection = ({ lat, lng, primaryData, secondaryData, type }: MapSectionProps) => {
   if (!lat || !lng || (primaryData.length === 0 && secondaryData.length === 0)) return null;
+
+  const { userIcon, fdhIcon, fatIcon, dcIcon, dpIcon } = getMapIcons();
+
+  const config = {
+    GPON: {
+      primaryLabel: "FDH",
+      secondaryLabel: "FAT",
+      primaryIcon: fdhIcon,
+      secondaryIcon: fatIcon
+    },
+    XDSL: {
+      primaryLabel: "DC / MSAG",
+      secondaryLabel: "DP",
+      primaryIcon: dcIcon,
+      secondaryIcon: dpIcon
+    }
+  }[type];
 
   return (
     <div className="bg-gradient-to-br from-purple-900/40 to-indigo-900/40 backdrop-blur-xl border border-purple-500/30 rounded-3xl p-6 shadow-2xl">
       <div className="mb-4">
         <h2 className="text-2xl font-bold text-purple-100 mb-2">Network Map</h2>
         <p className="text-purple-200/70">
-          Interactive map showing your location and nearby {primaryLabel}/{secondaryLabel}{" "}
-          infrastructure
+          Interactive map showing your location and nearby {type} infrastructure
         </p>
       </div>
       <div className="rounded-2xl overflow-hidden border border-purple-500/30">
@@ -46,8 +57,11 @@ export const MapSection = ({
           userPos={{ lat: parseFloat(lat), lng: parseFloat(lng) }}
           primaryData={primaryData}
           secondaryData={secondaryData}
-          primaryLabel={primaryLabel}
-          secondaryLabel={secondaryLabel}
+          primaryLabel={config.primaryLabel}
+          secondaryLabel={config.secondaryLabel}
+          userIcon={userIcon}
+          primaryIcon={config.primaryIcon}
+          secondaryIcon={config.secondaryIcon}
         />
       </div>
     </div>

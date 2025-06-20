@@ -33,6 +33,13 @@ export default function Home() {
         <p className="text-sm text-purple-300 mt-2">— {quote.author}</p>
       </blockquote>
 
+      <Link
+        href="/gallery"
+        className="mb-8 px-6 py-3 bg-purple-600 rounded-full text-lg font-semibold hover:bg-purple-700 transition-all shadow-lg"
+      >
+        View Our Packages
+      </Link>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-xl">
         {links.map((link) => (
           <Link

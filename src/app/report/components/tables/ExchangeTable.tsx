@@ -34,7 +34,13 @@ export default function ExchangeTable({ data, totalCount, mode }: ExchangeTableP
             <tr>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Region</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Exchange</th>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Order Count</th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">
+                Orders Paid Last Month
+              </th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">
+                MTD Orders Generated
+              </th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">MTD Orders Paid</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Headcount</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">
                 Missing {rangeInput ? " Days" : " People"}
@@ -59,8 +65,18 @@ export default function ExchangeTable({ data, totalCount, mode }: ExchangeTableP
                   </span>
                 </td>
                 <td className="py-4 px-6">
+                  <span className="px-2 py-1 bg-blue-600/40 text-purple-300 rounded-full text-sm font-semibold">
+                    {exchange.ordersInfo.lastMonthPaid}
+                  </span>
+                </td>
+                <td className="py-4 px-6">
+                  <span className="px-2 py-1 bg-yellow-600/40 text-purple-300 rounded-full text-sm font-semibold">
+                    {exchange.ordersInfo.monthToDateGenerated}
+                  </span>
+                </td>
+                <td className="py-4 px-6">
                   <span className="px-2 py-1 bg-green-600/40 text-purple-300 rounded-full text-sm font-semibold">
-                    {exchange.orderCount}
+                    {exchange.ordersInfo.monthToDatePaid}
                   </span>
                 </td>
                 <td className="py-4 px-6 text-white">{exchange.headCount}</td>
@@ -72,12 +88,12 @@ export default function ExchangeTable({ data, totalCount, mode }: ExchangeTableP
                         : "bg-green-600/20 text-green-300"
                     }`}
                   >
-                    {exchange.missing.toFixed(1)}
+                    {exchange.missing.toFixed(0)}
                   </span>
                 </td>
-                <td className="py-4 px-6 text-white">{exchange.min.toFixed(1)}</td>
-                <td className="py-4 px-6 text-white">{exchange.avg.toFixed(1)}</td>
-                <td className="py-4 px-6 text-white">{exchange.max.toFixed(1)}</td>
+                <td className="py-4 px-6 text-white">{exchange.min.toFixed(0)}</td>
+                <td className="py-4 px-6 text-white">{exchange.avg.toFixed(0)}</td>
+                <td className="py-4 px-6 text-white">{exchange.max.toFixed(0)}</td>
               </tr>
             ))}
           </tbody>
