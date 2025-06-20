@@ -9,6 +9,15 @@ type EmployeeTableProps = {
   mode: DateMode;
 };
 
+const badgeColors: Record<string, string> = {
+  MGT: "bg-black text-white",
+  FSA: "bg-blue-600 text-white",
+  TSA: "bg-pink-500 text-white",
+  FFO: "bg-purple-600 text-white",
+  OSP: "bg-orange-500 text-white",
+  REG: "bg-green-800 text-white"
+};
+
 export default function EmployeeTable({ data, totalCount, mode }: EmployeeTableProps) {
   const rangeInput = ["mtd", "ytd", "custom-range"].includes(mode);
 
@@ -36,26 +45,26 @@ export default function EmployeeTable({ data, totalCount, mode }: EmployeeTableP
             <tr>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">EPI</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Name</th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">DDS Count</th>
+              {rangeInput && (
+                <>
+                  <th className="text-left py-4 px-6 text-slate-300 font-semibold">Missing</th>
+                  <th className="text-left py-4 px-6 text-slate-300 font-semibold">Min</th>
+                  <th className="text-left py-4 px-6 text-slate-300 font-semibold">Avg</th>
+                  <th className="text-left py-4 px-6 text-slate-300 font-semibold">Max</th>
+                </>
+              )}
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">MTD Orders Paid</th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">
+                MTD Orders Generated
+              </th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">
                 Orders Paid Last Month
               </th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Role</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Type</th>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Region</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Exchange</th>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">DDS Count</th>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">
-                MTD Orders Generated
-              </th>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">MTD Orders Paid</th>
-              {rangeInput && (
-                <>
-                  <th className="text-left py-4 px-6 text-slate-300 font-semibold">Min</th>
-                  <th className="text-left py-4 px-6 text-slate-300 font-semibold">Avg</th>
-                  <th className="text-left py-4 px-6 text-slate-300 font-semibold">Max</th>
-                  <th className="text-left py-4 px-6 text-slate-300 font-semibold">Missing</th>
-                </>
-              )}
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Region</th>
             </tr>
           </thead>
           <tbody>
@@ -73,48 +82,12 @@ export default function EmployeeTable({ data, totalCount, mode }: EmployeeTableP
                   </Link>
                 </td>
                 <td className="py-4 px-6">
-                  <span className="px-2 py-1 bg-green-600/40 text-purple-300 rounded-full text-sm font-semibold">
-                    {emp.ordersInfo.lastMonthPaid}
-                  </span>
-                </td>
-                <td className="py-4 px-6">
-                  <span className="px-2 py-1 bg-blue-600/20 text-blue-300 rounded-full text-sm">
-                    {emp.role}
-                  </span>
-                </td>
-                <td className="py-4 px-6">
-                  <span
-                    className={`px-2 py-1 rounded-full text-sm ${
-                      emp.type === "Full-time"
-                        ? "bg-green-600/20 text-green-300"
-                        : "bg-yellow-600/20 text-yellow-300"
-                    }`}
-                  >
-                    {emp.type}
-                  </span>
-                </td>
-                <td className="py-4 px-6 text-slate-300">{emp.region}</td>
-                <td className="py-4 px-6 text-slate-300">{emp.exchange}</td>
-                <td className="py-4 px-6">
                   <span className="px-2 py-1 bg-purple-600/20 text-purple-300 rounded-full text-sm font-semibold">
                     {emp.entryCount}
                   </span>
                 </td>
-                <td className="py-4 px-6">
-                  <span className="px-2 py-1 bg-green-600/40 text-purple-300 rounded-full text-sm font-semibold">
-                    {emp.ordersInfo.monthToDateGenerated}
-                  </span>
-                </td>
-                <td className="py-4 px-6">
-                  <span className="px-2 py-1 bg-green-600/40 text-purple-300 rounded-full text-sm font-semibold">
-                    {emp.ordersInfo.monthToDatePaid}
-                  </span>
-                </td>
                 {rangeInput && (
                   <>
-                    <td className="py-4 px-6 text-white">{emp.min}</td>
-                    <td className="py-4 px-6 text-white">{emp.avg?.toFixed(1)}</td>
-                    <td className="py-4 px-6 text-white">{emp.max}</td>
                     <td className="py-4 px-6">
                       <span
                         className={`px-2 py-1 rounded-full text-sm ${
@@ -126,8 +99,38 @@ export default function EmployeeTable({ data, totalCount, mode }: EmployeeTableP
                         {emp.absent || 0}
                       </span>
                     </td>
+                    <td className="py-4 px-6 text-white">{emp.min}</td>
+                    <td className="py-4 px-6 text-white">{emp.avg?.toFixed(0)}</td>
+                    <td className="py-4 px-6 text-white">{emp.max}</td>
                   </>
                 )}
+                <td className="py-4 px-6">
+                  <span className="px-2 py-1 bg-green-600/40 text-purple-300 rounded-full text-sm font-semibold">
+                    {emp.ordersInfo.monthToDatePaid}
+                  </span>
+                </td>
+                <td className="py-4 px-6">
+                  <span className="px-2 py-1 bg-yellow-600/40 text-purple-300 rounded-full text-sm font-semibold">
+                    {emp.ordersInfo.monthToDateGenerated}
+                  </span>
+                </td>
+                <td className="py-4 px-6">
+                  <span className="px-2 py-1 bg-blue-600/40 text-purple-300 rounded-full text-sm font-semibold">
+                    {emp.ordersInfo.lastMonthPaid}
+                  </span>
+                </td>
+                <td className="py-4 px-6">
+                  <span className={`px-2 py-1 rounded-full text-sm ${badgeColors[emp.role]}`}>
+                    {emp.role}
+                  </span>
+                </td>
+                <td className="py-4 px-6">
+                  <span className={`px-2 py-1 rounded-full text-sm ${badgeColors[emp.type]}`}>
+                    {emp.type}
+                  </span>
+                </td>
+                <td className="py-4 px-6 text-slate-300">{emp.exchange}</td>
+                <td className="py-4 px-6 text-slate-300">{emp.region}</td>
               </tr>
             ))}
           </tbody>

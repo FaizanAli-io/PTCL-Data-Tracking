@@ -111,6 +111,7 @@ const computeExchangeStats = (
       ordersInfo: exchangeOrdersInfo,
       min: minimumTotal / (dateMode ? 1 : headCount),
       max: maximumTotal / (dateMode ? 1 : headCount),
+      efficiency: exchangeOrdersInfo.monthToDatePaid / headCount,
       avg: averageTotal / (headCount - (dateMode ? missing : 0) || 1)
     });
   }

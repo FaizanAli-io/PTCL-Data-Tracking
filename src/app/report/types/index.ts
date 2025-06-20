@@ -33,6 +33,7 @@ export type ExchangeAnalytics = {
   region: string;
   exchange: string;
   ordersInfo: ordersInfo;
+  efficiency: number;
   headCount: number;
   missing: number;
   min: number;

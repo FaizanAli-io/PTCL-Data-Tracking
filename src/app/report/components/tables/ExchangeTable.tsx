@@ -32,15 +32,7 @@ export default function ExchangeTable({ data, totalCount, mode }: ExchangeTableP
         <table className="w-full">
           <thead className="bg-white/5">
             <tr>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Region</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Exchange</th>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">
-                Orders Paid Last Month
-              </th>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">
-                MTD Orders Generated
-              </th>
-              <th className="text-left py-4 px-6 text-slate-300 font-semibold">MTD Orders Paid</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Headcount</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">
                 Missing {rangeInput ? " Days" : " People"}
@@ -48,6 +40,15 @@ export default function ExchangeTable({ data, totalCount, mode }: ExchangeTableP
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Min</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Avg</th>
               <th className="text-left py-4 px-6 text-slate-300 font-semibold">Max</th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Efficiency</th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">MTD Orders Paid</th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">
+                MTD Orders Generated
+              </th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">
+                Orders Paid Last Month
+              </th>
+              <th className="text-left py-4 px-6 text-slate-300 font-semibold">Region</th>
             </tr>
           </thead>
           <tbody>
@@ -58,28 +59,16 @@ export default function ExchangeTable({ data, totalCount, mode }: ExchangeTableP
                   index % 2 === 0 ? "bg-white/2" : ""
                 }`}
               >
-                <td className="py-4 px-6 text-white">{exchange.region}</td>
                 <td className="py-4 px-6">
                   <span className="px-3 py-1 bg-purple-600/20 text-purple-300 rounded-full text-sm font-semibold">
                     {exchange.exchange}
                   </span>
                 </td>
                 <td className="py-4 px-6">
-                  <span className="px-2 py-1 bg-blue-600/40 text-purple-300 rounded-full text-sm font-semibold">
-                    {exchange.ordersInfo.lastMonthPaid}
+                  <span className="px-2 py-1 bg-black text-purple-300 rounded-full text-sm font-semibold">
+                    {exchange.headCount}
                   </span>
                 </td>
-                <td className="py-4 px-6">
-                  <span className="px-2 py-1 bg-yellow-600/40 text-purple-300 rounded-full text-sm font-semibold">
-                    {exchange.ordersInfo.monthToDateGenerated}
-                  </span>
-                </td>
-                <td className="py-4 px-6">
-                  <span className="px-2 py-1 bg-green-600/40 text-purple-300 rounded-full text-sm font-semibold">
-                    {exchange.ordersInfo.monthToDatePaid}
-                  </span>
-                </td>
-                <td className="py-4 px-6 text-white">{exchange.headCount}</td>
                 <td className="py-4 px-6">
                   <span
                     className={`px-2 py-1 rounded-full text-sm ${
@@ -94,6 +83,33 @@ export default function ExchangeTable({ data, totalCount, mode }: ExchangeTableP
                 <td className="py-4 px-6 text-white">{exchange.min.toFixed(0)}</td>
                 <td className="py-4 px-6 text-white">{exchange.avg.toFixed(0)}</td>
                 <td className="py-4 px-6 text-white">{exchange.max.toFixed(0)}</td>
+                <td
+                  className={`py-4 px-6 font-bold text-${
+                    exchange.efficiency < 5
+                      ? "red-500"
+                      : exchange.efficiency < 10
+                      ? "yellow-400"
+                      : "green-400"
+                  }`}
+                >
+                  {exchange.efficiency.toFixed(1)}
+                </td>
+                <td className="py-4 px-6">
+                  <span className="px-2 py-1 bg-green-600/40 text-purple-300 rounded-full text-sm font-semibold">
+                    {exchange.ordersInfo.monthToDatePaid}
+                  </span>
+                </td>
+                <td className="py-4 px-6">
+                  <span className="px-2 py-1 bg-yellow-600/40 text-purple-300 rounded-full text-sm font-semibold">
+                    {exchange.ordersInfo.monthToDateGenerated}
+                  </span>
+                </td>
+                <td className="py-4 px-6">
+                  <span className="px-2 py-1 bg-blue-600/40 text-purple-300 rounded-full text-sm font-semibold">
+                    {exchange.ordersInfo.lastMonthPaid}
+                  </span>
+                </td>
+                <td className="py-4 px-6 text-white">{exchange.region}</td>
               </tr>
             ))}
           </tbody>

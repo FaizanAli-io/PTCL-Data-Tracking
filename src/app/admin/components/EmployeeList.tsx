@@ -5,10 +5,10 @@ import Link from "next/link";
 const badgeColors: Record<string, string> = {
   MGT: "bg-black text-white",
   FSA: "bg-blue-600 text-white",
-  TSA: "bg-green-600 text-white",
-  FFO: "bg-yellow-600 text-white",
+  TSA: "bg-pink-500 text-white",
+  FFO: "bg-purple-600 text-white",
   OSP: "bg-orange-500 text-white",
-  REG: "bg-pink-500 text-white"
+  REG: "bg-green-800 text-white"
 };
 
 export default function EmployeeList({
