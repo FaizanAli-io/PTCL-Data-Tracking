@@ -18,7 +18,8 @@ export default function Home() {
     { href: "#graph", label: "Graphical Visualizer" },
     { href: "/network", label: "🔒 Network Insights" },
     { href: "/report/employee", label: "Employee Report" },
-    { href: "/report/exchange", label: "Exchange Report" }
+    { href: "/report/exchange", label: "Exchange Report" },
+    { href: "/report/efficiency", label: "Efficiency Report" }
   ];
 
   return (

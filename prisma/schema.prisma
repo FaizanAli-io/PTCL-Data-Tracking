@@ -51,7 +51,7 @@ enum EntryType {
 }
 
 model Employee {
-  epi        String       @id
+  epi        String      @id
   name       String
   type       JobType
   role       JobRole
@@ -60,7 +60,7 @@ model Employee {
   joinDate   DateTime
   FSA        FSA[]
   TSA        TSA[]
-  PaidOrders PaidOrders[]
+  PaidOrders PaidOrders?
 }
 
 model FSA {
