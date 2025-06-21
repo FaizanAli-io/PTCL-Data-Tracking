@@ -86,7 +86,7 @@ export default function ExchangeTable({ data, totalCount, mode }: ExchangeTableP
                 <td
                   className={`py-4 px-6 font-bold text-${
                     exchange.efficiency < 5
-                      ? "red-500"
+                      ? "red-400"
                       : exchange.efficiency < 10
                       ? "yellow-400"
                       : "green-400"

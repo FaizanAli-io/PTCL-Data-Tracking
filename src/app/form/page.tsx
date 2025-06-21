@@ -208,7 +208,7 @@ export default function MainForm() {
             <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
               <div
                 ref={modalRef}
-                className="bg-white rounded-xl p-6 max-w-md w-full text-center shadow-2xl space-y-4 text-gray-800"
+                className="bg-zinc-900 rounded-xl p-6 max-w-md w-full text-center shadow-2xl space-y-4 text-white"
               >
                 <h2 className="text-2xl font-semibold">Thank you for your submission!</h2>
                 <p>
@@ -216,7 +216,7 @@ export default function MainForm() {
                   {employee.entryCount === 1 ? "entry" : "entries"} today.
                 </p>
                 <button
-                  className="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-500"
+                  className="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-500 shadow-md"
                   onClick={() => setSubmitted(false)}
                 >
                   Submit Again
@@ -256,7 +256,7 @@ export default function MainForm() {
               Fetch Employee Data
             </button>
             {error && (
-              <div className="p-3 bg-red-200 text-red-800 rounded text-sm border border-red-400">
+              <div className="p-3 bg-red-900 text-red-100 border border-red-600 rounded text-sm">
                 {error}
               </div>
             )}
