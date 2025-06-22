@@ -141,7 +141,7 @@ export default function EmployeeAnalyticsPage() {
           timeLeft={timeLeft}
         />
 
-        <EmployeeTable data={filteredData} totalCount={data.length} mode={mode} />
+        <EmployeeTable data={filteredData} totalCount={data.length} rangeMode={rangeInput} />
       </div>
     </div>
   );

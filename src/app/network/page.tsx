@@ -14,14 +14,14 @@ import PasswordGate from "@/components/PasswordGate";
 
 export default function NetworkPage() {
   const { lat, lng, isGettingLocation, getCurrentPosition, setCoordinates } = useGeolocation();
-  const { fdh, fat, dc, dp, isLoading, fetchNetworkData } = useNetworkData();
+  const { FDH, FAT, DC, DP, isLoading, fetchNetworkData } = useNetworkData();
 
   const [thresholdEnabled, setThresholdEnabled] = useState(false);
   const [type, setType] = useState<"GPON" | "XDSL">("GPON");
   const [threshold, setThreshold] = useState("10000");
   const [limit, setLimit] = useState("5");
 
-  const cleanFDH = fdh.map((row) => ({
+  const cleanFDH = FDH.map((row) => ({
     Region: row.Region,
     Exchange: row.Exchange.slice(4),
     "FDH ID": row["FDH MXID"],
@@ -30,10 +30,10 @@ export default function NetworkPage() {
     "FAT Count": row["FAT COUNT"],
     Latitude: row.LAT,
     Longitude: row.LOG,
-    Distance: (row.distance / 1000).toFixed(2) + " km"
+    Distance: row.distance + " meters"
   }));
 
-  const cleanFAT = fat.map((row) => ({
+  const cleanFAT = FAT.map((row) => ({
     Region: row.Region,
     Division: row.Division,
     "FDH ID": row["FDH MXID"],
@@ -41,10 +41,10 @@ export default function NetworkPage() {
     Capacity: row.CAPACITY,
     Latitude: row.LAT,
     Longitude: row.LOG,
-    Distance: (row.distance / 1000).toFixed(2) + " km"
+    Distance: row.distance + " meters"
   }));
 
-  const cleanDC = dc.map((row) => ({
+  const cleanDC = DC.map((row) => ({
     Region: row.Region,
     Exchange: row.Exchange,
     "DC Name": row["DC Name"],
@@ -56,10 +56,10 @@ export default function NetworkPage() {
     Spare: row["DC Spare Capacity"],
     Latitude: row.LAT,
     Longitude: row.LOG,
-    Distance: (row.distance / 1000).toFixed(2) + " km"
+    Distance: row.distance + " meters"
   }));
 
-  const cleanDP = dp.map((row) => ({
+  const cleanDP = DP.map((row) => ({
     Region: row.Region,
     Exchange: row.Exchange,
     "DC Name": row["DC Name"],
@@ -70,7 +70,7 @@ export default function NetworkPage() {
     Loading: row["DP Loading"],
     Latitude: row.LAT,
     Longitude: row.LOG,
-    Distance: (row.distance / 1000).toFixed(2) + " km"
+    Distance: row.distance + " meters"
   }));
 
   const handleLatChange = useCallback(
@@ -100,12 +100,12 @@ export default function NetworkPage() {
     Boolean(lat) &&
     Boolean(lng) &&
     !isLoading &&
-    ((type === "GPON" && fdh.length === 0 && fat.length === 0) ||
-      (type === "XDSL" && dc.length === 0 && dp.length === 0));
+    ((type === "GPON" && FDH.length === 0 && FAT.length === 0) ||
+      (type === "XDSL" && DC.length === 0 && DP.length === 0));
 
   const showResults =
-    (type === "GPON" && fdh.length > 0 && fat.length > 0) ||
-    (type === "XDSL" && dc.length > 0 && dp.length > 0);
+    (type === "GPON" && FDH.length > 0 && FAT.length > 0) ||
+    (type === "XDSL" && DC.length > 0 && DP.length > 0);
 
   return (
     <PasswordGate>
@@ -138,8 +138,8 @@ export default function NetworkPage() {
             lat={lat}
             lng={lng}
             type={type}
-            primaryData={type === "GPON" ? fdh : dc}
-            secondaryData={type === "GPON" ? fat : dp}
+            primaryData={type === "GPON" ? FDH : DC}
+            secondaryData={type === "GPON" ? FAT : DP}
           />
 
           {showResults && (

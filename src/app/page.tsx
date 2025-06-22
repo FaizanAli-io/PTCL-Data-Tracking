@@ -4,6 +4,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { salesQuotes } from "@/misc/quotes";
 
+interface linkButton {
+  href: string;
+  label: string;
+  disabled: string;
+}
+
 export default function Home() {
   const [quote, setQuote] = useState(salesQuotes[0]);
 
@@ -14,12 +20,15 @@ export default function Home() {
 
   const links = [
     { href: "/form", label: "DDS Form" },
-    { href: "/admin", label: "🔒 Admin Panel" },
-    { href: "#graph", label: "Graphical Visualizer" },
-    { href: "/network", label: "🔒 Network Insights" },
     { href: "/report/employee", label: "Employee Report" },
     { href: "/report/exchange", label: "Exchange Report" },
-    { href: "/report/efficiency", label: "Efficiency Report" }
+    { href: "/report/efficiency", label: "Efficiency Report" },
+    { href: "/admin", label: "🔒 Admin Panel" },
+    { href: "/network", label: "🔒 Network Insights (Feasability)" },
+    { href: "#", label: "Distributor-Referral Leads", disabled: true },
+    { href: "#", label: "Graphical Visualizer", disabled: true },
+    { href: "#", label: "Customer Verfication", disabled: true },
+    { href: "#", label: "Competitor Analysis", disabled: true }
   ];
 
   return (
@@ -36,17 +45,22 @@ export default function Home() {
 
       <Link
         href="/gallery"
-        className="mb-8 px-6 py-3 bg-purple-600 rounded-full text-lg font-semibold hover:bg-purple-700 transition-all shadow-lg"
+        className="mb-8 px-6 py-3 bg-green-600 rounded-full text-lg font-semibold hover:bg-green-700 transition-all shadow-lg"
       >
-        View Our Packages
+        PTCL Packages
       </Link>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-xl">
         {links.map((link) => (
           <Link
-            key={link.href}
+            key={link.label}
             href={link.href}
-            className="block w-full text-center p-4 bg-purple-600 rounded-lg hover:bg-purple-700 transition-all shadow-md"
+            className={
+              "block w-full text-center p-4 rounded-lg transition-all shadow-md " +
+              (link.disabled
+                ? "bg-gray-600 hover:bg-gray-700"
+                : "bg-purple-600 hover:bg-purple-700")
+            }
           >
             {link.label}
           </Link>

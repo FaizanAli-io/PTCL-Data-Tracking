@@ -7,14 +7,8 @@ export type FilterState = {
   exchange: string;
 };
 
-type ordersInfo = {
-  lastMonthPaid: number;
-  monthToDatePaid: number;
-  monthToDateGenerated: number;
-};
-
 export type EmployeeAnalytics = {
-  epi: number;
+  epi: string;
   name: string;
   role: string;
   type: string;
@@ -22,7 +16,9 @@ export type EmployeeAnalytics = {
   exchange: string;
   joinDate: string;
   entryCount: number;
-  ordersInfo: ordersInfo;
+  lastMonthPaid: number;
+  monthToDatePaid: number;
+  monthToDateGenerated: number;
   avg?: number;
   min?: number;
   max?: number;
@@ -32,7 +28,9 @@ export type EmployeeAnalytics = {
 export type ExchangeAnalytics = {
   region: string;
   exchange: string;
-  ordersInfo: ordersInfo;
+  lastMonthPaid: number;
+  monthToDatePaid: number;
+  monthToDateGenerated: number;
   efficiency: number;
   headCount: number;
   missing: number;

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { BaseForm } from "./BaseForm";
 import { useFormState } from "./hooks/useFormState";
 import { useState, useRef, useEffect } from "react";
@@ -180,24 +181,6 @@ export default function MainForm() {
     }
   };
 
-  const modalRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-        setSubmitted(false);
-      }
-    };
-
-    if (submitted) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [submitted]);
-
   const { form, onChange } = isFieldAgent ? fsaState : tsaState;
 
   return (
@@ -206,20 +189,23 @@ export default function MainForm() {
         <>
           {submitted && (
             <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-              <div
-                ref={modalRef}
-                className="bg-zinc-900 rounded-xl p-6 max-w-md w-full text-center shadow-2xl space-y-4 text-white"
-              >
+              <div className="bg-zinc-900 rounded-xl p-6 max-w-md w-full text-center shadow-2xl space-y-4 text-white">
                 <h2 className="text-2xl font-semibold">Thank you for your submission!</h2>
                 <p>
                   You have submitted <span className="font-bold">{employee.entryCount}</span>{" "}
                   {employee.entryCount === 1 ? "entry" : "entries"} today.
                 </p>
+
                 <button
-                  className="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-500 shadow-md"
+                  className={`mt-4 px-4 py-2 text-white rounded shadow-md ${
+                    cooldownLeft > 0
+                      ? "bg-gray-500 cursor-not-allowed"
+                      : "bg-purple-600 hover:bg-purple-500"
+                  }`}
+                  disabled={cooldownLeft > 0}
                   onClick={() => setSubmitted(false)}
                 >
-                  Submit Again
+                  {cooldownLeft > 0 ? `Please wait ${cooldownLeft}s...` : "Submit Again"}
                 </button>
               </div>
             </div>
@@ -237,7 +223,7 @@ export default function MainForm() {
           />
         </>
       ) : (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex flex-col items-center justify-center space-y-6">
           <div className="max-w-md w-full bg-white/10 backdrop-blur-md p-6 rounded-xl shadow-xl space-y-4">
             <input
               type="text"
@@ -249,18 +235,28 @@ export default function MainForm() {
               }}
               className="p-3 w-full rounded bg-white/20 text-white placeholder:text-white/70 border border-white/30 focus:outline-none focus:ring-2 focus:ring-purple-400"
             />
+
             <button
               onClick={getEmployeeData}
               className="w-full p-3 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
             >
               Fetch Employee Data
             </button>
+
             {error && (
               <div className="p-3 bg-red-900 text-red-100 border border-red-600 rounded text-sm">
                 {error}
               </div>
             )}
           </div>
+
+          <Image
+            alt="Image"
+            width={800}
+            height={600}
+            src={`/images/Flash Fiber/promotion.jpg`}
+            className="w-full max-w-md h-auto rounded-xl shadow-lg"
+          />
         </div>
       )}
     </div>

@@ -108,7 +108,7 @@ const computeExchangeStats = (
       exchange,
       headCount,
       missing,
-      ordersInfo: exchangeOrdersInfo,
+      ...exchangeOrdersInfo,
       min: minimumTotal / (dateMode ? 1 : headCount),
       max: maximumTotal / (dateMode ? 1 : headCount),
       efficiency: exchangeOrdersInfo.monthToDatePaid / headCount,
@@ -116,9 +116,11 @@ const computeExchangeStats = (
     });
   }
 
-  return results
-    .sort((a, b) => b.avg - a.avg)
-    .map((x) => ({ ...x, region: formatEnum(x.region), exchange: formatEnum(x.exchange) }));
+  return results.map((x) => ({
+    ...x,
+    region: formatEnum(x.region),
+    exchange: formatEnum(x.exchange)
+  }));
 };
 
 export async function POST(req: NextRequest) {
@@ -128,7 +130,13 @@ export async function POST(req: NextRequest) {
 
     const employees = await prisma.employee.findMany({
       select: { epi: true, region: true, exchange: true },
-      where: { ...(role && { role }), ...(type && { type }), NOT: { role: "MGT", type: "MGT" } }
+      where: {
+        ...(role && { role }),
+        ...(type && { type }),
+        NOT: {
+          OR: [{ role: "MGT" }, { type: "MGT" }]
+        }
+      }
     });
 
     const epis = employees.map((e) => e.epi);

@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 
     const employees = await prisma.employee.findMany({
       select: { epi: true, name: true, role: true, type: true, region: true, exchange: true },
-      where: { NOT: { role: "MGT", type: "MGT" } }
+      where: { NOT: { OR: [{ role: "MGT" }, { type: "MGT" }] } }
     });
 
     const epis = employees.map((e) => e.epi);
@@ -106,22 +106,21 @@ export async function POST(req: NextRequest) {
       return {
         ...emp,
         absent,
-        epi: emp.epi,
         avg: stats.avg,
         min: stats.min,
         max: stats.max,
         entryCount: stats.entryCount,
         region: formatEnum(emp.region),
         exchange: formatEnum(emp.exchange),
-        ordersInfo: orderCountMap.get(emp.epi) ?? {
+        ...(orderCountMap.get(emp.epi) ?? {
+          epi: emp.epi,
           lastMonthPaid: 0,
           monthToDatePaid: 0,
           monthToDateGenerated: 0
-        }
+        })
       };
     });
 
-    report.sort((a, b) => b.entryCount - a.entryCount);
     return NextResponse.json(report, { status: 200 });
   } catch (e) {
     console.error("Error generating report:", e);

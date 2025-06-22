@@ -142,7 +142,11 @@ export default function ExchangeAnalyticsPage() {
           timeLeft={timeLeft}
         />
 
-        <ExchangeTable data={filteredData} totalCount={exchangeData.length} mode={mode} />
+        <ExchangeTable
+          data={filteredData}
+          totalCount={exchangeData.length}
+          rangeMode={["mtd", "ytd", "custom-range"].includes(mode)}
+        />
       </div>
     </div>
   );

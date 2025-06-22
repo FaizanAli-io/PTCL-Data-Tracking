@@ -74,6 +74,6 @@ export async function GET(req: NextRequest) {
   const result2 = filterAndSort(allSheet2, latKey, lngKey);
 
   return NextResponse.json(
-    type === "XDSL" ? { dc: result1, dp: result2 } : { fdh: result1, fat: result2 }
+    type === "XDSL" ? { DC: result1, DP: result2 } : { FDH: result1, FAT: result2 }
   );
 }

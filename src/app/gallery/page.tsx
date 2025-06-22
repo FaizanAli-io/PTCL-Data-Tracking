@@ -23,7 +23,7 @@ export default function GalleryPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-white px-6 py-12">
       <div className="flex justify-between items-center mb-10">
-        <h1 className="text-4xl font-bold text-center flex-1">Image Gallery</h1>
+        <h1 className="text-4xl font-bold text-center flex-1">Package Gallery</h1>
         <button
           onClick={() => (window.location.href = "/form")}
           className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium ml-4"

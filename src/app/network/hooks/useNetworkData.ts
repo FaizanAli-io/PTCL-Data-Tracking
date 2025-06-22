@@ -3,10 +3,10 @@ import { useState, useCallback } from "react";
 type RecordType = Record<string, any>;
 
 interface NetworkDataState {
-  fdh: RecordType[];
-  fat: RecordType[];
-  dc: RecordType[];
-  dp: RecordType[];
+  FDH: RecordType[];
+  FAT: RecordType[];
+  DC: RecordType[];
+  DP: RecordType[];
   isLoading: boolean;
 }
 
@@ -19,10 +19,10 @@ interface FetchOptions {
 
 export const useNetworkData = () => {
   const [state, setState] = useState<NetworkDataState>({
-    fdh: [],
-    fat: [],
-    dc: [],
-    dp: [],
+    FDH: [],
+    FAT: [],
+    DC: [],
+    DP: [],
     isLoading: false
   });
 
@@ -49,10 +49,10 @@ export const useNetworkData = () => {
 
         setState((prev) => ({
           ...prev,
-          fdh: data.fdh || [],
-          fat: data.fat || [],
-          dc: data.dc || [],
-          dp: data.dp || [],
+          FDH: data.FDH || [],
+          FAT: data.FAT || [],
+          DC: data.DC || [],
+          DP: data.DP || [],
           isLoading: false
         }));
       } catch (error) {
@@ -65,7 +65,7 @@ export const useNetworkData = () => {
   );
 
   const clearData = useCallback(() => {
-    setState({ fdh: [], fat: [], dc: [], dp: [], isLoading: false });
+    setState({ FDH: [], FAT: [], DC: [], DP: [], isLoading: false });
   }, []);
 
   return {

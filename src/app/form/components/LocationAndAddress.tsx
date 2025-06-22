@@ -3,8 +3,12 @@ import { DisabledInput, InputBox } from "./InputBox";
 
 type Props = {
   form: any;
+  gponStatus: any;
+  xdslStatus: any;
   gpsAccuracy: string;
+  localErrors: string[];
   isFieldAgent: boolean;
+  localWarnings: string[];
   getLocation: () => void;
   generateAddress: () => void;
   onChange: (key: string, value: any) => void;
@@ -12,8 +16,12 @@ type Props = {
 
 export const LocationAndAddress = ({
   form,
+  gponStatus,
+  xdslStatus,
   gpsAccuracy,
+  localErrors,
   isFieldAgent,
+  localWarnings,
   getLocation,
   generateAddress,
   onChange
@@ -26,6 +34,22 @@ export const LocationAndAddress = ({
           <DisabledInput label="* Longitude" value={form.customerLongitude} />
           <DisabledInput label="Accuracy (m)" value={gpsAccuracy} />
         </div>
+
+        {localWarnings.length > 0 && (
+          <div className="bg-yellow-100 border border-yellow-300 text-yellow-800 p-3 rounded">
+            {localWarnings.map((w, i) => (
+              <div key={i}>⚠️ {w}</div>
+            ))}
+          </div>
+        )}
+
+        {localErrors.length > 0 && (
+          <div className="bg-red-100 border border-red-300 text-red-700 p-3 rounded">
+            {localErrors.map((e, i) => (
+              <div key={i}>❌ {e}</div>
+            ))}
+          </div>
+        )}
 
         <button
           type="button"
@@ -63,6 +87,34 @@ export const LocationAndAddress = ({
         </div>
 
         <Map lat={form.customerLatitude} lng={form.customerLongitude} />
+
+        <div className="flex justify-center space-x-4 p-2">
+          <div
+            className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium ${
+              gponStatus?.available
+                ? "bg-green-100 text-green-700 border border-green-200"
+                : "bg-red-100 text-red-700 border border-red-200"
+            }`}
+          >
+            <span className="text-xl">{gponStatus?.available ? "✅" : "❌"}</span>
+            <span>
+              {gponStatus?.available ? `GPON (${gponStatus.distance}m)` : "GPON Unavailable"}
+            </span>
+          </div>
+
+          <div
+            className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium ${
+              xdslStatus?.available
+                ? "bg-green-100 text-green-700 border border-green-200"
+                : "bg-red-100 text-red-700 border border-red-200"
+            }`}
+          >
+            <span className="text-xl">{xdslStatus?.available ? "✅" : "❌"}</span>
+            <span>
+              {xdslStatus?.available ? `XDSL (${xdslStatus.distance}m)` : "XDSL Unavailable"}
+            </span>
+          </div>
+        </div>
       </>
     );
   }
