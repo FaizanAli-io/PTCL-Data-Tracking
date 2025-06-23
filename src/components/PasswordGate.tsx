@@ -3,11 +3,16 @@ import clsx from "clsx";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 
-export default function PasswordGate({ children }: { children: React.ReactNode }) {
+export default function PasswordGate({
+  correctPassword,
+  children
+}: {
+  correctPassword?: string;
+  children: React.ReactNode;
+}) {
+  const [shake, setShake] = useState(false);
   const [password, setPassword] = useState("");
   const [authorized, setAuthorized] = useState(false);
-  const [shake, setShake] = useState(false);
-  const correctPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
 
   const handleSubmit = () => {
     if (password === correctPassword) {
@@ -28,7 +33,7 @@ export default function PasswordGate({ children }: { children: React.ReactNode }
             "animate-shake": shake
           })}
         >
-          <h2 className="text-xl font-bold">Enter Admin Password</h2>
+          <h2 className="text-xl font-bold">Enter Password</h2>
           <input
             type="password"
             value={password}

@@ -1,5 +1,6 @@
 import { Map } from "./Map";
 import { DisabledInput, InputBox } from "./InputBox";
+import { ServiceStatusBadge } from "./ServiceStatusBadge";
 
 type Props = {
   form: any;
@@ -89,31 +90,8 @@ export const LocationAndAddress = ({
         <Map lat={form.customerLatitude} lng={form.customerLongitude} />
 
         <div className="flex justify-center space-x-4 p-2">
-          <div
-            className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium ${
-              gponStatus?.available
-                ? "bg-green-100 text-green-700 border border-green-200"
-                : "bg-red-100 text-red-700 border border-red-200"
-            }`}
-          >
-            <span className="text-xl">{gponStatus?.available ? "✅" : "❌"}</span>
-            <span>
-              {gponStatus?.available ? `GPON (${gponStatus.distance}m)` : "GPON Unavailable"}
-            </span>
-          </div>
-
-          <div
-            className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium ${
-              xdslStatus?.available
-                ? "bg-green-100 text-green-700 border border-green-200"
-                : "bg-red-100 text-red-700 border border-red-200"
-            }`}
-          >
-            <span className="text-xl">{xdslStatus?.available ? "✅" : "❌"}</span>
-            <span>
-              {xdslStatus?.available ? `XDSL (${xdslStatus.distance}m)` : "XDSL Unavailable"}
-            </span>
-          </div>
+          <ServiceStatusBadge label="GPON" status={gponStatus} />
+          <ServiceStatusBadge label="XDSL" status={xdslStatus} />
         </div>
       </>
     );

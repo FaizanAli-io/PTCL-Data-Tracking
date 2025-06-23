@@ -108,7 +108,7 @@ export default function NetworkPage() {
     (type === "XDSL" && DC.length > 0 && DP.length > 0);
 
   return (
-    <PasswordGate>
+    <PasswordGate correctPassword={process.env.NEXT_PUBLIC_PWD2}>
       <div className="min-h-screen bg-gradient-to-br from-purple-950 via-indigo-950 to-purple-900 p-4 sm:p-6">
         <BackgroundEffects />
 

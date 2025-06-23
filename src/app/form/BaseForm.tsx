@@ -5,6 +5,7 @@ import { EmployeeData } from "./components/EmployeeData";
 import { ServiceDetails } from "./components/ServiceDetails";
 import { LocationAndAddress } from "./components/LocationAndAddress";
 import { CustomerInformation } from "./components/CustomerInformation";
+import { ServiceStatus } from "./components/ServiceStatusBadge";
 
 export const BaseForm = ({
   form,
@@ -25,15 +26,14 @@ export const BaseForm = ({
   cooldownLeft: number;
   isFieldAgent: boolean;
 }) => {
-  const [gpsAccuracy, setGpsAccuracy] = useState("");
-  const [localErrors, setLocalErrors] = useState<string[]>([]);
-  const [localWarnings, setLocalWarnings] = useState<string[]>([]);
-
   const warnThreshold = 1000;
   const stopThreshold = 10000;
 
-  const [gponStatus, setGponStatus] = useState<{ distance?: number; available?: boolean }>();
-  const [xdslStatus, setXdslStatus] = useState<{ distance?: number; available?: boolean }>();
+  const [gpsAccuracy, setGpsAccuracy] = useState("");
+  const [localErrors, setLocalErrors] = useState<string[]>([]);
+  const [localWarnings, setLocalWarnings] = useState<string[]>([]);
+  const [gponStatus, setGponStatus] = useState<ServiceStatus>();
+  const [xdslStatus, setXdslStatus] = useState<ServiceStatus>();
 
   const getLocation = async () => {
     navigator.geolocation.getCurrentPosition(
@@ -58,6 +58,9 @@ export const BaseForm = ({
 
         const route = `/api/network?lat=${coords.latitude}&lng=${coords.longitude}&threshold=5000&limit=1&type=`;
 
+        setGponStatus({ loading: true });
+        setXdslStatus({ loading: true });
+
         const [gponData, xdslData] = await Promise.all([
           fetch(route + "GPON").then((res) => res.json()),
           fetch(route + "XDSL").then((res) => res.json())
@@ -65,14 +68,14 @@ export const BaseForm = ({
 
         setGponStatus(
           gponData.FDH && gponData.FDH.length > 0
-            ? { available: true, distance: gponData.FDH[0].distance }
-            : { available: false }
+            ? { available: true, loading: false, distance: gponData.FDH[0].distance }
+            : { available: false, loading: false }
         );
 
         setXdslStatus(
           xdslData.DC && xdslData.DC.length > 0
-            ? { available: true, distance: xdslData.DC[0].distance }
-            : { available: false }
+            ? { available: true, loading: false, distance: xdslData.DC[0].distance }
+            : { available: false, loading: false }
         );
       },
       console.error,

@@ -73,7 +73,7 @@ export default function OrdersPage() {
   );
 
   return (
-    <PasswordGate>
+    <PasswordGate correctPassword={process.env.NEXT_PUBLIC_PWD1}>
       <div className="p-6 space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-semibold text-white">Paid Orders</h1>

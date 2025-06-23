@@ -135,7 +135,7 @@ export default function EmployeePage() {
   const handleDownloadAll = () => setDownloadOpen(true);
 
   return (
-    <PasswordGate>
+    <PasswordGate correctPassword={process.env.NEXT_PUBLIC_PWD1}>
       <div className="min-h-screen bg-gradient-to-br from-[#2a064f] to-[#1a0644] text-white p-6 space-y-6">
         <div>
           <h1 className="text-4xl font-bold flex items-center gap-3">
