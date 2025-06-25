@@ -28,26 +28,29 @@ export default function ExchangeTable({
       label: `Missing ${rangeMode ? "Days" : "People"}`,
       sortable: true,
       bgColor: (row) =>
-        row.missing > 0 ? "bg-red-600/20 text-red-300" : "bg-green-600/20 text-green-300"
+        row.missing > 0 ? "bg-red-600/20 text-red-300" : "bg-green-600/20 text-green-300",
+      render: (row) => row.missing.toFixed(0)
     },
     {
       key: "min",
       label: "Min",
       sortable: true,
-      bgColor: () => "bg-gray-600/40"
+      bgColor: () => "bg-gray-600/40",
+      render: (row) => row.min.toFixed(0)
     },
     {
       key: "avg",
       label: "Avg",
       sortable: true,
-      render: (row) => row.avg.toFixed(0),
-      bgColor: () => "bg-gray-600/40"
+      bgColor: () => "bg-gray-600/40",
+      render: (row) => row.avg.toFixed(0)
     },
     {
       key: "max",
       label: "Max",
       sortable: true,
-      bgColor: () => "bg-gray-600/40"
+      bgColor: () => "bg-gray-600/40",
+      render: (row) => row.max.toFixed(0)
     },
     {
       key: "efficiency",
