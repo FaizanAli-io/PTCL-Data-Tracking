@@ -10,7 +10,7 @@ import { PageHeader } from "./components/layout/PageHeader";
 import { ControlPanel } from "./components/form/ControlPanel";
 import { BackgroundEffects } from "./components/layout/BackgroundEffects";
 
-import PasswordGate from "@/components/PasswordGate";
+import PermissionGate from "@/components/PermissionGate";
 
 export default function NetworkPage() {
   const { lat, lng, isGettingLocation, getCurrentPosition, setCoordinates } = useGeolocation();
@@ -108,7 +108,7 @@ export default function NetworkPage() {
     (type === "XDSL" && DC.length > 0 && DP.length > 0);
 
   return (
-    <PasswordGate correctPassword={process.env.NEXT_PUBLIC_PWD2}>
+    <PermissionGate minLevel={2}>
       <div className="min-h-screen bg-gradient-to-br from-purple-950 via-indigo-950 to-purple-900 p-4 sm:p-6">
         <BackgroundEffects />
 
@@ -177,6 +177,6 @@ export default function NetworkPage() {
           <EmptyState show={showEmptyState} type={type} />
         </div>
       </div>
-    </PasswordGate>
+    </PermissionGate>
   );
 }

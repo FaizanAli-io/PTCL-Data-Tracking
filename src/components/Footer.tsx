@@ -1,4 +1,4 @@
-import { Sparkles, Mail, Github, Linkedin, Phone } from "lucide-react";
+import { Sparkles, Mail, Github, Linkedin } from "lucide-react";
 
 export default function Footer() {
   return (

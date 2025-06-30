@@ -3,28 +3,36 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { salesQuotes } from "@/misc/quotes";
+import { usePermission } from "@/hooks/usePermission";
 
 interface linkButton {
   href: string;
   label: string;
-  disabled: string;
+  level?: number;
+  disabled?: boolean;
 }
 
 export default function Home() {
   const [quote, setQuote] = useState(salesQuotes[0]);
+  const { isLoggedIn, name, level } = usePermission();
 
   useEffect(() => {
     const random = Math.floor(Math.random() * salesQuotes.length);
     setQuote(salesQuotes[random]);
   }, []);
 
-  const links = [
+  const logout = () => {
+    document.cookie = "permission=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    window.location.reload();
+  };
+
+  const links: linkButton[] = [
     { href: "/form", label: "DDS Form" },
-    { href: "/report/employee", label: "Employee Report" },
-    { href: "/report/exchange", label: "Exchange Report" },
-    { href: "/report/efficiency", label: "Efficiency Report" },
-    { href: "/admin", label: "🔒 Admin Panel" },
-    { href: "/network", label: "🔒 Network Insights (Feasability)" },
+    { href: "/report/employee", label: "Employee Report", level: 1 },
+    { href: "/report/exchange", label: "Exchange Report", level: 1 },
+    { href: "/report/efficiency", label: "Efficiency Report", level: 1 },
+    { href: "/network", label: "Network Insights", level: 2 },
+    { href: "/admin", label: "Admin Panel", level: 3 },
     { href: "#", label: "Distributor-Referral Leads", disabled: true },
     { href: "#", label: "Graphical Visualizer", disabled: true },
     { href: "#", label: "Customer Verfication", disabled: true },
@@ -32,7 +40,31 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-800 to-indigo-900 p-8 text-white">
+    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-800 to-indigo-900 p-8 text-white relative">
+      {/* Header Bar */}
+      <div className="absolute top-4 right-6 text-sm flex gap-3 items-center">
+        {isLoggedIn ? (
+          <>
+            <span className="bg-white/10 px-4 py-2 rounded-full text-purple-100">
+              Welcome, <strong>{name}</strong>
+            </span>
+            <button
+              onClick={logout}
+              className="bg-white/10 px-4 py-2 rounded-full text-red-300 hover:bg-white/20 transition"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <Link
+            href="/login"
+            className="bg-white/10 px-4 py-2 rounded-full text-purple-100 hover:bg-white/20 transition"
+          >
+            Login
+          </Link>
+        )}
+      </div>
+
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-2">Welcome to Retail Sales Digital Portal</h1>
         <h2 className="text-xl font-light text-purple-200">KTR North [II & III]</h2>
@@ -51,20 +83,29 @@ export default function Home() {
       </Link>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-xl">
-        {links.map((link) => (
-          <Link
-            key={link.label}
-            href={link.href}
-            className={
-              "block w-full text-center p-4 rounded-lg transition-all shadow-md " +
-              (link.disabled
-                ? "bg-gray-600 hover:bg-gray-700"
-                : "bg-purple-600 hover:bg-purple-700")
-            }
-          >
-            {link.label}
-          </Link>
-        ))}
+        {links.map((link) => {
+          const levelTooLow = link.level !== undefined && level < link.level;
+          const isDisabled = link.disabled || levelTooLow;
+
+          return (
+            <div
+              key={link.label}
+              className={`block w-full text-center p-4 rounded-lg transition-all shadow-md ${
+                isDisabled
+                  ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                  : "bg-purple-600 hover:bg-purple-700"
+              }`}
+            >
+              {isDisabled ? (
+                <span>
+                  {link.label} {levelTooLow ? "🔒" : ""}
+                </span>
+              ) : (
+                <Link href={link.href}>{link.label}</Link>
+              )}
+            </div>
+          );
+        })}
       </div>
     </main>
   );

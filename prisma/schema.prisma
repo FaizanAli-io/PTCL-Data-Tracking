@@ -51,16 +51,17 @@ enum EntryType {
 }
 
 model Employee {
-  epi        String      @id
-  name       String
-  type       JobType
-  role       JobRole
-  region     Region
-  exchange   Exchange
-  joinDate   DateTime
-  FSA        FSA[]
-  TSA        TSA[]
-  PaidOrders PaidOrders?
+  epi         String       @id
+  name        String
+  type        JobType
+  role        JobRole
+  region      Region
+  exchange    Exchange
+  joinDate    DateTime
+  FSA         FSA[]
+  TSA         TSA[]
+  PaidOrders  PaidOrders?
+  Permissions Permissions?
 }
 
 model FSA {
@@ -102,4 +103,12 @@ model PaidOrders {
   lastMonthPaid        Int
   monthToDatePaid      Int
   monthToDateGenerated Int
+}
+
+model Permissions {
+  epi      String   @id
+  employee Employee @relation(fields: [epi], references: [epi], onDelete: Cascade)
+  email    String   @unique
+  level    Int
+  code     String?
 }

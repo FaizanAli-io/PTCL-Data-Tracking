@@ -10,6 +10,7 @@ import PageHeader from "../components/ui/PageHeader";
 import SummaryCards from "../components/ui/SummaryCards";
 import EmployeeTable from "../components/tables/EmployeeTable";
 import ReportControlsPanel from "../components/controls/ReportControlsPanel";
+import PermissionGate from "@/components/PermissionGate";
 
 export default function EmployeeAnalyticsPage() {
   const { data, filteredData, loading, filters, setFilters, filterOptions, fetchData } =
@@ -113,36 +114,38 @@ export default function EmployeeAnalyticsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <PageHeader
-          icon={BarChart3}
-          title="Employee Analytics Dashboard"
-          subtitle="Track and analyze employee performance metrics"
-        />
+    <PermissionGate minLevel={1}>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <PageHeader
+            icon={BarChart3}
+            title="Employee Analytics Dashboard"
+            subtitle="Track and analyze employee performance metrics"
+          />
 
-        <SummaryCards items={employeeStats} columns={4} className="mb-6" />
+          <SummaryCards items={employeeStats} columns={4} className="mb-6" />
 
-        <ReportControlsPanel
-          mode={mode}
-          setMode={setMode}
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
-          workingDays={workingDays}
-          setWorkingDays={setWorkingDays}
-          loading={loading}
-          onFetchData={handleFetchData}
-          filters={filters}
-          setFilters={setFilters}
-          filterOptions={filterOptions}
-          autoRefresh={autoRefresh}
-          timeLeft={timeLeft}
-        />
+          <ReportControlsPanel
+            mode={mode}
+            setMode={setMode}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
+            workingDays={workingDays}
+            setWorkingDays={setWorkingDays}
+            loading={loading}
+            onFetchData={handleFetchData}
+            filters={filters}
+            setFilters={setFilters}
+            filterOptions={filterOptions}
+            autoRefresh={autoRefresh}
+            timeLeft={timeLeft}
+          />
 
-        <EmployeeTable data={filteredData} totalCount={data.length} rangeMode={rangeInput} />
+          <EmployeeTable data={filteredData} totalCount={data.length} rangeMode={rangeInput} />
+        </div>
       </div>
-    </div>
+    </PermissionGate>
   );
 }

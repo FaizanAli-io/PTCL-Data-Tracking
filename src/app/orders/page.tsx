@@ -4,7 +4,7 @@ import * as XLSX from "xlsx";
 
 import { toast } from "react-hot-toast";
 import { useEffect, useState } from "react";
-import PasswordGate from "@/components/PasswordGate";
+import PermissionGate from "@/components/PermissionGate";
 
 type PaidOrder = {
   epi: string;
@@ -73,7 +73,7 @@ export default function OrdersPage() {
   );
 
   return (
-    <PasswordGate correctPassword={process.env.NEXT_PUBLIC_PWD1}>
+    <PermissionGate minLevel={3}>
       <div className="p-6 space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-semibold text-white">Paid Orders</h1>
@@ -145,6 +145,6 @@ export default function OrdersPage() {
           </table>
         </div>
       </div>
-    </PasswordGate>
+    </PermissionGate>
   );
 }

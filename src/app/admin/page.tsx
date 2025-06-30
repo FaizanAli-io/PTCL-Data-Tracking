@@ -9,7 +9,7 @@ import EmployeeList from "./components/EmployeeList";
 import EmployeeDialog from "./components/EmployeeDialog";
 import DownloadDialog from "./components/DownloadDialog";
 
-import PasswordGate from "@/components/PasswordGate";
+import PermissionGate from "@/components/PermissionGate";
 
 type Employee = {
   epi: string;
@@ -135,7 +135,7 @@ export default function EmployeePage() {
   const handleDownloadAll = () => setDownloadOpen(true);
 
   return (
-    <PasswordGate correctPassword={process.env.NEXT_PUBLIC_PWD1}>
+    <PermissionGate minLevel={3}>
       <div className="min-h-screen bg-gradient-to-br from-[#2a064f] to-[#1a0644] text-white p-6 space-y-6">
         <div>
           <h1 className="text-4xl font-bold flex items-center gap-3">
@@ -202,6 +202,6 @@ export default function EmployeePage() {
         />
       </div>
       <DownloadDialog open={downloadOpen} setOpen={setDownloadOpen} />
-    </PasswordGate>
+    </PermissionGate>
   );
 }

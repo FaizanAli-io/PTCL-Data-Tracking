@@ -10,6 +10,7 @@ import PageHeader from "../components/ui/PageHeader";
 import SummaryCards from "../components/ui/SummaryCards";
 import ExchangeTable from "../components/tables/ExchangeTable";
 import ReportControlsPanel from "../components/controls/ReportControlsPanel";
+import PermissionGate from "@/components/PermissionGate";
 
 export default function ExchangeAnalyticsPage() {
   const { exchangeData, filteredData, loading, filters, setFilters, filterOptions, fetchData } =
@@ -114,40 +115,42 @@ export default function ExchangeAnalyticsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <PageHeader
-          icon={Building2}
-          title="Exchange Analytics Dashboard"
-          subtitle="Performance metrics across different exchanges"
-        />
+    <PermissionGate minLevel={1}>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <PageHeader
+            icon={Building2}
+            title="Exchange Analytics Dashboard"
+            subtitle="Performance metrics across different exchanges"
+          />
 
-        <SummaryCards items={exchangeStats} columns={4} className="mb-6" />
+          <SummaryCards items={exchangeStats} columns={4} className="mb-6" />
 
-        <ReportControlsPanel
-          mode={mode}
-          setMode={setMode}
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
-          workingDays={workingDays}
-          setWorkingDays={setWorkingDays}
-          loading={loading}
-          onFetchData={handleFetchData}
-          filters={filters}
-          setFilters={setFilters}
-          filterOptions={filterOptions}
-          autoRefresh={autoRefresh}
-          timeLeft={timeLeft}
-        />
+          <ReportControlsPanel
+            mode={mode}
+            setMode={setMode}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
+            workingDays={workingDays}
+            setWorkingDays={setWorkingDays}
+            loading={loading}
+            onFetchData={handleFetchData}
+            filters={filters}
+            setFilters={setFilters}
+            filterOptions={filterOptions}
+            autoRefresh={autoRefresh}
+            timeLeft={timeLeft}
+          />
 
-        <ExchangeTable
-          data={filteredData}
-          totalCount={exchangeData.length}
-          rangeMode={["mtd", "ytd", "custom-range"].includes(mode)}
-        />
+          <ExchangeTable
+            data={filteredData}
+            totalCount={exchangeData.length}
+            rangeMode={["mtd", "ytd", "custom-range"].includes(mode)}
+          />
+        </div>
       </div>
-    </div>
+    </PermissionGate>
   );
 }
