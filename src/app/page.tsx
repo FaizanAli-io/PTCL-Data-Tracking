@@ -21,11 +21,6 @@ export default function Home() {
     setQuote(salesQuotes[random]);
   }, []);
 
-  const logout = () => {
-    document.cookie = "permission=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    window.location.reload();
-  };
-
   const links: linkButton[] = [
     { href: "/form", label: "DDS Form" },
     { href: "/report/employee", label: "Employee Report", level: 1 },
@@ -44,17 +39,9 @@ export default function Home() {
       {/* Header Bar */}
       <div className="absolute top-4 right-6 text-sm flex gap-3 items-center">
         {isLoggedIn ? (
-          <>
-            <span className="bg-white/10 px-4 py-2 rounded-full text-purple-100">
-              Welcome, <strong>{name}</strong>
-            </span>
-            <button
-              onClick={logout}
-              className="bg-white/10 px-4 py-2 rounded-full text-red-300 hover:bg-white/20 transition"
-            >
-              Logout
-            </button>
-          </>
+          <span className="bg-white/10 px-4 py-2 rounded-full text-purple-100">
+            Welcome, <strong>{name}</strong>
+          </span>
         ) : (
           <Link
             href="/login"

@@ -4,32 +4,37 @@ import { useEffect, useState } from "react";
 
 interface Permission {
   epi?: string;
-  email?: string;
+  name?: string;
   level?: number;
-  employee?: { name: string };
 }
 
 export function usePermission() {
   const [permission, setPermission] = useState<Permission | null>(null);
 
   useEffect(() => {
-    const cookieMatch = document.cookie.match(/permission=([^;]+)/);
-    if (cookieMatch) {
-      try {
-        const decoded = decodeURIComponent(cookieMatch[1]);
-        const parsed = JSON.parse(decoded);
-        setPermission(parsed);
-        console.log(parsed);
-      } catch {
-        setPermission(null);
+    const getPermissionFromCookie = () => {
+      const match = document.cookie.match(/(?:^|;\s*)permission=([^;]+)/);
+      if (match) {
+        try {
+          const decoded = decodeURIComponent(match[1]);
+          const parsed: Permission = JSON.parse(decoded);
+          return parsed;
+        } catch {
+          return null;
+        }
       }
-    }
+      return null;
+    };
+
+    const parsed = getPermissionFromCookie();
+    setPermission(parsed);
   }, []);
 
   return {
     permission,
     isLoggedIn: !!permission,
-    level: permission?.level || 0,
-    name: permission?.employee?.name || ""
+    epi: permission?.epi || "",
+    name: permission?.name || "",
+    level: permission?.level ?? 0
   };
 }

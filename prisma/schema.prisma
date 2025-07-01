@@ -31,9 +31,11 @@ enum Exchange {
   Exchange_N
   KAP
   SITE
+  PECHS
   Hijri
   Johar
   Malir
+  Garden
   Hadeed
   Maymar
   Orangi
@@ -108,7 +110,6 @@ model PaidOrders {
 model Permissions {
   epi      String   @id
   employee Employee @relation(fields: [epi], references: [epi], onDelete: Cascade)
-  email    String   @unique
+  pass     String
   level    Int
-  code     String?
 }
