@@ -33,9 +33,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const newPassword = generateRandomPassword();
-
-    await prisma.permissions.update({ where: { epi }, data: { pass: newPassword } });
+    if (user.level < 4)
+      await prisma.permissions.update({ where: { epi }, data: { pass: generateRandomPassword() } });
 
     const cookieValue = encodeURIComponent(
       JSON.stringify({
@@ -45,14 +44,11 @@ export async function POST(request: NextRequest) {
       })
     );
 
-    const response = NextResponse.json({
-      success: true,
-      message: "Login successful. New password has been generated."
-    });
+    const response = NextResponse.json({ success: true, message: "Login successful." });
 
     response.headers.append(
       "Set-Cookie",
-      `permission=${cookieValue}; Path=/; Max-Age=${60 * 60 * 24}; SameSite=Lax`
+      `permission=${cookieValue}; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=Lax; Secure=false`
     );
 
     return response;

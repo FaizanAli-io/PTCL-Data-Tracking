@@ -36,7 +36,7 @@ export default function PermissionsPage() {
   }, []);
 
   return (
-    <PermissionGate minLevel={3}>
+    <PermissionGate minLevel={4}>
       <div className="min-h-screen bg-gray-950 text-white p-6">
         <h1 className="text-2xl font-bold mb-6">All Permissions</h1>
 
