@@ -116,7 +116,8 @@ export async function POST(req: NextRequest) {
           epi: emp.epi,
           lastMonthPaid: 0,
           monthToDatePaid: 0,
-          monthToDateGenerated: 0
+          monthToDateGenerated: 0,
+          monthToDateCompleted: 0
         })
       };
     });

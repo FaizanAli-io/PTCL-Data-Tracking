@@ -11,6 +11,7 @@ type PaidOrder = {
   lastMonthPaid: number;
   monthToDatePaid: number;
   monthToDateGenerated: number;
+  monthToDateCompleted: number;
   employee: { name: string };
 };
 
@@ -45,7 +46,8 @@ export default function OrdersPage() {
         epi: String(row["EPI"]),
         lastMonthPaid: parseInt(row["LM Paid"]),
         monthToDatePaid: parseInt(row["MTD Paid"]),
-        monthToDateGenerated: parseInt(row["MTD Gen"])
+        monthToDateGenerated: parseInt(row["MTD Gen"]),
+        monthToDateCompleted: parseInt(row["MTD Com"])
       }));
 
       const res = await fetch("/api/orders", {
@@ -110,6 +112,7 @@ export default function OrdersPage() {
                 <th className="px-6 py-3">EPI</th>
                 <th className="px-6 py-3">Employee Name</th>
                 <th className="px-6 py-3">Last Month Paid</th>
+                <th className="px-6 py-3">Month To Date Completed</th>
                 <th className="px-6 py-3">Month To Date Paid</th>
                 <th className="px-6 py-3">Month To Date Generated</th>
               </tr>
@@ -135,9 +138,10 @@ export default function OrdersPage() {
                   >
                     <td className="px-6 py-4">{entry.epi}</td>
                     <td className="px-6 py-4">{entry.employee.name}</td>
-                    <td className="px-6 py-4">{entry.lastMonthPaid}</td>
-                    <td className="px-6 py-4">{entry.monthToDatePaid}</td>
-                    <td className="px-6 py-4">{entry.monthToDateGenerated}</td>
+                    <td className="px-6 py-4">{entry.lastMonthPaid ?? 0}</td>
+                    <td className="px-6 py-4">{entry.monthToDateCompleted ?? 0}</td>
+                    <td className="px-6 py-4">{entry.monthToDatePaid ?? 0}</td>
+                    <td className="px-6 py-4">{entry.monthToDateGenerated ?? 0}</td>
                   </tr>
                 ))
               )}

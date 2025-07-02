@@ -63,19 +63,22 @@ const computeExchangeStats = (
     let exchangeOrdersInfo = {
       lastMonthPaid: 0,
       monthToDatePaid: 0,
-      monthToDateGenerated: 0
+      monthToDateGenerated: 0,
+      monthToDateCompleted: 0
     };
 
     for (const epi of epis) {
       const ordersInfo = orderCountMap.get(epi) ?? {
         lastMonthPaid: 0,
         monthToDatePaid: 0,
-        monthToDateGenerated: 0
+        monthToDateGenerated: 0,
+        monthToDateCompleted: 0
       };
 
       exchangeOrdersInfo.lastMonthPaid += ordersInfo.lastMonthPaid;
       exchangeOrdersInfo.monthToDatePaid += ordersInfo.monthToDatePaid;
       exchangeOrdersInfo.monthToDateGenerated += ordersInfo.monthToDateGenerated;
+      exchangeOrdersInfo.monthToDateCompleted += ordersInfo.monthToDateCompleted;
 
       const dayMap = epiDayMap.get(epi);
 

@@ -13,13 +13,14 @@ interface Employee {
   region: string;
   exchange: string;
   PaidOrders: {
-    lastMonthPaid: number;
-    monthToDatePaid: number;
-    monthToDateGenerated: number;
+    lastMonthPaid: number | null;
+    monthToDatePaid: number | null;
+    monthToDateCompleted: number | null;
+    monthToDateGenerated: number | null;
   } | null;
 }
 
-type OrderType = "currentPaid" | "currentGenerated" | "previous";
+type OrderType = "previous" | "currentPaid" | "currentGenerated" | "currentCompleted";
 
 export async function POST(req: NextRequest) {
   try {
@@ -55,6 +56,7 @@ export async function POST(req: NextRequest) {
     const valueMap: Record<OrderType, (emp: any) => number> = {
       currentPaid: (emp) => emp.PaidOrders?.monthToDatePaid ?? 0,
       currentGenerated: (emp) => emp.PaidOrders?.monthToDateGenerated ?? 0,
+      currentCompleted: (emp) => emp.PaidOrders?.monthToDateCompleted ?? 0,
       previous: (emp) => emp.PaidOrders?.lastMonthPaid ?? 0
     };
 

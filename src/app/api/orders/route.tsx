@@ -8,7 +8,7 @@ export async function GET() {
       include: { employee: { select: { name: true } } }
     });
 
-    return NextResponse.json(data.sort((a, b) => b.lastMonthPaid - a.lastMonthPaid));
+    return NextResponse.json(data.sort((a, b) => (b.lastMonthPaid ?? 0) - (a.lastMonthPaid ?? 0)));
   } catch (error) {
     console.error("Failed to fetch paid orders:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
@@ -23,6 +23,7 @@ export async function POST(req: Request) {
       const payload = {
         lastMonthPaid: item.lastMonthPaid,
         monthToDatePaid: item.monthToDatePaid,
+        monthToDateCompleted: item.monthToDateCompleted,
         monthToDateGenerated: item.monthToDateGenerated
       };
 

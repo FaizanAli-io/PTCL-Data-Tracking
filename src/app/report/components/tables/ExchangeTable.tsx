@@ -64,10 +64,16 @@ export default function ExchangeTable({
       }
     },
     {
+      key: "monthToDateCompleted",
+      label: "MTD Orders Completed",
+      sortable: true,
+      bgColor: () => "bg-green-800/40 text-purple-300"
+    },
+    {
       key: "monthToDatePaid",
       label: "MTD Orders Paid",
       sortable: true,
-      bgColor: () => "bg-green-600/40 text-purple-300"
+      bgColor: () => "bg-green-400/40 text-purple-300"
     },
     {
       key: "monthToDateGenerated",

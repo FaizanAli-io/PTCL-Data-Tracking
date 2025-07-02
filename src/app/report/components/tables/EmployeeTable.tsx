@@ -57,22 +57,32 @@ export default function EmployeeTable({
       showWhen: () => rangeMode
     },
     {
+      key: "monthToDateCompleted",
+      label: "MTD Orders Completed",
+      sortable: true,
+      bgColor: () => "bg-green-800/40",
+      render: (row) => row.monthToDateCompleted ?? 0
+    },
+    {
       key: "monthToDatePaid",
       label: "MTD Orders Paid",
       sortable: true,
-      bgColor: () => "bg-green-600/40"
+      bgColor: () => "bg-green-400/40",
+      render: (row) => row.monthToDatePaid ?? 0
     },
     {
       key: "monthToDateGenerated",
       label: "MTD Orders Generated",
       sortable: true,
-      bgColor: () => "bg-yellow-600/40"
+      bgColor: () => "bg-yellow-600/40",
+      render: (row) => row.monthToDateGenerated ?? 0
     },
     {
       key: "lastMonthPaid",
       label: "Orders Paid Last Month",
       sortable: true,
-      bgColor: () => "bg-blue-600/40"
+      bgColor: () => "bg-blue-600/40",
+      render: (row) => row.lastMonthPaid ?? 0
     },
     {
       key: "role",
