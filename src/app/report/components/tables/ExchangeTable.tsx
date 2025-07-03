@@ -32,13 +32,6 @@ export default function ExchangeTable({
       render: (row) => row.missing.toFixed(0)
     },
     {
-      key: "min",
-      label: "Min",
-      sortable: true,
-      bgColor: () => "bg-gray-600/40",
-      render: (row) => row.min.toFixed(0)
-    },
-    {
       key: "avg",
       label: "Avg",
       sortable: true,
@@ -46,16 +39,9 @@ export default function ExchangeTable({
       render: (row) => row.avg.toFixed(0)
     },
     {
-      key: "max",
-      label: "Max",
       sortable: true,
-      bgColor: () => "bg-gray-600/40",
-      render: (row) => row.max.toFixed(0)
-    },
-    {
       key: "efficiency",
       label: "Efficiency",
-      sortable: true,
       render: (row) => row.efficiency.toFixed(1),
       bgColor: (row) => {
         if (row.efficiency < 5) return "bg-red-600/20 text-red-400";
@@ -64,28 +50,34 @@ export default function ExchangeTable({
       }
     },
     {
+      sortable: true,
       key: "monthToDateCompleted",
       label: "MTD Orders Completed",
-      sortable: true,
-      bgColor: () => "bg-green-800/40 text-purple-300"
+      bgColor: () => "bg-green-500/30"
     },
     {
+      sortable: true,
       key: "monthToDatePaid",
       label: "MTD Orders Paid",
-      sortable: true,
-      bgColor: () => "bg-green-400/40 text-purple-300"
+      bgColor: () => "bg-green-600/30"
     },
     {
+      sortable: true,
       key: "monthToDateGenerated",
       label: "MTD Orders Generated",
-      sortable: true,
-      bgColor: () => "bg-yellow-600/40 text-purple-300"
+      bgColor: () => "bg-green-700/30"
     },
     {
-      key: "lastMonthPaid",
-      label: "Orders Paid Last Month",
       sortable: true,
-      bgColor: () => "bg-blue-600/40 text-purple-300"
+      key: "lastMonthCompleted",
+      label: "Last Month Orders Completed",
+      bgColor: () => "bg-blue-500/30"
+    },
+    {
+      sortable: true,
+      key: "lastMonthPaid",
+      label: "Last Month Orders Paid",
+      bgColor: () => "bg-blue-600/30"
     },
     {
       key: "region",

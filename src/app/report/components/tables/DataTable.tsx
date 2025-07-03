@@ -141,7 +141,7 @@ export default function DataTable<T extends Record<string, any>>({
                     return (
                       <td key={col.key as string} className="py-4 px-6">
                         <CellContent
-                          value={col.render ? col.render(row) : String(row[col.key])}
+                          value={col.render ? col.render(row) : String(row[col.key] ?? 0)}
                           bgColor={col.bgColor?.(row)}
                           link={col.link?.(row)}
                         />

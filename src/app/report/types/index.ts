@@ -1,3 +1,5 @@
+import { OrderData } from "@/types/types";
+
 export type DateMode = "yesterday" | "today" | "mtd" | "ytd" | "custom-date" | "custom-range";
 
 export type FilterState = {
@@ -5,13 +7,6 @@ export type FilterState = {
   type: string;
   region: string;
   exchange: string;
-};
-
-type OrderData = {
-  lastMonthPaid: number;
-  monthToDatePaid: number;
-  monthToDateGenerated: number;
-  monthToDateCompleted: number;
 };
 
 export type EmployeeAnalytics = {

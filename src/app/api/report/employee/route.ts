@@ -1,4 +1,5 @@
 import { prisma, formatEnum } from "@/lib";
+import { orderFields } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
 
 const getDateConditions = (dateMode: boolean, startDate: string, endDate?: string) => {
@@ -114,10 +115,7 @@ export async function POST(req: NextRequest) {
         exchange: formatEnum(emp.exchange),
         ...(orderCountMap.get(emp.epi) ?? {
           epi: emp.epi,
-          lastMonthPaid: 0,
-          monthToDatePaid: 0,
-          monthToDateGenerated: 0,
-          monthToDateCompleted: 0
+          ...Object.fromEntries(orderFields.map((field) => [field, 0]))
         })
       };
     });

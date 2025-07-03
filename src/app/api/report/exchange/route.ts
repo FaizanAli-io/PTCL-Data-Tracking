@@ -1,5 +1,8 @@
 import { prisma, formatEnum } from "@/lib";
+import { orderFields } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
+
+type OrderField = (typeof orderFields)[number];
 
 const getDateConditions = (dateMode: boolean, startDate: string, endDate?: string) => {
   const start = new Date(startDate);
@@ -60,25 +63,19 @@ const computeExchangeStats = (
     let minimumTotal = dateMode ? Infinity : 0;
     let maximumTotal = dateMode ? -Infinity : 0;
 
-    let exchangeOrdersInfo = {
-      lastMonthPaid: 0,
-      monthToDatePaid: 0,
-      monthToDateGenerated: 0,
-      monthToDateCompleted: 0
-    };
+    let exchangeOrdersInfo: Record<OrderField, number> = Object.fromEntries(
+      orderFields.map((key) => [key, 0])
+    ) as Record<OrderField, number>;
 
     for (const epi of epis) {
-      const ordersInfo = orderCountMap.get(epi) ?? {
-        lastMonthPaid: 0,
-        monthToDatePaid: 0,
-        monthToDateGenerated: 0,
-        monthToDateCompleted: 0
+      const ordersInfo: Record<OrderField, number> = {
+        ...Object.fromEntries(orderFields.map((key) => [key, 0])),
+        ...(orderCountMap.get(epi) ?? {})
       };
 
-      exchangeOrdersInfo.lastMonthPaid += ordersInfo.lastMonthPaid;
-      exchangeOrdersInfo.monthToDatePaid += ordersInfo.monthToDatePaid;
-      exchangeOrdersInfo.monthToDateGenerated += ordersInfo.monthToDateGenerated;
-      exchangeOrdersInfo.monthToDateCompleted += ordersInfo.monthToDateCompleted;
+      for (const field of orderFields) {
+        exchangeOrdersInfo[field] += ordersInfo[field];
+      }
 
       const dayMap = epiDayMap.get(epi);
 

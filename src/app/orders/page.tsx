@@ -4,16 +4,13 @@ import * as XLSX from "xlsx";
 
 import { toast } from "react-hot-toast";
 import { useEffect, useState } from "react";
+import { OrderData, orderFields } from "@/types/types";
 import PermissionGate from "@/components/PermissionGate";
 
 type PaidOrder = {
   epi: string;
-  lastMonthPaid: number;
-  monthToDatePaid: number;
-  monthToDateGenerated: number;
-  monthToDateCompleted: number;
-  employee: { name: string };
-};
+  name: string;
+} & OrderData;
 
 export default function OrdersPage() {
   const [data, setData] = useState<PaidOrder[]>([]);
@@ -42,13 +39,13 @@ export default function OrdersPage() {
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(sheet);
 
-      const payload = rows.map((row: any) => ({
-        epi: String(row["EPI"]),
-        lastMonthPaid: parseInt(row["LM Paid"]),
-        monthToDatePaid: parseInt(row["MTD Paid"]),
-        monthToDateGenerated: parseInt(row["MTD Gen"]),
-        monthToDateCompleted: parseInt(row["MTD Com"])
-      }));
+      const payload = rows.map((row: any) => {
+        const entry: Record<string, any> = { epi: String(row["epi"]) };
+        for (const key of orderFields) {
+          entry[key] = parseInt(row[key]) || 0;
+        }
+        return entry;
+      });
 
       const res = await fetch("/api/orders", {
         headers: { "Content-Type": "application/json" },
@@ -71,7 +68,7 @@ export default function OrdersPage() {
   const filteredData = data.filter(
     (entry) =>
       entry.epi.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.employee.name.toLowerCase().includes(searchTerm.toLowerCase())
+      entry.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -95,6 +92,24 @@ export default function OrdersPage() {
           </div>
         </div>
 
+        <div className="bg-gray-800 text-white p-4 rounded-lg shadow-md overflow-x-auto">
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-sm font-semibold whitespace-nowrap">Excel Columns:</span>
+            <div className="flex-1 text-xs text-white/80 whitespace-nowrap overflow-hidden text-ellipsis">
+              {"epi, " + orderFields.join(", ")}
+            </div>
+            <button
+              onClick={() => {
+                const tabSeparated = ["epi", ...orderFields].join("\t");
+                navigator.clipboard.writeText(tabSeparated);
+              }}
+              className="text-xs bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded shrink-0"
+            >
+              Copy Excel Columns
+            </button>
+          </div>
+        </div>
+
         <div>
           <input
             type="text"
@@ -111,10 +126,11 @@ export default function OrdersPage() {
               <tr>
                 <th className="px-6 py-3">EPI</th>
                 <th className="px-6 py-3">Employee Name</th>
-                <th className="px-6 py-3">Last Month Paid</th>
-                <th className="px-6 py-3">Month To Date Completed</th>
-                <th className="px-6 py-3">Month To Date Paid</th>
-                <th className="px-6 py-3">Month To Date Generated</th>
+                {orderFields.map((field) => (
+                  <th key={field} className="px-6 py-3 capitalize">
+                    {field.replace(/([A-Z])/g, " $1")}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -137,11 +153,12 @@ export default function OrdersPage() {
                     className="hover:bg-white/10 transition-colors border-t border-white/10"
                   >
                     <td className="px-6 py-4">{entry.epi}</td>
-                    <td className="px-6 py-4">{entry.employee.name}</td>
-                    <td className="px-6 py-4">{entry.lastMonthPaid ?? 0}</td>
-                    <td className="px-6 py-4">{entry.monthToDateCompleted ?? 0}</td>
-                    <td className="px-6 py-4">{entry.monthToDatePaid ?? 0}</td>
-                    <td className="px-6 py-4">{entry.monthToDateGenerated ?? 0}</td>
+                    <td className="px-6 py-4">{entry.name}</td>
+                    {orderFields.map((field) => (
+                      <td key={field} className="px-6 py-4">
+                        {entry[field as keyof PaidOrder] ?? 0}
+                      </td>
+                    ))}
                   </tr>
                 ))
               )}

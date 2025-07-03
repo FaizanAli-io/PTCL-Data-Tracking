@@ -83,3 +83,24 @@ export async function GET() {
     );
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  const body = await req.json();
+
+  if (body.resetAll && body.newPassword) {
+    try {
+      const updated = await prisma.permissions.updateMany({
+        where: { level: { lt: 4 } },
+        data: { pass: body.newPassword }
+      });
+      return NextResponse.json({ success: true, count: updated.count });
+    } catch (err) {
+      return NextResponse.json(
+        { success: false, error: "Failed to reset passwords" },
+        { status: 500 }
+      );
+    }
+  }
+
+  return NextResponse.json({ success: false, error: "Invalid request" }, { status: 400 });
+}

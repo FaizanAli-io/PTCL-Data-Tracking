@@ -17,6 +17,14 @@ type Props = {
   loading: boolean;
 };
 
+const orderOptions: { key: string; label: string }[] = [
+  { key: "lastMonthPaid", label: "Previous Month Paid" },
+  { key: "lastMonthCompleted", label: "Previous Month Completed" },
+  { key: "monthToDateGenerated", label: "Current Month Generated" },
+  { key: "monthToDatePaid", label: "Current Month Paid" },
+  { key: "monthToDateCompleted", label: "Current Month Completed" }
+];
+
 export default function EfficiencyControls(props: Props) {
   const {
     role,
@@ -85,18 +93,11 @@ export default function EfficiencyControls(props: Props) {
             onChange={(e) => setOrderType(e.target.value as OrderType)}
             className="bg-gradient-to-br from-purple-800/80 to-slate-700/80 p-3 rounded-xl text-white border border-purple-400/30 shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400/50"
           >
-            <option value="currentCompleted" className="bg-slate-800 text-white">
-              Current Completed
-            </option>
-            <option value="currentPaid" className="bg-slate-800 text-white">
-              Current Paid
-            </option>
-            <option value="currentGenerated" className="bg-slate-800 text-white">
-              Current Generated
-            </option>
-            <option value="previous" className="bg-slate-800 text-white">
-              Previous Month
-            </option>
+            {orderOptions.map((opt) => (
+              <option key={opt.key} value={opt.key} className="bg-slate-800 text-white">
+                {opt.label}
+              </option>
+            ))}
           </select>
         </div>
 

@@ -35,13 +35,6 @@ export default function EmployeeTable({
       showWhen: () => rangeMode
     },
     {
-      key: "min",
-      label: "Min",
-      sortable: true,
-      bgColor: () => "bg-gray-600/40",
-      showWhen: () => rangeMode
-    },
-    {
       key: "avg",
       label: "Avg",
       sortable: true,
@@ -50,39 +43,34 @@ export default function EmployeeTable({
       showWhen: () => rangeMode
     },
     {
-      key: "max",
-      label: "Max",
       sortable: true,
-      bgColor: () => "bg-gray-600/40",
-      showWhen: () => rangeMode
-    },
-    {
       key: "monthToDateCompleted",
       label: "MTD Orders Completed",
-      sortable: true,
-      bgColor: () => "bg-green-800/40",
-      render: (row) => row.monthToDateCompleted ?? 0
+      bgColor: () => "bg-green-500/30"
     },
     {
+      sortable: true,
       key: "monthToDatePaid",
       label: "MTD Orders Paid",
-      sortable: true,
-      bgColor: () => "bg-green-400/40",
-      render: (row) => row.monthToDatePaid ?? 0
+      bgColor: () => "bg-green-600/30"
     },
     {
+      sortable: true,
       key: "monthToDateGenerated",
       label: "MTD Orders Generated",
-      sortable: true,
-      bgColor: () => "bg-yellow-600/40",
-      render: (row) => row.monthToDateGenerated ?? 0
+      bgColor: () => "bg-green-700/30"
     },
     {
-      key: "lastMonthPaid",
-      label: "Orders Paid Last Month",
       sortable: true,
-      bgColor: () => "bg-blue-600/40",
-      render: (row) => row.lastMonthPaid ?? 0
+      key: "lastMonthCompleted",
+      label: "Last Month Orders Completed",
+      bgColor: () => "bg-blue-500/30"
+    },
+    {
+      sortable: true,
+      key: "lastMonthPaid",
+      label: "Last Month Orders Paid",
+      bgColor: () => "bg-blue-600/30"
     },
     {
       key: "role",

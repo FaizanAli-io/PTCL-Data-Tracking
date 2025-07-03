@@ -1,3 +1,4 @@
+import { OrderData } from "@/types/types";
 import { prisma, formatEnum } from "@/lib";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -12,15 +13,8 @@ interface Employee {
   epi: string;
   region: string;
   exchange: string;
-  PaidOrders: {
-    lastMonthPaid: number | null;
-    monthToDatePaid: number | null;
-    monthToDateCompleted: number | null;
-    monthToDateGenerated: number | null;
-  } | null;
+  PaidOrders: ({ epi: string } & OrderData) | null;
 }
-
-type OrderType = "previous" | "currentPaid" | "currentGenerated" | "currentCompleted";
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,7 +27,7 @@ export async function POST(req: NextRequest) {
     }: {
       role?: any;
       type?: any;
-      orderType: OrderType;
+      orderType: string;
       classInterval: number;
       maxValue: number;
     } = await req.json();
@@ -53,19 +47,15 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    const valueMap: Record<OrderType, (emp: any) => number> = {
-      currentPaid: (emp) => emp.PaidOrders?.monthToDatePaid ?? 0,
-      currentGenerated: (emp) => emp.PaidOrders?.monthToDateGenerated ?? 0,
-      currentCompleted: (emp) => emp.PaidOrders?.monthToDateCompleted ?? 0,
-      previous: (emp) => emp.PaidOrders?.lastMonthPaid ?? 0
+    const getValue = (emp: any, orderType: string): number => {
+      const value = emp?.PaidOrders?.[orderType];
+      return typeof value === "number" ? value : 0;
     };
-
-    const getValue = (emp: any) => valueMap[orderType](emp);
 
     const exchangesMap = new Map<string, ExchangeData>();
 
     for (const emp of employees) {
-      const value = getValue(emp);
+      const value = getValue(emp, orderType);
       if (value == null) continue;
 
       const regionExchangeKey = `${emp.region}-${emp.exchange}`;

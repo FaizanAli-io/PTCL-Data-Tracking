@@ -103,8 +103,9 @@ model PaidOrders {
   epi                  String   @id
   employee             Employee @relation(fields: [epi], references: [epi], onDelete: Cascade)
   lastMonthPaid        Int?
-  monthToDatePaid      Int?
+  lastMonthCompleted   Int?
   monthToDateGenerated Int?
+  monthToDatePaid      Int?
   monthToDateCompleted Int?
 }
 

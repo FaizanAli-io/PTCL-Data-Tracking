@@ -1,6 +1,6 @@
 import { prisma } from "@/lib";
-
 import { NextResponse } from "next/server";
+import { orderFields } from "@/types/types";
 
 export async function GET() {
   try {
@@ -8,7 +8,11 @@ export async function GET() {
       include: { employee: { select: { name: true } } }
     });
 
-    return NextResponse.json(data.sort((a, b) => (b.lastMonthPaid ?? 0) - (a.lastMonthPaid ?? 0)));
+    return NextResponse.json(
+      data
+        .sort((a, b) => Number(a.epi) - Number(b.epi))
+        .map(({ employee, ...rest }) => ({ ...rest, name: employee.name }))
+    );
   } catch (error) {
     console.error("Failed to fetch paid orders:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
@@ -19,26 +23,31 @@ export async function POST(req: Request) {
   try {
     const data = await req.json();
 
-    for (const item of data) {
-      const payload = {
-        lastMonthPaid: item.lastMonthPaid,
-        monthToDatePaid: item.monthToDatePaid,
-        monthToDateCompleted: item.monthToDateCompleted,
-        monthToDateGenerated: item.monthToDateGenerated
-      };
-
-      try {
-        await prisma.paidOrders.upsert({
-          update: payload,
-          where: { epi: item.epi },
-          create: { epi: item.epi, ...payload }
-        });
-      } catch (err) {
-        console.error(`Failed to upsert for EPI ${item.epi}`);
-      }
+    if (!Array.isArray(data)) {
+      return NextResponse.json({ error: "Invalid data format" }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true });
+    const results = await Promise.allSettled(
+      data.map((item: any) => {
+        const payload: Record<string, number> = {};
+
+        for (const key of orderFields) {
+          const value = Number(item[key]);
+          payload[key] = isNaN(value) ? 0 : value;
+        }
+
+        return prisma.paidOrders.upsert({
+          update: payload,
+          where: { epi: String(item.epi) },
+          create: { epi: String(item.epi), ...payload }
+        });
+      })
+    );
+
+    const failed = results.filter((r) => r.status === "rejected").length;
+    const success = results.length - failed;
+
+    return NextResponse.json({ success, failed });
   } catch (err) {
     console.error("Error uploading orders:", err);
     return NextResponse.json({ error: "Failed to upload orders" }, { status: 500 });
