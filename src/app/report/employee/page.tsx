@@ -22,38 +22,24 @@ export default function EmployeeAnalyticsPage() {
   const [mode, setMode] = useState<DateMode>("today");
 
   const [autoRefresh, setAutoRefresh] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(30);
 
   const refreshRate = 30;
 
   const handleFetchData = () => {
     fetchData(mode, startDate, endDate, workingDays);
-    setRefreshKey((prev) => prev + 1);
-    setTimeLeft(refreshRate);
     setAutoRefresh(true);
   };
 
   useEffect(() => {
     if (!autoRefresh) return;
 
-    const interval = setInterval(() => {
-      fetchData(mode, startDate, endDate, workingDays);
-      setTimeLeft(refreshRate);
-    }, refreshRate * 1000);
+    const interval = setInterval(
+      () => fetchData(mode, startDate, endDate, workingDays),
+      refreshRate * 1000
+    );
 
     return () => clearInterval(interval);
-  }, [autoRefresh, refreshKey, mode, startDate, endDate, workingDays, fetchData]);
-
-  useEffect(() => {
-    if (!autoRefresh) return;
-
-    const countdown = setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : refreshRate));
-    }, 1000);
-
-    return () => clearInterval(countdown);
-  }, [autoRefresh]);
+  }, [autoRefresh, mode, startDate, endDate, workingDays, fetchData]);
 
   // Summary Stats
   const totalEmployees = filteredData.length;
@@ -139,8 +125,7 @@ export default function EmployeeAnalyticsPage() {
             filters={filters}
             setFilters={setFilters}
             filterOptions={filterOptions}
-            autoRefresh={autoRefresh}
-            timeLeft={timeLeft}
+            exchangeView={false}
           />
 
           <EmployeeTable data={filteredData} totalCount={data.length} rangeMode={rangeInput} />

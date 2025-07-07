@@ -10,7 +10,8 @@ export const useEmployeeData = () => {
     role: "",
     type: "",
     region: "",
-    exchange: ""
+    exchange: "",
+    entryType: ""
   });
 
   const { filterOptions, filterLoading } = useFilterOptions();
@@ -26,7 +27,13 @@ export const useEmployeeData = () => {
       const res = await fetch("/api/report/employee", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode, startDate, endDate, workingDays })
+        body: JSON.stringify({
+          mode,
+          startDate,
+          endDate,
+          workingDays,
+          entryType: filters.entryType
+        })
       });
       const result = await res.json();
       setData(result);

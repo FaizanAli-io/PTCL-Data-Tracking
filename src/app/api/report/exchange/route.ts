@@ -125,14 +125,16 @@ const computeExchangeStats = (
 
 export async function POST(req: NextRequest) {
   try {
-    const { mode, startDate, endDate, workingDays, role, type } = await req.json();
+    const { mode, startDate, endDate, workingDays, role, empType, entType } = await req.json();
     const dateMode = ["yesterday", "today", "custom-date"].includes(mode);
+
+    console.log({ mode, startDate, endDate, workingDays, role, empType, entType });
 
     const employees = await prisma.employee.findMany({
       select: { epi: true, region: true, exchange: true },
       where: {
         ...(role && { role }),
-        ...(type && { type }),
+        ...(empType && { type: empType }),
         NOT: {
           OR: [{ role: "MGT" }, { type: "MGT" }]
         }
@@ -149,6 +151,7 @@ export async function POST(req: NextRequest) {
       prisma.fSA.findMany({
         where: {
           epi: { in: epis },
+          ...(entType && { type: entType }),
           ...getDateConditions(dateMode, startDate, endDate)
         },
         select: { epi: true, createdAt: true }

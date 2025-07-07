@@ -13,8 +13,7 @@ import ReportControlsPanel from "../components/controls/ReportControlsPanel";
 import PermissionGate from "@/components/PermissionGate";
 
 export default function ExchangeAnalyticsPage() {
-  const { exchangeData, filteredData, loading, filters, setFilters, filterOptions, fetchData } =
-    useExchangeData();
+  const { data, loading, filters, setFilters, filterOptions, fetchData } = useExchangeData();
 
   const [startDate, setStartDate] = useState(formatDate(new Date()));
   const [endDate, setEndDate] = useState(formatDate(addDays(new Date(), 1)));
@@ -22,49 +21,35 @@ export default function ExchangeAnalyticsPage() {
   const [mode, setMode] = useState<DateMode>("today");
 
   const [autoRefresh, setAutoRefresh] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(30);
 
   const refreshRate = 30;
 
   const handleFetchData = () => {
     fetchData(mode, startDate, endDate, workingDays);
-    setRefreshKey((prev) => prev + 1);
-    setTimeLeft(refreshRate);
     setAutoRefresh(true);
   };
 
   useEffect(() => {
     if (!autoRefresh) return;
 
-    const interval = setInterval(() => {
-      fetchData(mode, startDate, endDate, workingDays);
-      setTimeLeft(refreshRate);
-    }, refreshRate * 1000);
+    const interval = setInterval(
+      () => fetchData(mode, startDate, endDate, workingDays),
+      refreshRate * 1000
+    );
 
     return () => clearInterval(interval);
-  }, [autoRefresh, refreshKey, mode, startDate, endDate, workingDays, fetchData]);
+  }, [autoRefresh, mode, startDate, endDate, workingDays, fetchData]);
 
-  useEffect(() => {
-    if (!autoRefresh) return;
+  // Summary stats
+  const totalExchanges = data.length;
 
-    const countdown = setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : refreshRate));
-    }, 1000);
-
-    return () => clearInterval(countdown);
-  }, [autoRefresh]);
-
-  // Summary calculations
-  const totalExchanges = filteredData.length;
-
-  const bestExchange = filteredData.reduce(
+  const bestExchange = data.reduce(
     (best, current) => (current.avg > best.avg ? current : best),
-    filteredData[0]
+    data[0]
   );
 
   const regionMap = new Map<string, { total: number; count: number }>();
-  for (const ex of filteredData) {
+  for (const ex of data) {
     if (!regionMap.has(ex.region)) regionMap.set(ex.region, { total: 0, count: 0 });
     const r = regionMap.get(ex.region)!;
     r.total += ex.avg;
@@ -140,13 +125,12 @@ export default function ExchangeAnalyticsPage() {
             filters={filters}
             setFilters={setFilters}
             filterOptions={filterOptions}
-            autoRefresh={autoRefresh}
-            timeLeft={timeLeft}
+            exchangeView={true}
           />
 
           <ExchangeTable
-            data={filteredData}
-            totalCount={exchangeData.length}
+            data={data}
+            totalCount={data.length}
             rangeMode={["mtd", "ytd", "custom-range"].includes(mode)}
           />
         </div>

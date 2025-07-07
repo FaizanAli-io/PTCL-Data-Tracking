@@ -59,7 +59,7 @@ const computeEmployeeStats = (entries: { epi: string; createdAt: Date }[]) => {
 
 export async function POST(req: NextRequest) {
   try {
-    const { mode, startDate, endDate, workingDays } = await req.json();
+    const { mode, startDate, endDate, workingDays, entryType } = await req.json();
     const dateMode = ["yesterday", "today", "custom-date"].includes(mode);
 
     const employees = await prisma.employee.findMany({
@@ -77,6 +77,7 @@ export async function POST(req: NextRequest) {
       prisma.fSA.findMany({
         where: {
           epi: { in: epis },
+          ...(entryType && { type: entryType }),
           ...getDateConditions(dateMode, startDate, endDate)
         },
         select: { epi: true, createdAt: true }

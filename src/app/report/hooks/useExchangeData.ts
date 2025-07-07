@@ -1,18 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useFilterOptions } from "./useFilterOptions";
-import { EmployeeAnalytics, DateMode, FilterState, ExchangeAnalytics } from "../types";
+import { ExchangeAnalytics, DateMode, FilterState } from "../types";
 
 export const useExchangeData = () => {
-  const [data, setData] = useState<EmployeeAnalytics[]>([]);
-  const [exchangeData, setExchangeData] = useState<ExchangeAnalytics[]>([]);
-  const [filteredData, setFilteredData] = useState<ExchangeAnalytics[]>([]);
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<ExchangeAnalytics[]>([]);
 
   const [filters, setFilters] = useState<FilterState>({
     role: "",
     type: "",
     region: "",
-    exchange: ""
+    exchange: "",
+    entryType: ""
   });
 
   const { filterOptions, filterLoading } = useFilterOptions();
@@ -34,35 +33,22 @@ export const useExchangeData = () => {
           startDate,
           workingDays,
           role: filters.role,
-          type: filters.type
+          empType: filters.type,
+          entType: filters.entryType
         })
       });
       const result = await res.json();
-      setExchangeData(result);
-      setData([]);
+      setData(result);
     } catch (error) {
       console.error("Failed to fetch exchange data:", error);
-      setExchangeData([]);
       setData([]);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    setFilteredData(
-      exchangeData.filter(
-        (item) =>
-          (!filters.region || item.region === filters.region) &&
-          (!filters.exchange || item.exchange === filters.exchange)
-      )
-    );
-  }, [filters, exchangeData]);
-
   return {
     data,
-    exchangeData,
-    filteredData,
     loading,
     filterLoading,
     filters,

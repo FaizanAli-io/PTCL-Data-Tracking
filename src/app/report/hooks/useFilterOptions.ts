@@ -5,6 +5,7 @@ type FilterOptions = {
   types: string[];
   regions: string[];
   exchanges: string[];
+  entryTypes: string[];
 };
 
 export function useFilterOptions() {
@@ -12,7 +13,8 @@ export function useFilterOptions() {
     roles: [],
     types: [],
     regions: [],
-    exchanges: []
+    exchanges: [],
+    entryTypes: []
   });
   const [filterLoading, setFilterLoading] = useState(false);
 
@@ -27,7 +29,8 @@ export function useFilterOptions() {
           roles: data.roles.filter((r: string) => r !== "MGT"),
           types: data.types.filter((t: string) => t !== "MGT"),
           regions: data.regions.filter((t: string) => t !== "KTR N"),
-          exchanges: data.exchanges
+          exchanges: data.exchanges,
+          entryTypes: data.entryTypes
         });
       }
     } catch (error) {

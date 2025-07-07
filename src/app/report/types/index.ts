@@ -7,6 +7,7 @@ export type FilterState = {
   type: string;
   region: string;
   exchange: string;
+  entryType: string;
 };
 
 export type EmployeeAnalytics = {

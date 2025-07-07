@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Search } from "lucide-react";
 import { DateMode } from "../../types";
 
 const rangeInputs = ["mtd", "ytd", "custom-range"];
@@ -13,8 +12,6 @@ type DateControlsProps = {
   setEndDate: (date: string) => void;
   workingDays: number;
   setWorkingDays: (days: number) => void;
-  loading: boolean;
-  onFetchData: () => void;
 };
 
 export default function DateControls({
@@ -25,9 +22,7 @@ export default function DateControls({
   endDate,
   setEndDate,
   workingDays,
-  setWorkingDays,
-  loading,
-  onFetchData
+  setWorkingDays
 }: DateControlsProps) {
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);

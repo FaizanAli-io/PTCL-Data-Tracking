@@ -21,9 +21,9 @@ type ReportControlsPanelProps = {
     types: string[];
     regions: string[];
     exchanges: string[];
+    entryTypes: string[];
   };
-  autoRefresh: boolean;
-  timeLeft: number;
+  exchangeView: boolean;
 };
 
 export default function ReportControlsPanel({
@@ -39,7 +39,8 @@ export default function ReportControlsPanel({
   onFetchData,
   filters,
   setFilters,
-  filterOptions
+  filterOptions,
+  exchangeView
 }: ReportControlsPanelProps) {
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20 mb-8 space-y-6">
@@ -58,11 +59,14 @@ export default function ReportControlsPanel({
           setEndDate={setEndDate}
           workingDays={workingDays}
           setWorkingDays={setWorkingDays}
-          loading={loading}
-          onFetchData={onFetchData}
         />
 
-        <FilterControls filters={filters} setFilters={setFilters} options={filterOptions} />
+        <FilterControls
+          filters={filters}
+          setFilters={setFilters}
+          options={filterOptions}
+          exchangeView={exchangeView}
+        />
 
         <button
           onClick={onFetchData}
