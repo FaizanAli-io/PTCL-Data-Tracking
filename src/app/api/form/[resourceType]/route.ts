@@ -50,21 +50,29 @@ export async function GET(
   { params }: { params: Promise<{ resourceType: ResourceType }> }
 ) {
   try {
-    const { searchParams } = new URL(req.url);
-    const from = searchParams.get("from");
-    const to = searchParams.get("to");
+    const url = new URL(req.url);
+    const end = url.searchParams.get("end");
+    const start = url.searchParams.get("start");
 
-    const where: any = {};
-    if (from || to) {
-      where.createdAt = {};
-      if (to) where.createdAt.lte = new Date(to);
-      if (from) where.createdAt.gte = new Date(from);
+    if (!start || !end || isNaN(Date.parse(start)) || isNaN(Date.parse(end))) {
+      return NextResponse.json({ message: "Invalid 'start' or 'end' date" }, { status: 400 });
     }
 
     const { resourceType } = await params;
-    const data = await getPrismaHandler(resourceType).findMany({ where });
-    return new NextResponse(JSON.stringify(data), { status: 200 });
-  } catch {
-    return new NextResponse(JSON.stringify({ error: "Failed to fetch records" }), { status: 500 });
+    const prisma = getPrismaHandler(resourceType);
+
+    const data = await prisma.findMany({
+      where: {
+        createdAt: {
+          gte: new Date(start),
+          lte: new Date(end)
+        }
+      }
+    });
+
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
+    console.error("GET error:", error);
+    return NextResponse.json({ error: "Failed to fetch records" }, { status: 500 });
   }
 }

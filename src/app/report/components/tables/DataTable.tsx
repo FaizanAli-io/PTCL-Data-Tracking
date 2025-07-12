@@ -59,11 +59,11 @@ export default function DataTable<T extends Record<string, any>>({
   const handleHeaderClick = (column: keyof T, sortable?: boolean) => {
     if (!sortable) return;
     if (column === sortColumn) {
-      setSortDirection((prev) => (prev === "asc" ? "desc" : prev === "desc" ? null : "asc"));
+      setSortDirection((prev) => (prev === "desc" ? "asc" : prev === "asc" ? null : "desc"));
       if (sortDirection === null) setSortColumn(null);
     } else {
       setSortColumn(column);
-      setSortDirection("asc");
+      setSortDirection("desc");
     }
   };
 

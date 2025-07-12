@@ -31,7 +31,7 @@ export default function FilterControls({
         onChange={(e) => updateFilter(key, e.target.value)}
         className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
       >
-        <option value="">All {label}</option>
+        <option value="">All {label}s</option>
         {items.map((item) => (
           <option key={item} value={item}>
             {item}
@@ -42,7 +42,7 @@ export default function FilterControls({
   );
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+    <div className={`grid grid-cols-2 md:grid-cols-${exchangeView ? 3 : 5} gap-4`}>
       {renderSelect("Role", "role", options.roles)}
       {renderSelect("Employee Type", "type", options.types)}
       {!exchangeView && renderSelect("Region", "region", options.regions)}
